@@ -1,0 +1,62 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Manrope:wght@200..800&family=Public+Sans:ital,wght@0,100..900;1,100..900&display=swap');
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer utilities {
+    .register-container {
+        @apply min-h-screen w-full flex flex-col items-center justify-around bg-white px-4 py-8 font-inter
+    }
+
+    .register-logo-main-div {
+        @apply flex items-center justify-between gap-3 mt-8
+    }
+
+    .register-logo-div {
+        @apply w-full h-full rounded-md flex items-center justify-center
+    }
+
+    .register-logo-img {
+        @apply w-[173px] h-[42px] object-contain
+    }
+
+    .register-card {
+        @apply w-full max-w-[400px]
+    }
+
+    .register-title {
+        @apply text-center text-2xl font-medium mb-8 text-[#25272D]
+    }
+
+    .register-signin-btn {
+        @apply w-full bg-white border-solid !border-2 !border-[#E2E4E9] rounded-md py-2.5 px-4 flex items-center justify-center gap-3 text-sm font-medium text-[#25272D] hover:bg-gray-50 transition shadow-sm
+    }
+
+    .register-email-label {
+        @apply block text-xs font-medium text-[#8F929C] mb-2
+    }
+
+    .register-email-input {
+        @apply w-full h-[36px] border border-[#E2E4E9] py-2.5 px-4 text-sm font-medium text-[#25272D] focus:outline-none focus:ring-2 focus:ring-blue-500
+    }
+
+    .register-password-label {
+        @apply block text-xs font-medium text-gray-600 mb-2
+    }
+
+    .register-password-input {
+        @apply w-full h-[36px] border border-[#E2E4E9] py-2.5 px-4 text-sm font-medium text-[#25272D] focus:outline-none focus:ring-2 focus:ring-blue-500
+    }
+
+    .register-continue-btn {
+        @apply w-full h-[36px] bg-[#6696F5] text-white py-2.5 rounded-md mt-5 hover:bg-blue-600 transition text-sm font-medium shadow-sm
+    }
+
+    .register-footer {
+        @apply mb-8 text-xs text-gray-500 flex flex-wrap gap-4 justify-center items-center
+    }
+
+    .register-footer-link {
+        @apply cursor-pointer hover:text-gray-700
+    }
+}
