@@ -3,40 +3,28 @@ description: Push code to both Personal and Organization GitHub repositories
 ---
 
 This workflow will:
-1.  Initialize Git.
-2.  Add both `origin` (Personal) and `organization` remotes.
-3.  Commit all changes.
-4.  Push to both repositories.
+1.  Stage all changes.
+2.  Commit changes with a "Work in progress" message (or you can edit it).
+3.  Push to both `origin` (Personal) and `organization` (Organization) repositories.
 
-### Repositories
-- **Personal (Origin):** `https://github.com/hamzaahmad3006/Project-Management-System.git`
-- **Organization:** `https://github.com/bootcampwise/Project3-Project-Management-System.git`
+**Note:** This workflow assumes the repository is already initialized and remotes are set.
 
 ### Steps
 
-1.  **Initialize & Configure Remotes**
+1.  **Stage & Commit Changes**
     ```powershell
-    git init
-    git branch -M main
-    git remote add origin https://github.com/hamzaahmad3006/Project-Management-System.git
-    git remote add organization https://github.com/bootcampwise/Project3-Project-Management-System.git
+    git add .
+    git commit -m "Update project changes"
     ```
 
-2.  **Commit Changes**
+2.  **Push to Organization**
     ```powershell
-    echo "# Project-Management-System" >> README.md
-    git add .
-    git commit -m "Initial commit: Project setup and feature implementation"
+    // turbo
+    git push -u organization main
     ```
 
 3.  **Push to Personal Repo**
     ```powershell
     // turbo
     git push -u origin main
-    ```
-
-4.  **Push to Organization Repo**
-    ```powershell
-    // turbo
-    git push -u organization main
     ```

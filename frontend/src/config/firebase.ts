@@ -2,9 +2,9 @@ import { initializeApp } from "firebase/app";
 import { getAuth, GithubAuthProvider, GoogleAuthProvider } from "firebase/auth";
 
 const firebaseConfig = {
-    apiKey: "AIzaSyChzGJO0ITNM6Kx6mpVd5qWz2gHZx6yAVM",
-    authDomain: "project-management-9638c.firebaseapp.com",
-    projectId: "project-management-9638c",
+    apiKey: process.env.REACT_APP_FIREBASE_API_KEY,
+    authDomain: process.env.REACT_APP_FIREBASE_AUTH_DOMAIN,
+    projectId: process.env.REACT_APP_FIREBASE_PROJECT_ID,
 };
 
 const app = initializeApp(firebaseConfig);
