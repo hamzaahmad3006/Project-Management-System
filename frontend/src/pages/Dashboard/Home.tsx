@@ -5,6 +5,7 @@ import { fetchKPIs, fetchRecentActivity } from '../../store/slices/dashboardSlic
 import { FaArrowUp, FaArrowDown, FaFilter, FaCalendar } from 'react-icons/fa';
 import { Chart as ChartJS, ArcElement, CategoryScale, LinearScale, PointElement, LineElement, Filler, Tooltip, Legend } from 'chart.js';
 import { Doughnut, Line } from 'react-chartjs-2';
+import { DashboardTask } from 'types';
 
 ChartJS.register(ArcElement, CategoryScale, LinearScale, PointElement, LineElement, Filler, Tooltip, Legend);
 
@@ -70,7 +71,7 @@ const Dashboard: React.FC = () => {
     };
 
     const getStatusBadge = (status: string) => {
-        const styles: any = {
+        const styles: Record<string, string> = {
             'TODO': 'bg-blue-100 text-blue-700',
             'IN_PROGRESS': 'bg-orange-100 text-orange-700',
             'COMPLETED': 'bg-green-100 text-green-700',
@@ -79,7 +80,7 @@ const Dashboard: React.FC = () => {
     };
 
     const getPriorityBadge = (priority: string) => {
-        const styles: any = {
+        const styles: Record<string, string> = {
             'HIGH': 'text-red-600',
             'MEDIUM': 'text-orange-600',
             'LOW': 'text-green-600',
@@ -91,23 +92,23 @@ const Dashboard: React.FC = () => {
     const latestTasks = recentActivity.slice(0, 4);
 
     return (
-        <div className="p-6 bg-white min-h-screen">
+        <div className="p-4 md:p-6 bg-white min-h-screen">
             {/* Header */}
-            <div className="flex items-center justify-between mb-6">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
                 <h1 className="text-2xl font-semibold text-gray-900">Dashboard</h1>
-                <div className="flex items-center gap-4">
-                    <select className="px-3 py-2 border border-gray-300 rounded-lg text-sm">
+                <div className="flex flex-wrap items-center gap-2 sm:gap-4">
+                    <select className="px-3 py-2 border border-gray-300 rounded-lg text-sm flex-grow md:flex-grow-0">
                         <option>All Projects</option>
                     </select>
-                    <button className="flex items-center gap-2 px-3 py-2 border border-gray-300 rounded-lg text-sm hover:bg-gray-50">
+                    <button className="flex items-center gap-2 px-3 py-2 border border-gray-300 rounded-lg text-sm hover:bg-gray-50 flex-grow md:flex-grow-0 justify-center">
                         <FaFilter size={14} />
                         Filters
                     </button>
-                    <div className="flex items-center gap-2 px-3 py-2 border border-gray-300 rounded-lg text-sm">
+                    <div className="hidden sm:flex items-center gap-2 px-3 py-2 border border-gray-300 rounded-lg text-sm">
                         <FaCalendar size={14} />
                         <span>{new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</span>
                     </div>
-                    <div className="flex gap-1 border border-gray-300 rounded-lg p-1">
+                    <div className="flex gap-1 border border-gray-300 rounded-lg p-1 overflow-x-auto max-w-full">
                         {['D', 'W', 'M', 'BM', 'Y'].map((period) => (
                             <button key={period} className={`px-3 py-1 text-sm rounded ${period === 'M' ? 'bg-gray-200' : 'hover:bg-gray-100'}`}>
                                 {period}
@@ -118,7 +119,7 @@ const Dashboard: React.FC = () => {
             </div>
 
             {/* KPI Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
                 {/* Total Tasks */}
                 <div className="bg-white border border-gray-200 rounded-lg p-4">
                     <div className="flex items-center justify-between mb-2">
@@ -292,12 +293,12 @@ const Dashboard: React.FC = () => {
                                 </tr>
                             </thead>
                             <tbody>
-                                {latestTasks.map((task: any) => (
+                                {latestTasks.map((task: DashboardTask) => (
                                     <tr key={task.id} className="border-b border-gray-100 text-sm">
                                         <td className="py-3">
                                             <input type="checkbox" className="rounded" />
                                         </td>
-                                        <td className="py-3 font-medium">{task.title}</td>
+                                        <td className="py-3 font-medium">{task.name}</td>
                                         <td className="py-3 text-gray-600">{task.project?.name || 'N/A'}</td>
                                         <td className="py-3">
                                             <span className="text-gray-600">-</span>

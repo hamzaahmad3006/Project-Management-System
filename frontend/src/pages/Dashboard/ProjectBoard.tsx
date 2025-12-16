@@ -8,28 +8,9 @@ import CreateProjectModal from '../../components/Modals/CreateProjectModal';
 import TaskDetailPanel from '../../components/Dashboard/TaskDetailPanel';
 import { useAppDispatch } from '../../store/hooks';
 import { createTaskAction } from '../../store/slices/taskSlice';
+import { Task, Section } from '../../types';
 
-interface Task {
-    id: string;
-    name: string;
-    project?: string;
-    subtasks?: string;
-    status: string;
-    priority?: string;
-    dueDate?: string;
-    label?: string[];
-    assignee?: { name: string, avatar: string };
-    comments?: number;
-    attachments?: number;
-}
 
-interface Section {
-    id: string;
-    title: string;
-    count: number;
-    color: string;
-    tasks: Task[];
-}
 
 const ProjectBoard: React.FC = () => {
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
@@ -38,7 +19,7 @@ const ProjectBoard: React.FC = () => {
     const [collapsedSections, setCollapsedSections] = useState<string[]>(['postpone', 'qa']); // Set default collapsed sections
 
     const dispatch = useAppDispatch();
-    const handleAddTask = (taskName: any, sectionId: any) => {
+    const handleAddTask = (taskName: string, sectionId: string) => {
         const newTaskData = {
             name: taskName,
             sectionId: sectionId, // Kis column mein ban raha hai (e.g., Backlog ID)
@@ -126,19 +107,26 @@ const ProjectBoard: React.FC = () => {
     return (
         <div className="flex flex-col h-full bg-white">
             {/* Header */}
-            <header className="px-6 py-4 border-b border-gray-200">
-                <div className="flex items-center justify-between mb-4">
-                    <div className="flex items-center gap-3">
-                        <h1 className="text-2xl font-bold text-gray-800">Project Board [2023]</h1>
-                        <FaStar className="text-yellow-400 cursor-pointer" />
-                        <FaEllipsisH className="text-gray-400 cursor-pointer" />
-                        <span className="px-2 py-0.5 text-xs font-medium text-green-700 bg-green-100 rounded-full flex items-center gap-1">
+            <header className="px-4 md:px-6 py-4 border-b border-gray-200">
+                <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-4 gap-4">
+                    <div className="flex items-center gap-3 w-full md:w-auto justify-between md:justify-start">
+                        <div className="flex items-center gap-3">
+                            <h1 className="text-xl md:text-2xl font-bold text-gray-800">Project Board [2023]</h1>
+                            <FaStar className="text-yellow-400 cursor-pointer" />
+                            <FaEllipsisH className="text-gray-400 cursor-pointer" />
+                        </div>
+                        <span className="md:hidden px-2 py-0.5 text-xs font-medium text-green-700 bg-green-100 rounded-full flex items-center gap-1">
                             <span className="w-1.5 h-1.5 bg-green-500 rounded-full"></span>
                             On track
                         </span>
                     </div>
 
-                    <div className="flex items-center gap-3">
+                    <div className="hidden md:flex px-2 py-0.5 text-xs font-medium text-green-700 bg-green-100 rounded-full items-center gap-1">
+                        <span className="w-1.5 h-1.5 bg-green-500 rounded-full"></span>
+                        On track
+                    </div>
+
+                    <div className="flex w-full md:w-auto items-center justify-between md:justify-end gap-3">
                         {/* Avatars placeholder */}
                         <div className="flex -space-x-2">
                             <div className="w-8 h-8 rounded-full bg-gray-300 border-2 border-white"></div>
@@ -146,22 +134,24 @@ const ProjectBoard: React.FC = () => {
                             <div className="w-8 h-8 rounded-full bg-indigo-300 border-2 border-white flex items-center justify-center text-xs font-medium text-white">4</div>
                         </div>
 
-                        <button className="px-3 py-1.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded hover:bg-gray-50">
-                            Share
-                        </button>
-                        <button
-                            onClick={() => setIsCreateModalOpen(true)}
-                            className="px-3 py-1.5 text-sm font-medium text-white bg-blue-600 rounded hover:bg-blue-700 flex items-center gap-2"
-                        >
-                            Create
-                            <FaChevronDown size={10} />
-                        </button>
+                        <div className="flex gap-2">
+                            <button className="px-3 py-1.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded hover:bg-gray-50">
+                                Share
+                            </button>
+                            <button
+                                onClick={() => setIsCreateModalOpen(true)}
+                                className="px-3 py-1.5 text-sm font-medium text-white bg-blue-600 rounded hover:bg-blue-700 flex items-center gap-2"
+                            >
+                                Create
+                                <FaChevronDown size={10} />
+                            </button>
+                        </div>
                     </div>
                 </div>
 
                 {/* Tabs & Filters */}
-                <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-6 text-sm text-gray-600">
+                <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 overflow-x-auto no-scrollbar">
+                    <div className="flex items-center gap-6 text-sm text-gray-600 min-w-max">
                         {['Board', 'Table', 'Calendar', 'Timeline'].map(view => (
                             <button
                                 key={view}
@@ -180,18 +170,18 @@ const ProjectBoard: React.FC = () => {
                         </button>
                     </div>
 
-                    <div className="flex items-center gap-3 text-sm text-gray-600">
+                    <div className="flex items-center gap-3 text-sm text-gray-600 min-w-max md:w-auto">
                         <div className="flex items-center gap-2 hover:text-gray-900 cursor-pointer">
-                            <FaSearch size={14} /> Search
+                            <FaSearch size={14} /> <span className="hidden sm:inline">Search</span>
                         </div>
                         <div className="flex items-center gap-2 hover:text-gray-900 cursor-pointer">
-                            <FaFilter size={14} /> Filter
+                            <FaFilter size={14} /> <span className="hidden sm:inline">Filter</span>
                         </div>
                         <div className="flex items-center gap-2 hover:text-gray-900 cursor-pointer">
-                            <FaSort size={14} /> Sort
+                            <FaSort size={14} /> <span className="hidden sm:inline">Sort</span>
                         </div>
                         <div className="flex items-center gap-2 hover:text-gray-900 cursor-pointer">
-                            <FaList size={14} /> Fields
+                            <FaList size={14} /> <span className="hidden sm:inline">Fields</span>
                         </div>
                     </div>
                 </div>
@@ -338,13 +328,12 @@ const ProjectBoard: React.FC = () => {
                             {/* Calendar Days */}
                             <div className="flex-1 grid grid-cols-7 grid-rows-5">
                                 {Array.from({ length: 35 }).map((_, i) => {
-                                    // Logic to start from Oct 2024 context (starts roughly)
-                                    // Mocking visual layout: 28th starts previous month
-                                    let dayNum = i - 3; // Offset to start 28, 29, 30, 31, 1...
+
+                                    let dayNum = i - 3;
                                     let isCurrentMonth = true;
 
                                     if (dayNum < 1) {
-                                        dayNum = 31 + dayNum; // Previous month dates
+                                        dayNum = 31 + dayNum;
                                         isCurrentMonth = false;
                                     } else if (dayNum > 31) {
                                         dayNum = dayNum - 31; // Next month dates
@@ -380,7 +369,7 @@ const ProjectBoard: React.FC = () => {
                     </div>
                 ) : (
                     // Table View Content
-                    <>
+                    <div className="min-w-[800px] overflow-x-auto">
                         {/* Table Header */}
                         <div className="grid grid-cols-12 gap-4 pb-2 border-b border-gray-200 text-xs font-medium text-gray-500 uppercase">
                             <div className="col-span-6 pl-8">Name</div>
@@ -476,7 +465,7 @@ const ProjectBoard: React.FC = () => {
                                 )}
                             </div>
                         ))}
-                    </>
+                    </div>
                 )}
             </div>
 

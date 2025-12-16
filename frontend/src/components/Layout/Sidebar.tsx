@@ -8,17 +8,13 @@ import CreateTeamModal from '../Modals/CreateTeamModal';
 import SettingsModal from '../Modals/SettingsModal';
 import SearchModal from '../Modals/SearchModal';
 import NotificationPopover from '../Popovers/NotificationPopover';
-import {
-    FaSearch, FaBell, FaChevronRight, FaChevronDown, FaUserPlus, FaCog, FaBars, FaTimes, FaRegCheckCircle,
-    FaRegFile, FaPlus,
-    FaTabletAlt,
-    FaTablet,
-    FaTablets,
-    FaTable
-} from 'react-icons/fa';
-import { LayoutDashboard } from "lucide-react";
+import { FaSearch, FaBell, FaChevronRight, FaChevronDown, FaUserPlus, FaCog, FaBars, FaTimes, FaRegCheckCircle, FaRegFile, FaPlus, } from 'react-icons/fa';
+import { logout } from 'store/slices/authSlice';
+import { useDispatch } from 'react-redux';
+import { MdLogout } from 'react-icons/md';
 
 const Sidebar: React.FC = () => {
+    const dispatch = useDispatch();
     const { user } = useSelector((state: RootState) => state.auth);
     const isManager = user?.role === 'MANAGER';
     const [isOpen, setIsOpen] = useState(true);
@@ -34,6 +30,7 @@ const Sidebar: React.FC = () => {
     useEffect(() => {
         console.log('Sidebar - isCreateTeamOpen changed to:', isCreateTeamOpen);
     }, [isCreateTeamOpen]);
+
 
 
     const teamspaces = [
@@ -65,7 +62,6 @@ const Sidebar: React.FC = () => {
 
     return (
         <>
-            {/* Mobile Menu Button */}
             <button
                 onClick={() => setIsMobileOpen(!isMobileOpen)}
                 className="md:hidden fixed top-4 left-4 z-50 p-2 bg-white rounded-lg shadow-md"
@@ -73,7 +69,6 @@ const Sidebar: React.FC = () => {
                 {isMobileOpen ? <FaTimes size={20} /> : <FaBars size={20} />}
             </button>
 
-            {/* Sidebar */}
             <aside
                 className={`
                     fixed md:sticky top-0 h-screen bg-[#FAFAFA] border-r border-gray-200
@@ -82,7 +77,6 @@ const Sidebar: React.FC = () => {
                     ${isMobileOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}
                 `}
             >
-                {/* Header */}
                 <div className="p-4 border-b border-gray-200 flex items-center justify-between">
                     {isOpen && (
                         <div className="flex items-center gap-2">
@@ -97,13 +91,10 @@ const Sidebar: React.FC = () => {
                         className="p-1 hover:bg-gray-200 rounded hidden md:block"
                     >
                         <img src='/assets/SidebarIcon.png' alt="Logo" />
-                        {/* <FaTable size={16} className="text-gray-600" /> */}
                     </button>
                 </div>
 
-                {/* Navigation */}
                 <nav className="p-3 space-y-1">
-                    {/* Search */}
                     <div
                         onClick={() => setIsSearchOpen(true)}
                         className={`flex items-center gap-3 px-3 py-2 text-gray-600 hover:bg-gray-200 rounded cursor-pointer ${!isOpen && 'justify-center'}`}
@@ -112,7 +103,6 @@ const Sidebar: React.FC = () => {
                         {isOpen && <span className="text-sm">Search</span>}
                     </div>
 
-                    {/* Notifications */}
                     <div
                         onClick={() => setIsNotificationOpen(!isNotificationOpen)}
                         className={`flex items-center gap-3 px-3 py-2 text-gray-600 hover:bg-gray-200 rounded cursor-pointer ${!isOpen && 'justify-center'} ${isNotificationOpen ? 'bg-gray-200 text-gray-900' : ''}`}
@@ -121,7 +111,6 @@ const Sidebar: React.FC = () => {
                         {isOpen && <span className="text-sm">Notifications</span>}
                     </div>
 
-                    {/* Tasks */}
                     <NavLink
                         to="/tasks"
                         className={({ isActive }) =>
@@ -133,7 +122,6 @@ const Sidebar: React.FC = () => {
                         {isOpen && <span className="text-sm">Tasks</span>}
                     </NavLink>
 
-                    {/* Create Project - Manager Only */}
                     {isManager && (
                         <div
                             onClick={() => setIsCreateProjectOpen(true)}
@@ -144,7 +132,6 @@ const Sidebar: React.FC = () => {
                         </div>
                     )}
 
-                    {/* Teamspaces Section */}
                     {isOpen && (
                         <>
                             <div className="pt-4 pb-2 px-3 flex items-center justify-between group">
@@ -200,10 +187,8 @@ const Sidebar: React.FC = () => {
                     )}
                 </nav>
 
-                {/* Footer - Manager Only for Invite/Settings */}
-                <div className="absolute bottom-0 w-full border-t border-gray-200 p-3 space-y-1">
 
-                    {/* Invite teammates – Only if sidebar is open */}
+                <div className="absolute bottom-0 w-full border-t border-gray-200 p-3 space-y-1">
                     {isOpen && isManager && (
                         <div
                             onClick={() => setIsInviteOpen(true)}
@@ -214,20 +199,25 @@ const Sidebar: React.FC = () => {
                         </div>
                     )}
 
-                    {/* Settings – apply same condition */}
+
                     <div
                         onClick={() => setIsSettingsOpen(true)}
                         className={`flex items-center gap-3 px-3 py-2 text-gray-600 hover:bg-gray-200 rounded cursor-pointer ${!isOpen && "justify-center"
-                            }`}
-                    >
+                            }`}>
                         <FaCog size={16} />
                         {isOpen && <span className="text-sm">Setting</span>}
+                    </div>
+
+                    <div
+                        onClick={() => dispatch(logout())}
+                        className="flex items-center gap-3 px-3 py-2 text-gray-600 hover:bg-gray-200 rounded cursor-pointer">
+                        <MdLogout size={16} />
+                        {isOpen && <span className="text-sm">Logout</span>}
                     </div>
                 </div>
 
             </aside>
 
-            {/* Mobile Overlay */}
             {isMobileOpen && (
                 <div
                     onClick={() => setIsMobileOpen(false)}
@@ -235,7 +225,6 @@ const Sidebar: React.FC = () => {
                 />
             )}
 
-            {/* Modals */}
             <CreateProjectModal isOpen={isCreateProjectOpen} onClose={() => setIsCreateProjectOpen(false)} />
             <InviteTeammatesModal isOpen={isInviteOpen} onClose={() => setIsInviteOpen(false)} />
             <CreateTeamModal

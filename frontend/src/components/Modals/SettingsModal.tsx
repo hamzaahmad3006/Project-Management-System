@@ -1,14 +1,27 @@
 import { Switch } from '@mui/material';
 import React, { useState } from 'react';
-import { FaUser, FaLock, FaBell, FaUsers, FaTimes } from 'react-icons/fa';
+import { FaUser, FaTimes } from 'react-icons/fa';
+import { SettingsModalProps, ProfileSettingsProps } from '../../types';
+import { handleChange, handleImageChange, handleChangeProfile } from '../../utils/Hooks';
+import { useSelector } from 'react-redux';
+import { RootState } from 'store/store';
+import Loader from 'components/Loaders/Loader';
 
-interface SettingsModalProps {
-    isOpen: boolean;
-    onClose: () => void;
-}
+
+
 
 const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose }) => {
+    const { user } = useSelector((state: RootState) => state.auth)
     const [activeTab, setActiveTab] = useState('profile');
+    const [profile, setProfile] = useState({
+        name: user?.name || "",
+        role: user?.role || "",
+        email: user?.email || "",
+        avatar: user?.avatar || "",
+    });
+    const [file, setFile] = useState<File | null>(null);
+    const [loading, setLoading] = useState(false);
+
 
     if (!isOpen) return null;
 
@@ -75,7 +88,17 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose }) => {
 
                     {/* Scrollable Content */}
                     <div className="flex-1 p-6 overflow-y-auto">
-                        {activeTab === 'profile' && <ProfileSettings />}
+                        {activeTab === 'profile' && (
+                            <ProfileSettings
+                                profile={profile}
+                                setProfile={setProfile}
+                                file={file}
+                                setFile={setFile}
+                                loading={loading}
+                                setLoading={setLoading}
+                            />
+                        )}
+
                         {activeTab === 'security' && <SecuritySettings />}
                         {activeTab === 'notifications' && <NotificationsSettings />}
                         {activeTab === 'general' && <GeneralSettings />}
@@ -89,152 +112,106 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose }) => {
     );
 };
 
-// --- Sub-components (can be moved to separate files later) ---
 
 
 
-const ProfileSettings = () => {
-    return (
-        <div className="w-full max-w-xl bg-white rounded-lg  space-y-6">
+const ProfileSettings: React.FC<ProfileSettingsProps & {
+    file: File | null,
+    setFile: React.Dispatch<React.SetStateAction<File | null>>,
+    loading: boolean,
+    setLoading: React.Dispatch<React.SetStateAction<boolean>>
+}> = ({
+    profile, setProfile, file, setFile, loading, setLoading
+}) => {
+        return (
+            <div className="w-full max-w-xl bg-white rounded-lg space-y-6">
 
-            {/* PHOTO */}
-            <div className="flex items-center gap-6">
-                <div className="w-20 h-20 rounded-full bg-gray-200 border border-gray-300 flex items-center justify-center">
-                    <FaUser size={32} className="text-gray-400" />
+                <div className="flex items-center gap-6">
+                    <div className="w-20 h-20 rounded-full bg-gray-200 border flex items-center justify-center">
+                        {profile.avatar ? (
+                            <img src={profile.avatar} alt="Profile" className="w-full h-full object-cover rounded-full" />
+                        ) : (
+                            <FaUser size={32} className="text-gray-400" />
+                        )}
+                    </div>
+
+                    <div className="flex gap-3">
+                        <label className="px-3 py-2 cursor-pointer border border-gray-300 rounded-md text-sm text-gray-700 bg-white hover:bg-gray-50">
+                            Upload
+                            <input
+                                type="file"
+                                accept="image/*"
+                                onChange={(e) => handleImageChange(e, setFile)}
+                                className="hidden"
+                            />
+                        </label>
+
+                        <button
+                            className="px-3 py-2 border border-gray-300 rounded-md text-sm text-gray-700 bg-white hover:bg-gray-50"
+                            onClick={() => {
+                                setProfile((prev) => ({ ...prev, avatar: "" }));
+                                setFile(null);
+                            }}
+                        >
+                            Remove photo
+                        </button>
+                    </div>
                 </div>
 
-                <div className="flex gap-3">
-                    <button className="px-3 py-2 border border-gray-300 rounded-md text-sm text-gray-700 bg-white hover:bg-gray-50">
-                        Upload new photo
+                {/* Form Fields */}
+                <div className="space-y-4">
+                    <div>
+                        <label className="text-sm text-gray-500 mb-1 block">Full name</label>
+                        <input
+                            type="text"
+                            name="name"
+                            value={profile.name}
+                            onChange={(e) => handleChange(e, setProfile)}
+                            className="w-full px-3 py-2 border rounded-md"
+                        />
+                    </div>
+                    <div>
+                        <label className="text-sm text-gray-500 mb-1 block">Job title</label>
+                        <input
+                            type="text"
+                            name="role"
+                            value={profile.role}
+                            onChange={(e) => handleChange(e, setProfile)}
+                            className="w-full px-3 py-2 border rounded-md"
+                        />
+                    </div>
+                    <div>
+                        <label className="text-sm text-gray-500 mb-1 block">Email</label>
+                        <input
+                            type="email"
+                            name="email"
+                            disabled
+                            value={profile.email}
+                            onChange={(e) => handleChange(e, setProfile)}
+                            className="w-full px-3 py-2 border rounded-md"
+                        />
+                    </div>
+                </div>
+
+                {/* Action Buttons */}
+                <div className="border-t pt-4 flex items-center gap-3">
+                    {loading ? (
+                        <Loader />
+                    ) : (
+                        <button
+                            className="px-5 py-2.5 bg-blue-600 text-white rounded-md text-sm hover:bg-blue-700"
+                            onClick={() => handleChangeProfile(profile, file, setProfile, setLoading)}
+                        >
+                            Save
+                        </button>
+                    )}
+                    <button className="px-5 py-2.5 bg-white border rounded-md text-sm text-gray-700 hover:bg-gray-100">
+                        Cancel
                     </button>
-
-                    <button className="px-3 py-2 border border-gray-300 rounded-md text-sm text-gray-700 bg-white hover:bg-gray-50">
-                        Remove photo
-                    </button>
-
                 </div>
             </div>
-
-            {/* FORM */}
-            <div className="space-y-4">
-                {/* FULL NAME */}
-                <div>
-                    <label className="text-sm text-gray-500 mb-1 block">Full name</label>
-                    <input
-                        type="text"
-                        defaultValue="Yauhen Rymaszewski"
-                        className="w-full px-3 py-2 rounded-md border border-gray-300 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
-                    />
-                </div>
-
-                {/* JOB TITLE */}
-                <div>
-                    <label className="text-sm text-gray-500 mb-1 block">Job title</label>
-                    <input
-                        type="text"
-                        defaultValue="Product designer"
-                        className="w-full px-3 py-2 rounded-md border border-gray-300 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
-                    />
-                </div>
-
-                {/* TEAM DROPDOWN (same as UI) */}
-                <div>
-                    <label className="text-sm text-gray-500 mb-1 block">Team</label>
-                    <select className="w-full px-3 py-2 rounded-md border border-gray-300 bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500">
-                        <option>Designer Team</option>
-                        <option>Developer Team</option>
-                        <option>Marketing Team</option>
-                    </select>
-                </div>
-
-                {/* EMAIL */}
-                <div>
-                    <label className="text-sm text-gray-500 mb-1 block">Email</label>
-                    <input
-                        type="email"
-                        defaultValue="yauhen1312@gmail.com"
-                        className="w-full px-3 py-2 rounded-md border border-gray-300 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
-                    />
-                </div>
-            </div>
-
-            {/* ACTION BUTTONS */}
-            <div className="border-t pt-4 flex items-center gap-3">
-                <button className="px-5 py-2.5 rounded-md bg-blue-600 text-white text-sm hover:bg-blue-700">
-                    Save
-                </button>
-
-                <button className="px-5 py-2.5 rounded-md bg-white border border-gray-300 text-sm text-gray-700 hover:bg-gray-100">
-                    Cancel
-                </button>
-
-                <button className="ml-auto px-5 py-2.5 rounded-md border border-red-600 text-red-600 text-sm hover:bg-red-50">
-                    Delete account
-                </button>
-            </div>
-        </div>
-    );
-};
-
-
-
-// const ProfileSettings = () => (
-//     <div className="space-y-6 max-w-lg ">
-//         <div className="flex items-center gap-6 ">
-//             <div className="w-20 h-20 bg-gray-200 rounded-full flex items-center justify-center text-2xl text-gray-400 font-bold border-4 border-white shadow-sm">
-//                 <FaUser size={20} />
-//             </div>
-//             <div className='flex gap-2 w-[250px]'>
-//                 <button className="bg-white border border-gray-300 rounded text-sm font-medium text-gray-700 hover:bg-gray-50">
-//                     Upload new Photo
-//                 </button>
-
-//                 <button className="bg-white border border-gray-300 rounded text-sm font-medium text-gray-700 hover:bg-gray-50">
-//                     Remove Photo
-//                 </button>
-//             </div>
-
-//             {/* <p className="mt-1 text-xs text-gray-500">JPG, GIF or PNG. 1MB max.</p> */}
-
-//         </div>
-
-//         <div className="space-y-4">
-//             <div>
-//                 <label className="block text-sm font-medium text-[#8F929C] mb-1">Full Name</label>
-//                 <input type="text" className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500" />
-//             </div>
-//             <div>
-//                 <label className="block text-sm font-medium text-[#8F929C] mb-1">Job title</label>
-//                 <input type="email" className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500" />
-//             </div>
-//             <div>
-//                 <label className="block text-sm font-medium text-[#8F929C] mb-1">Team</label>
-//                 <input type="text" className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500" />
-//             </div>
-//             <div>
-//                 <label className="block text-sm font-medium text-[#8F929C] mb-1">Email Address</label>
-//                 <input type="email" className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500" />
-//             </div>
-
-//         </div>
-
-
-//         <div className="flex flex-row border-t border-gray-500 pt-4 space-x-2">
-
-//             <button className="px-5 py-2.5 rounded-lg bg-blue-600 text-white  text-sm font-medium hover:bg-blue-700 shadow-sm">Save</button>
-//             <button className="px-5 py-2.5 rounded-lg bg-white text-gray-600  text-sm font-medium hover:bg-gray-100 shadow-sm">Cancel</button>
-//             <button className="px-5 py-2.5 rounded-lg border-solid border border-red-600 text-red-600  text-sm font-medium  shadow-sm">Delete Account</button>
-
-//         </div>
-
-
-
-
-//     </div>
-// );
-
-
-
+        );
+    };
 
 
 const SecuritySettings = () => (
@@ -444,21 +421,6 @@ const NotificationsSettings = () => {
 };
 
 
-
-// const NotificationSettings = () => (
-//     <div className="space-y-6">
-//         <div className="space-y-4">
-//             <h4 className="text-sm font-medium text-gray-900">Email Notifications</h4>
-//             <div className="space-y-3">
-//                 {['New tasks assigned to me', 'Comments on my tasks', 'Project status updates', 'Team invites'].map((item, idx) => (
-//                     <label key={idx} className="flex items-center gap-3 cursor-pointer">
-//                         <input type="checkbox" defaultChecked className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500" />
-//                         <span className="text-sm text-gray-700">{item}</span>
-//                     </label>
-//                 ))}
-//             </div>
-//         </div>
-//     </div>
-// );
-
 export default SettingsModal;
+
+

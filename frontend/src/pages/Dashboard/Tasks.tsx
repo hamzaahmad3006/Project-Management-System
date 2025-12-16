@@ -7,15 +7,11 @@ import {
     FaEllipsisH, FaPaperclip, FaCheckSquare, FaCalendarAlt
 } from 'react-icons/fa';
 
-/**
- * Tasks Page
- * Displays tasks in a Kanban layout matching the screenshot design.
- */
+
 const Tasks: React.FC = () => {
     const dispatch = useAppDispatch();
     const { tasks, loading } = useAppSelector((state) => state.tasks);
 
-    // UI State
     const [viewMode, setViewMode] = useState<'KANBAN' | 'LIST'>('KANBAN');
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
     const [searchTerm, setSearchTerm] = useState('');
@@ -24,8 +20,6 @@ const Tasks: React.FC = () => {
         dispatch(fetchTasks({}));
     }, [dispatch]);
 
-    // Group tasks by status for Kanban Board
-    // Mapping: Backend Status -> UI Column
     const columns = [
         { id: 'TODO', title: 'To-Do', color: 'bg-blue-500', items: tasks.filter(t => t.status === 'TODO' || !t.status) },
         { id: 'IN_PROGRESS', title: 'In Progress', color: 'bg-orange-500', items: tasks.filter(t => t.status === 'IN_PROGRESS') },
@@ -36,16 +30,12 @@ const Tasks: React.FC = () => {
     return (
 
         <div className="h-full flex flex-col bg-white overflow-hidden">
-            {/* --- Header Section --- */}
             <header className="px-8 py-6 border-b border-gray-200 bg-white">
                 <div className="flex flex-col gap-6">
-                    {/* Title */}
                     <h1 className="text-3xl font-extrabold text-gray-900 tracking-tight">Tasks</h1>
 
-                    {/* Toolbar */}
                     <div className="flex flex-wrap items-center justify-between gap-4">
 
-                        {/* Left: View Switcher */}
                         <div className="flex bg-gray-100 p-1 rounded-lg">
                             <button
                                 onClick={() => setViewMode('KANBAN')}
@@ -61,9 +51,7 @@ const Tasks: React.FC = () => {
                             </button>
                         </div>
 
-                        {/* Right: Actions */}
                         <div className="flex items-center gap-3 ml-auto">
-                            {/* Search */}
                             <div className="relative">
                                 <FaSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
                                 <input
@@ -82,7 +70,6 @@ const Tasks: React.FC = () => {
                                 <FaSortAmountDown size={12} /> Sort By
                             </button>
 
-                            {/* New Task Button */}
                             <button
                                 onClick={() => setIsCreateModalOpen(true)}
                                 className="flex items-center gap-2 px-4 py-2 text-sm font-semibold text-white bg-blue-600 rounded-lg hover:bg-blue-700 shadow-sm shadow-blue-200"
@@ -94,12 +81,10 @@ const Tasks: React.FC = () => {
                 </div>
             </header>
 
-            {/* --- Kanban Content --- */}
             <div className="flex-1 overflow-x-auto overflow-y-hidden p-8 bg-gray-50">
                 <div className="flex h-full gap-6">
                     {columns.map(col => (
                         <div key={col.id} className="w-[290px] flex-shrink-0 flex flex-col h-full">
-                            {/* Column Header */}
                             <div className="flex items-center justify-between mb-4 px-1">
                                 <div className="flex items-center gap-2">
                                     <div className={`w-2.5 h-2.5 rounded-full ${col.color}`}></div>
@@ -112,7 +97,6 @@ const Tasks: React.FC = () => {
                                 </div>
                             </div>
 
-                            {/* Cards Container */}
                             <div className="flex-1 overflow-y-auto pr-2 space-y-3 pb-8">
                                 {col.items.map((task, idx) => (
                                     <div
@@ -134,12 +118,6 @@ const Tasks: React.FC = () => {
                                         <h4 className="text-sm font-bold text-gray-800 mb-1 leading-snug">{task.title}</h4>
                                         <p className="text-xs text-gray-500 line-clamp-2 mb-3">{task.description || "No description provided."}</p>
 
-                                        {/* Attachments Preview (Mock) */}
-                                        {/* {idx === 0 && (
-                                            <div className="mb-3 rounded-lg overflow-hidden h-24 bg-gray-100">
-                                                <img src="https://via.placeholder.com/300x150" alt="Attachment" className="w-full h-full object-cover" />
-                                            </div>
-                                        )} */}
 
                                         {/* Footer Row */}
                                         <div className="flex items-center justify-between pt-3 border-t border-gray-50 mt-auto">
