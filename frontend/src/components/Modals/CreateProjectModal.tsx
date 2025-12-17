@@ -1,20 +1,26 @@
-import React, { useState } from 'react';
+import React from 'react';
+import { useCreateProject } from '../../utils/Hooks/ModalHooks';
 import TemplateGalleryModal from './TemplateGalleryModal';
 import { FaTimes, FaMagic, FaChevronDown } from 'react-icons/fa';
+import { CreateModalProps } from '../../types';
 
-interface CreateProjectModalProps {
-    isOpen: boolean;
-    onClose: () => void;
-}
 
-const CreateProjectModal: React.FC<CreateProjectModalProps> = ({ isOpen, onClose }) => {
-    const [isGalleryOpen, setIsGalleryOpen] = useState(false);
-    const [selectedTemplate, setSelectedTemplate] = useState<string | null>(null);
-
-    const handleTemplateSelect = (template: string) => {
-        setSelectedTemplate(template);
-        setIsGalleryOpen(false);
-    };
+const CreateProjectModal: React.FC<CreateModalProps> = ({ isOpen, onClose }) => {
+    const {
+        allTeams,
+        isGalleryOpen,
+        setIsGalleryOpen,
+        selectedTemplate,
+        handleTemplateSelect,
+        name,
+        setName,
+        description,
+        setDescription,
+        teamId,
+        setTeamId,
+        isLoading,
+        handleCreate
+    } = useCreateProject(onClose);
 
     if (!isOpen) return null;
 
@@ -39,6 +45,8 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({ isOpen, onClose
                             placeholder="e.g. Website Redesign"
                             className="w-full px-3 py-2 border border-blue-400 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 transition-shadow"
                             autoFocus
+                            value={name}
+                            onChange={(e) => setName(e.target.value)}
                         />
                     </div>
 
@@ -65,10 +73,17 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({ isOpen, onClose
                         <div className="space-y-1.5">
                             <label className="block text-sm font-medium text-gray-700">Select a team</label>
                             <div className="relative">
-                                <select className="w-full px-3 py-2 border border-gray-300 rounded-md appearance-none focus:outline-none focus:border-blue-500 bg-white text-sm text-gray-700">
-                                    <option>Design team</option>
-                                    <option>Development team</option>
-                                    <option>Marketing team</option>
+                                <select
+                                    value={teamId}
+                                    onChange={(e) => setTeamId(e.target.value)}
+                                    className="w-full px-3 py-2 border border-gray-300 rounded-md appearance-none focus:outline-none focus:border-blue-500 bg-white text-sm text-gray-700"
+                                >
+                                    <option value="">No Team</option>
+                                    {allTeams?.map((team) => (
+                                        <option key={team.id} value={team.id}>
+                                            {team.name}
+                                        </option>
+                                    ))}
                                 </select>
                                 <FaChevronDown size={12} className="absolute right-3 top-3 text-gray-400 pointer-events-none" />
                             </div>
@@ -95,13 +110,19 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({ isOpen, onClose
                             rows={3}
                             placeholder="Please share your main reason..."
                             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-blue-500 resize-none text-sm"
+                            value={description}
+                            onChange={(e) => setDescription(e.target.value)}
                         ></textarea>
                     </div>
 
                     {/* Buttons */}
                     <div className="flex items-center gap-3 pt-2">
-                        <button className="px-5 py-2 bg-blue-500 text-white text-sm font-medium rounded hover:bg-blue-600 transition-colors shadow-sm">
-                            Create project
+                        <button
+                            onClick={handleCreate}
+                            disabled={isLoading || !name.trim()}
+                            className="px-5 py-2 bg-blue-500 text-white text-sm font-medium rounded hover:bg-blue-600 transition-colors shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                            {isLoading ? 'Creating...' : 'Create project'}
                         </button>
                         <button onClick={onClose} className="px-5 py-2 bg-white border border-gray-300 text-gray-700 text-sm font-medium rounded hover:bg-gray-50 transition-colors">
                             Cancel

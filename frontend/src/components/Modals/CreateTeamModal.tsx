@@ -1,87 +1,21 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { FaTimes } from "react-icons/fa";
-import { useAppDispatch, useAppSelector } from "../../store/hooks";
-import { fetchAllUsers } from "../../store/slices/authSlice";
-import api from "../../api/axios";
+import { CreateModalProps, User } from "../../types";
+import { useCreateTeam } from "../../utils/Hooks/ModalHooks";
 
-interface CreateTeamModalProps {
-    isOpen: boolean;
-    onClose: () => void;
-}
 
-interface User {
-    id: string;
-    name: string;
-    email: string;
-    role: "MEMBER" | "MANAGER";
-    avatar?: string;
-}
-
-const CreateTeamModal: React.FC<CreateTeamModalProps> = ({ isOpen, onClose }) => {
-    const dispatch = useAppDispatch();
-    const allUsers: User[] = useAppSelector((state) => state.auth.allUsers || []);
-
-    const [teamName, setTeamName] = useState("");
-    const [selectedMembers, setSelectedMembers] = useState<string[]>([]);
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState<string | null>(null);
-    const [success, setSuccess] = useState(false);
-
-    useEffect(() => {
-        if (isOpen) {
-            dispatch(fetchAllUsers());
-            // Reset form when modal opens
-            setTeamName("");
-            setSelectedMembers([]);
-            setError(null);
-            setSuccess(false);
-        }
-    }, [isOpen, dispatch]);
-
-    const toggleMember = (userId: string) => {
-        setSelectedMembers((prev) =>
-            prev.includes(userId)
-                ? prev.filter((id) => id !== userId)
-                : [...prev, userId]
-        );
-    };
-
-    const handleCreateTeam = async () => {
-        // Validation
-        if (!teamName.trim()) {
-            setError("Team name is required");
-            return;
-        }
-
-        if (selectedMembers.length === 0) {
-            setError("Please select at least one member");
-            return;
-        }
-
-        setLoading(true);
-        setError(null);
-
-        try {
-            const response = await api.post("/teams", {
-                name: teamName,
-                memberIds: selectedMembers,
-            });
-
-            console.log("Team created successfully:", response.data);
-            setSuccess(true);
-
-            // Close modal after short delay to show success
-            setTimeout(() => {
-                onClose();
-                setSuccess(false);
-            }, 1500);
-        } catch (err: any) {
-            console.error("Create team error:", err);
-            setError(err.response?.data?.message || "Failed to create team");
-        } finally {
-            setLoading(false);
-        }
-    };
+const CreateTeamModal: React.FC<CreateModalProps> = ({ isOpen, onClose }) => {
+    const {
+        allUsers,
+        teamName,
+        setTeamName,
+        selectedMembers,
+        loading,
+        error,
+        success,
+        toggleMember,
+        handleCreateTeam
+    } = useCreateTeam(onClose);
 
     if (!isOpen) return null;
 
@@ -151,38 +85,50 @@ const CreateTeamModal: React.FC<CreateTeamModalProps> = ({ isOpen, onClose }) =>
                             {allUsers.length === 0 ? (
                                 <p className="text-gray-400 text-sm text-center py-4">Loading users...</p>
                             ) : (
-                                allUsers.map((user) => (
-                                    <div
-                                        key={user.id}
-                                        onClick={() => !loading && toggleMember(user.id)}
-                                        className={`flex items-center justify-between p-2 rounded cursor-pointer transition-colors ${selectedMembers.includes(user.id)
-                                            ? "bg-blue-100 border border-blue-300"
-                                            : "hover:bg-gray-50"
-                                            } ${loading ? "opacity-50 cursor-not-allowed" : ""}`}
-                                    >
-                                        <div className="flex items-center gap-3">
-                                            <div className="relative">
-                                                <img
-                                                    src={user.avatar || "https://via.placeholder.com/40"}
-                                                    alt={user.name}
-                                                    className="w-10 h-10 rounded-full object-cover border border-gray-200"
-                                                />
-                                                {selectedMembers.includes(user.id) && (
-                                                    <div className="absolute -top-1 -right-1 bg-blue-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs">
-                                                        ✓
+                                allUsers.map((user: User) => {
+                                    const isAlreadyInTeam = user.teamMemberships && user.teamMemberships.length > 0;
+                                    return (
+                                        <div
+                                            key={user.id}
+                                            onClick={() => !loading && !isAlreadyInTeam && toggleMember(user.id)}
+                                            className={`flex items-center justify-between p-2 rounded cursor-pointer transition-colors ${selectedMembers.includes(user.id)
+                                                ? "bg-blue-100 border border-blue-300"
+                                                : isAlreadyInTeam
+                                                    ? "opacity-50 bg-gray-100 cursor-not-allowed"
+                                                    : "hover:bg-gray-50"
+                                                } ${loading ? "opacity-50 cursor-not-allowed" : ""}`}
+                                        >
+                                            <div className="flex items-center gap-3">
+                                                <div className="relative">
+                                                    <img
+                                                        src={user.avatar || "https://via.placeholder.com/40"}
+                                                        alt={user.name}
+                                                        className="w-10 h-10 rounded-full object-cover border border-gray-200"
+                                                    />
+                                                    {selectedMembers.includes(user.id) && (
+                                                        <div className="absolute -top-1 -right-1 bg-blue-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs">
+                                                            ✓
+                                                        </div>
+                                                    )}
+                                                </div>
+                                                <div>
+                                                    <div className="text-sm font-semibold text-gray-800">
+                                                        {user.name}
+                                                        {isAlreadyInTeam && (
+                                                            <span className="ml-2 text-xs text-red-500 bg-red-50 px-1.5 py-0.5 rounded">
+                                                                Already in team
+                                                            </span>
+                                                        )}
                                                     </div>
-                                                )}
+                                                    <div className="text-xs text-gray-500">{user.email}</div>
+                                                </div>
                                             </div>
-                                            <div>
-                                                <div className="text-sm font-semibold text-gray-800">{user.name}</div>
-                                                <div className="text-xs text-gray-500">{user.email}</div>
-                                            </div>
+                                            <span className="text-xs font-medium text-gray-600 bg-gray-100 px-2 py-1 rounded">
+                                                {user.role}
+                                            </span>
                                         </div>
-                                        <span className="text-xs font-medium text-gray-600 bg-gray-100 px-2 py-1 rounded">
-                                            {user.role}
-                                        </span>
-                                    </div>
-                                ))
+                                    );
+                                })
                             )}
                         </div>
                     </div>

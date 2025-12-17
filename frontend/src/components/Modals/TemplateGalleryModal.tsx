@@ -1,11 +1,6 @@
 import React, { useState } from 'react';
 import { FaSearch, FaStar, FaRocket, FaPencilRuler, FaGraduationCap, FaBullhorn, FaCode, FaUsers, FaLaptopHouse, FaBriefcase, FaRegLightbulb, FaTimes } from 'react-icons/fa';
-
-interface TemplateGalleryModalProps {
-    isOpen: boolean;
-    onClose: () => void;
-    onSelectTemplate: (templateName: string) => void;
-}
+import { TemplateGalleryModalProps } from '../../types';
 
 const TemplateGalleryModal: React.FC<TemplateGalleryModalProps> = ({ isOpen, onClose, onSelectTemplate }) => {
     const [selectedCategory, setSelectedCategory] = useState('Development');

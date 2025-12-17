@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { NavLink } from 'react-router-dom';
+import { NavLink, useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../store/store';
 import CreateProjectModal from '../Modals/CreateProjectModal';
@@ -15,6 +15,7 @@ import { MdLogout } from 'react-icons/md';
 
 const Sidebar: React.FC = () => {
     const dispatch = useDispatch();
+    const navigate = useNavigate();
     const { user } = useSelector((state: RootState) => state.auth);
     const isManager = user?.role === 'MANAGER';
     const [isOpen, setIsOpen] = useState(true);
@@ -79,7 +80,7 @@ const Sidebar: React.FC = () => {
             >
                 <div className="p-4 border-b border-gray-200 flex items-center justify-between">
                     {isOpen && (
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-2 cursor-pointer" onClick={() => navigate('/')}>
                             <div className="w-6 h-6 bg-yellow-400 rounded flex items-center justify-center text-sm">
                                 ❖
                             </div>

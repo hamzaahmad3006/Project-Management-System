@@ -1,12 +1,9 @@
 import React, { useState } from 'react';
 import { FaTimes, FaEnvelope, FaChevronDown } from 'react-icons/fa';
+import { CreateModalProps } from '../../types';
 
-interface InviteTeammatesModalProps {
-    isOpen: boolean;
-    onClose: () => void;
-}
 
-const InviteTeammatesModal: React.FC<InviteTeammatesModalProps> = ({ isOpen, onClose }) => {
+const InviteTeammatesModal: React.FC<CreateModalProps> = ({ isOpen, onClose }) => {
     if (!isOpen) return null;
 
     return (

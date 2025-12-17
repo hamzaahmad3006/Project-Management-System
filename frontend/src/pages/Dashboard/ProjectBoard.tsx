@@ -7,7 +7,7 @@ import {
 import CreateProjectModal from '../../components/Modals/CreateProjectModal';
 import TaskDetailPanel from '../../components/Dashboard/TaskDetailPanel';
 import { useAppDispatch } from '../../store/hooks';
-import { createTaskAction } from '../../store/slices/taskSlice';
+import { createTask } from '../../store/slices/taskSlice';
 import { Task, Section } from '../../types';
 
 
@@ -26,7 +26,7 @@ const ProjectBoard: React.FC = () => {
             projectId: "current_project_id",
         };
         // Redux action dispatch karo
-        dispatch(createTaskAction(newTaskData));
+        dispatch(createTask(newTaskData));
     };
     const toggleSection = (sectionId: string) => {
         setCollapsedSections(prev =>

@@ -1,47 +1,36 @@
-import React, { useState } from 'react';
-import { FaTimes, FaUser, FaRegFlag, FaCalendarAlt } from 'react-icons/fa';
-import { useAppDispatch } from '../../store/hooks';
-import { createTask, createTaskAction } from '../../store/slices/taskSlice';
+import React from 'react';
+import { FaTimes, FaUser, FaRegFlag, FaCalendarAlt, FaLayerGroup } from 'react-icons/fa';
+import { CreateModalProps } from '../../types';
+import { useCreateTask } from '../../utils/Hooks/ModalHooks';
 
-interface CreateTaskModalProps {
-    isOpen: boolean;
-    onClose: () => void;
-}
 
-const CreateTaskModal: React.FC<CreateTaskModalProps> = ({ isOpen, onClose }) => {
-    const dispatch = useAppDispatch();
-    const [name, setName] = useState('');
-    const [description, setDescription] = useState('');
-    const [status, setStatus] = useState('TODO');
-    const [priority, setPriority] = useState('MEDIUM');
-    const [dueDate, setDueDate] = useState('');
-    const [assigneeId, setAssigneeId] = useState('');
+const CreateTaskModal: React.FC<CreateModalProps> = ({ isOpen, onClose }) => {
+    const {
+        projects,
+        name,
+        setName,
+        description,
+        setDescription,
+        status,
+        setStatus,
+        priority,
+        setPriority,
+        dueDate,
+        setDueDate,
+        assigneeId,
+        setAssigneeId,
+        projectId,
+        setProjectId,
+        isLoading,
+        teamMembers,
+        handleSubmit
+    } = useCreateTask(onClose);
 
     if (!isOpen) return null;
 
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-
-        // Dispatch action
-        await dispatch(createTaskAction({
-            name,
-            description,
-            status,
-            priority,
-            dueDate,
-            assigneeId,
-            sectionId: 'backlog', // Default to backlog/todo 
-            projectId: 'current_project_id' // Mock project ID
-        }));
-
-        onClose();
-        setName('');
-        setDescription('');
-    };
-
     return (
         <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black bg-opacity-50 backdrop-blur-sm">
-            <div className="bg-white rounded-xl shadow-2xl w-full max-w-lg mx-4 overflow-hidden transform transition-all scale-100">
+            <div className="bg-white rounded-xl shadow-2xl w-full max-w-lg mx-4 overflow-hidden transform transition-all scale-100 animate-fade-in-up">
 
                 {/* Header */}
                 <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 bg-gray-50/50">
@@ -66,6 +55,25 @@ const CreateTaskModal: React.FC<CreateTaskModalProps> = ({ isOpen, onClose }) =>
                             required
                             autoFocus
                         />
+                    </div>
+
+                    {/* Project Selector */}
+                    <div className="space-y-1.5">
+                        <label className="block text-sm font-semibold text-gray-700">Project <span className="text-red-500">*</span></label>
+                        <div className="relative">
+                            <select
+                                value={projectId}
+                                onChange={(e) => setProjectId(e.target.value)}
+                                className="w-full pl-8 pr-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 bg-white text-sm appearance-none"
+                                required
+                            >
+                                <option value="" disabled>Select a project</option>
+                                {projects.map((p) => (
+                                    <option key={p.id} value={p.id}>{p.name}</option>
+                                ))}
+                            </select>
+                            <FaLayerGroup className="absolute left-2.5 top-3 text-gray-400" size={14} />
+                        </div>
                     </div>
 
                     {/* Description */}
@@ -138,9 +146,11 @@ const CreateTaskModal: React.FC<CreateTaskModalProps> = ({ isOpen, onClose }) =>
                                     className="w-full pl-8 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-blue-500 bg-white text-sm appearance-none"
                                 >
                                     <option value="">Unassigned</option>
-                                    <option value="user1">Me (Current User)</option>
-                                    {/* Mock Users */}
-                                    <option value="user2">John Doe</option>
+                                    {teamMembers.map((member) => (
+                                        <option key={member.id} value={member.id}>
+                                            {member.name}
+                                        </option>
+                                    ))}
                                 </select>
                                 <FaUser className="absolute left-2.5 top-2.5 text-gray-400" size={12} />
                             </div>
@@ -158,9 +168,10 @@ const CreateTaskModal: React.FC<CreateTaskModalProps> = ({ isOpen, onClose }) =>
                         </button>
                         <button
                             type="submit"
-                            className="px-6 py-2 text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 rounded-md shadow-sm transition-all transform active:scale-95"
+                            disabled={isLoading}
+                            className={`px-6 py-2 text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 rounded-md shadow-sm transition-all transform active:scale-95 ${isLoading ? 'opacity-70 cursor-not-allowed' : ''}`}
                         >
-                            Create Task
+                            {isLoading ? 'Creating...' : 'Create Task'}
                         </button>
                     </div>
 

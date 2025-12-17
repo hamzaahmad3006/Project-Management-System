@@ -1,11 +1,6 @@
 import React from 'react';
 import { FaFilePdf, FaTimes } from 'react-icons/fa';
-
-interface NotificationPopoverProps {
-    isOpen: boolean;
-    onClose: () => void;
-    leftOffset?: number;
-}
+import { NotificationPopoverProps } from '../../types';
 
 const NotificationPopover: React.FC<NotificationPopoverProps> = ({ isOpen, onClose, leftOffset = 80 }) => {
     if (!isOpen) return null;

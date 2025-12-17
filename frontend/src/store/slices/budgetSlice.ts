@@ -31,12 +31,25 @@ export const fetchBudgetOverview = createAsyncThunk(
     }
 );
 
+export const updateProjectBudget = createAsyncThunk(
+    'budget/updateProjectBudget',
+    async ({ projectId, data }: { projectId: string; data: any }, { rejectWithValue }) => {
+        try {
+            const response = await api.put(`/budget/${projectId}`, data);
+            return response.data.project;
+        } catch (error: any) {
+            return rejectWithValue(error.response?.data?.message || 'Failed to update budget');
+        }
+    }
+);
+
 const budgetSlice = createSlice({
     name: 'budget',
     initialState,
     reducers: {},
     extraReducers: (builder) => {
         builder
+            // Fetch Overview
             .addCase(fetchBudgetOverview.pending, (state) => {
                 state.loading = true;
             })
@@ -48,6 +61,13 @@ const budgetSlice = createSlice({
             .addCase(fetchBudgetOverview.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.payload as string;
+            })
+            // Update Project Budget
+            .addCase(updateProjectBudget.fulfilled, (state, action) => {
+                const index = state.projects.findIndex(p => p.id === action.payload.id);
+                if (index !== -1) {
+                    state.projects[index] = { ...state.projects[index], ...action.payload };
+                }
             });
     },
 });

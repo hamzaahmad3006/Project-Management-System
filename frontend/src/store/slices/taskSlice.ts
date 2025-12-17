@@ -25,15 +25,15 @@ const initialState: TaskState = {
     error: null,
 };
 
-export const createTaskAction = createAsyncThunk(
+// Consolidated createTask action
+export const createTask = createAsyncThunk(
     'tasks/createTask',
     async (taskData: any, { rejectWithValue }) => {
         try {
-            // Backend ko data bhejo
-            const response = await api.post('/tasks/createTask', taskData);
+            const response = await api.post('/tasks', taskData);
             return response.data;
         } catch (error: any) {
-            return rejectWithValue(error.response.data);
+            return rejectWithValue(error.response?.data?.message || 'Failed to create task');
         }
     }
 );
@@ -46,18 +46,6 @@ export const fetchTasks = createAsyncThunk(
             return response.data.tasks;
         } catch (error: any) {
             return rejectWithValue(error.response?.data?.message || 'Failed to fetch tasks');
-        }
-    }
-);
-
-export const createTask = createAsyncThunk(
-    'tasks/createTask',
-    async (taskData: any, { rejectWithValue }) => {
-        try {
-            const response = await api.post('/tasks', taskData);
-            return response.data.task;
-        } catch (error: any) {
-            return rejectWithValue(error.response?.data?.message || 'Failed to create task');
         }
     }
 );

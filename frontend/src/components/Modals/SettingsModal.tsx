@@ -1,8 +1,8 @@
 import { Switch } from '@mui/material';
 import React, { useState } from 'react';
 import { FaUser, FaTimes } from 'react-icons/fa';
-import { SettingsModalProps, ProfileSettingsProps } from '../../types';
-import { handleChange, handleImageChange, handleChangeProfile } from '../../utils/Hooks';
+import { CreateModalProps, ProfileSettingsProps } from '../../types';
+import { handleChange, handleImageChange, handleChangeProfile } from '../../utils/Hooks/ModalHooks';
 import { useSelector } from 'react-redux';
 import { RootState } from 'store/store';
 import Loader from 'components/Loaders/Loader';
@@ -10,7 +10,7 @@ import Loader from 'components/Loaders/Loader';
 
 
 
-const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose }) => {
+const SettingsModal: React.FC<CreateModalProps> = ({ isOpen, onClose }) => {
     const { user } = useSelector((state: RootState) => state.auth)
     const [activeTab, setActiveTab] = useState('profile');
     const [profile, setProfile] = useState({

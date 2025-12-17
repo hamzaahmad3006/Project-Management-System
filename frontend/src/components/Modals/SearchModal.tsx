@@ -1,20 +1,10 @@
 import React, { useEffect } from 'react';
 import { FaSearch, FaCheckCircle, FaUser, FaSortAmountDown, FaCalendarAlt } from 'react-icons/fa';
+import { CreateModalProps } from '../../types';
+import { RecentItem } from '../../types';
 
-interface SearchModalProps {
-    isOpen: boolean;
-    onClose: () => void;
-}
 
-interface RecentItem {
-    id: string;
-    title: string;
-    subtitle: string;
-    date: string;
-    avatar?: string;
-}
-
-const SearchModal: React.FC<SearchModalProps> = ({ isOpen, onClose }) => {
+const SearchModal: React.FC<CreateModalProps> = ({ isOpen, onClose }) => {
     // Close on escape key
     useEffect(() => {
         const handleKeyDown = (e: KeyboardEvent) => {

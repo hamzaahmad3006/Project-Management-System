@@ -1,15 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { FaTimes, FaUser, FaRegFlag, FaCalendarAlt, FaLayerGroup, FaColumns, FaPaperclip } from 'react-icons/fa';
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
-import { createTaskAction } from '../../store/slices/taskSlice';
+import { createTask } from '../../store/slices/taskSlice';
 import { fetchProjects } from '../../store/slices/projectSlice';
+import { CreateModalProps } from '../../types';
 
-interface CreateGlobalTaskModalProps {
-    isOpen: boolean;
-    onClose: () => void;
-}
-
-const CreateGlobalTaskModal: React.FC<CreateGlobalTaskModalProps> = ({ isOpen, onClose }) => {
+const CreateGlobalTaskModal: React.FC<CreateModalProps> = ({ isOpen, onClose }) => {
     const dispatch = useAppDispatch();
     const { projects } = useAppSelector((state) => state.projects);
 
@@ -47,7 +43,7 @@ const CreateGlobalTaskModal: React.FC<CreateGlobalTaskModalProps> = ({ isOpen, o
         }
 
         // Dispatch action
-        await dispatch(createTaskAction({
+        await dispatch(createTask({
             name,
             description,
             status,
