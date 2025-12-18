@@ -1,81 +1,42 @@
-import React from 'react';
-import { FaFilePdf, FaTimes } from 'react-icons/fa';
+import React, { useEffect } from 'react';
+import { FaFilePdf, FaUserCircle } from 'react-icons/fa';
+import { useDispatch, useSelector } from 'react-redux';
 import { NotificationPopoverProps } from '../../types';
+import { RootState, AppDispatch } from '../../store/store';
+import { fetchNotifications, markNotificationAsRead, acceptTeamInvitation, declineTeamInvitation } from '../../store/slices/notificationSlice';
+import { formatDistanceToNow } from 'date-fns';
 
 const NotificationPopover: React.FC<NotificationPopoverProps> = ({ isOpen, onClose, leftOffset = 80 }) => {
+    const dispatch = useDispatch<AppDispatch>();
+    const { notifications, loading } = useSelector((state: RootState) => state.notifications);
+
+    useEffect(() => {
+        if (isOpen) {
+            dispatch(fetchNotifications());
+        }
+    }, [isOpen, dispatch]);
+
     if (!isOpen) return null;
 
-    const notifications = [
-        {
-            id: 1,
-            user: "Olivia Haze",
-            avatar: "https://i.pravatar.cc/150?u=1",
-            action: "joined the project",
-            target: "Marketing",
-            time: "1 min ago",
-            project: "Defcon systems",
-            type: "simple",
-            unread: true
-        },
-        {
-            id: 2,
-            user: "Hanna Wayne",
-            avatar: "https://i.pravatar.cc/150?u=2",
-            action: "wants to edit project",
-            target: "Directions",
-            time: "5 min ago",
-            project: "Defcon systems",
-            type: "request",
-            unread: true
-        },
-        {
-            id: 3,
-            user: "Greg Rodrigues",
-            avatar: "https://i.pravatar.cc/150?u=3",
-            action: "commented in",
-            target: "Directions",
-            time: "30 min ago",
-            project: "Defcon systems",
-            type: "comment",
-            content: "A tutorial would be cool. Unsure if people can see each others schedules without being admin?",
-            unread: false
-        },
-        {
-            id: 4,
-            user: "Olivia Haze",
-            avatar: "https://i.pravatar.cc/150?u=1",
-            action: "shared a file in",
-            target: "Marketing",
-            time: "1 hour ago",
-            project: "Defcon systems",
-            type: "file",
-            file: "Landing_draft.pdf",
-            fileType: "PDF-Download",
-            unread: false
-        },
-        {
-            id: 5,
-            user: "Valery Shane",
-            avatar: "https://i.pravatar.cc/150?u=4",
-            action: "marked 10 tasks complete in",
-            target: "BilldCorp",
-            time: "1 day ago",
-            project: "Defcon systems",
-            type: "simple",
-            unread: false
-        },
-        {
-            id: 6,
-            user: "Olivia Haze",
-            avatar: "https://i.pravatar.cc/150?u=1",
-            action: "wants to edit project",
-            target: "Directions",
-            time: "2 days ago",
-            project: "Defcon systems",
-            type: "request",
-            unread: false
+    const handleAccept = async (token: string, notificationId: string) => {
+        try {
+            await dispatch(acceptTeamInvitation(token)).unwrap();
+            await dispatch(markNotificationAsRead(notificationId));
+            alert("Invitation accepted successfully!");
+        } catch (error: any) {
+            alert(error || "Failed to accept invitation");
         }
-    ];
+    };
+
+    const handleDecline = async (token: string, notificationId: string) => {
+        try {
+            await dispatch(declineTeamInvitation(token)).unwrap();
+            await dispatch(markNotificationAsRead(notificationId));
+            alert("Invitation declined.");
+        } catch (error: any) {
+            alert(error || "Failed to decline invitation");
+        }
+    };
 
     return (
         <>
@@ -84,79 +45,77 @@ const NotificationPopover: React.FC<NotificationPopoverProps> = ({ isOpen, onClo
 
             {/* Popover Content */}
             <div
-                className="fixed top-4 bottom-4 w-[450px] bg-white rounded-2xl shadow-2xl z-50 overflow-hidden flex flex-col font-sans animate-in slide-in-from-left-4 duration-200 border border-gray-100"
+                className="fixed top-4 bottom-4 w-[450px] bg-white dark:bg-[#1a1c23] rounded-2xl shadow-2xl z-50 overflow-hidden flex flex-col font-sans animate-in slide-in-from-left-4 duration-200 border border-gray-100 dark:border-gray-800"
                 style={{ left: `${leftOffset + 16}px` }}
             >
                 {/* Header */}
-                <div className="p-5 flex items-center justify-between border-b border-gray-100 bg-white sticky top-0">
-                    <h3 className="text-xl font-semibold text-gray-800">Notifications</h3>
-                    <button className="text-sm text-gray-400 hover:text-blue-600 transition-colors">
+                <div className="p-5 flex items-center justify-between border-b border-gray-100 dark:border-gray-800 bg-white dark:bg-[#1a1c23] sticky top-0 z-10">
+                    <h3 className="text-xl font-bold text-gray-800 dark:text-gray-100 tracking-tight">Notifications</h3>
+                    <button
+                        onClick={() => notifications.forEach(n => !n.isRead && dispatch(markNotificationAsRead(n.id)))}
+                        className="text-xs font-bold uppercase tracking-wider text-gray-400 dark:text-gray-500 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+                    >
                         Mark all as read
                     </button>
                 </div>
 
                 {/* List */}
-                <div className="flex-1 overflow-y-auto custom-scrollbar">
-                    {notifications.map((notif) => (
-                        <div key={notif.id} className="p-5 border-b border-gray-50 hover:bg-gray-50 transition-colors relative group">
-                            {/* Blue dot for unread */}
-                            {notif.unread && (
-                                <div className="absolute top-6 right-5 w-2 h-2 bg-blue-500 rounded-full"></div>
-                            )}
+                <div className="flex-1 overflow-y-auto custom-scrollbar bg-white dark:bg-[#1a1c23]">
+                    {loading && notifications.length === 0 ? (
+                        <div className="p-10 text-center text-gray-500 dark:text-gray-400 flex flex-col items-center gap-3">
+                            <div className="w-8 h-8 border-2 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+                            <span className="text-sm font-medium">Loading notifications...</span>
+                        </div>
+                    ) : notifications.length === 0 ? (
+                        <div className="p-12 text-center text-gray-400 dark:text-gray-500 flex flex-col items-center gap-4">
+                            <span className="text-4xl opacity-20">🔔</span>
+                            <span className="text-sm font-medium">No notifications yet</span>
+                        </div>
+                    ) : (
+                        notifications.map((notif) => (
+                            <div key={notif.id} className="p-5 border-b border-gray-50 dark:border-gray-800/50 hover:bg-gray-50 dark:hover:bg-gray-800/30 transition-colors relative group">
+                                {/* Blue dot for unread */}
+                                {!notif.isRead && (
+                                    <div className="absolute top-6 right-5 w-2 h-2 bg-blue-500 rounded-full shadow-[0_0_8px_rgba(59,130,246,0.5)]"></div>
+                                )}
 
-                            <div className="flex gap-4">
-                                <img
-                                    src={notif.avatar}
-                                    alt={notif.user}
-                                    className="w-10 h-10 rounded-full object-cover flex-shrink-0"
-                                />
-
-                                <div className="flex-1 space-y-1">
-                                    <div className="text-[15px] leading-snug">
-                                        <span className="font-semibold text-gray-900">{notif.user}</span>{' '}
-                                        <span className="text-gray-600">{notif.action}</span>{' '}
-                                        <span className="font-medium text-gray-900">{notif.target}</span>
+                                <div className="flex gap-4">
+                                    <div className="w-10 h-10 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center flex-shrink-0 overflow-hidden border border-gray-200 dark:border-gray-700 shadow-sm">
+                                        <FaUserCircle className="text-gray-400 dark:text-gray-500 text-3xl" />
                                     </div>
 
-                                    <div className="text-xs text-gray-400">
-                                        {notif.time} <span className="text-gray-300">•</span> {notif.project}
+                                    <div className="flex-1 space-y-1.5">
+                                        <div className="text-[14px] leading-relaxed">
+                                            <span className="font-bold text-gray-900 dark:text-gray-100">{notif.title}</span>{' '}
+                                            <span className="text-gray-600 dark:text-gray-400 font-medium">{notif.message}</span>
+                                        </div>
+
+                                        <div className="text-[10px] font-bold uppercase tracking-wide text-gray-400 dark:text-gray-500">
+                                            {formatDistanceToNow(new Date(notif.createdAt), { addSuffix: true })}
+                                        </div>
+
+                                        {/* Type: TEAM_INVITATION (Accept/Decline) */}
+                                        {notif.type === 'TEAM_INVITATION' && !notif.isRead && (
+                                            <div className="flex gap-3 pt-3">
+                                                <button
+                                                    onClick={() => handleAccept(notif.data.token, notif.id)}
+                                                    className="px-6 py-1.5 bg-yellow-400 hover:bg-yellow-500 dark:bg-yellow-500 dark:hover:bg-yellow-600 text-gray-900 dark:text-gray-900 text-xs font-bold rounded shadow-sm transition-all transform active:scale-95"
+                                                >
+                                                    Accept
+                                                </button>
+                                                <button
+                                                    onClick={() => handleDecline(notif.data.token, notif.id)}
+                                                    className="px-6 py-1.5 border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-400 text-xs font-bold rounded hover:bg-gray-100 dark:hover:bg-gray-800 transition-all transform active:scale-95"
+                                                >
+                                                    Decline
+                                                </button>
+                                            </div>
+                                        )}
                                     </div>
-
-                                    {/* Type: Request (Approve/Deny) */}
-                                    {notif.type === 'request' && (
-                                        <div className="flex gap-3 pt-2">
-                                            <button className="px-5 py-1.5 bg-blue-500 hover:bg-blue-600 text-white text-sm font-medium rounded transition-colors shadow-sm shadow-blue-200">
-                                                Approve
-                                            </button>
-                                            <button className="px-5 py-1.5 border border-gray-200 text-gray-600 text-sm font-medium rounded hover:bg-gray-100 transition-colors">
-                                                Deny
-                                            </button>
-                                        </div>
-                                    )}
-
-                                    {/* Type: Comment */}
-                                    {notif.type === 'comment' && (
-                                        <div className="mt-2 p-3 bg-gray-100 rounded-lg text-sm text-gray-700 leading-relaxed border border-gray-200">
-                                            {notif.content}
-                                        </div>
-                                    )}
-
-                                    {/* Type: File */}
-                                    {notif.type === 'file' && (
-                                        <div className="mt-2 flex items-center gap-3 p-3 bg-gray-50 border border-gray-100 rounded-lg hover:border-gray-200 transition-colors cursor-pointer group/file">
-                                            <div className="w-10 h-10 bg-red-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                                                <FaFilePdf className="text-red-500 text-xl" />
-                                            </div>
-                                            <div>
-                                                <div className="text-sm font-medium text-gray-800 group-hover/file:text-blue-600 transition-colors">{notif.file}</div>
-                                                <div className="text-xs text-gray-400">{notif.fileType}</div>
-                                            </div>
-                                        </div>
-                                    )}
                                 </div>
                             </div>
-                        </div>
-                    ))}
+                        ))
+                    )}
                 </div>
             </div>
         </>
@@ -164,3 +123,4 @@ const NotificationPopover: React.FC<NotificationPopoverProps> = ({ isOpen, onClo
 };
 
 export default NotificationPopover;
+

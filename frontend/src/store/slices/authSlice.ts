@@ -7,6 +7,11 @@ interface User {
     name: string;
     role: 'MEMBER' | 'MANAGER';
     avatar?: string;
+    teamMemberships?: {
+        team: {
+            name: string;
+        };
+    }[];
 }
 
 interface AuthState {
@@ -87,8 +92,8 @@ export const fetchAllUsers = createAsyncThunk(
         try {
             const response = await api.get('/auth/all-users'); // backend endpoint to get all users
             return response.data.users; // assume backend returns { users: [...] }
-        } catch (error: any) {
-            return rejectWithValue(error.response?.data?.message || 'Failed to fetch users');
+        } catch (error: unknown) {
+            return rejectWithValue((error as Error).message || 'Failed to fetch users');
         }
     }
 );

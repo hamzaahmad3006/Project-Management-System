@@ -7,9 +7,11 @@ import { fetchProfile } from './store/slices/authSlice';
 import { useSelector } from 'react-redux';
 import { RootState } from './store/store';
 import Loader from 'components/Loaders/Loader';
+import { useTheme } from './hooks/useTheme';
 
 
 function App() {
+  useTheme();
   const dispatch = useDispatch();
   const { loading, user } = useSelector((state: RootState) => state.auth);
   const token = localStorage.getItem('token');

@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
-import { useSelector } from 'react-redux';
-import { RootState } from '../../store/store';
+import { useSelector, useDispatch } from 'react-redux';
+import { RootState, AppDispatch } from '../../store/store';
+import { fetchNotifications } from '../../store/slices/notificationSlice';
 import CreateProjectModal from '../Modals/CreateProjectModal';
 import InviteTeammatesModal from '../Modals/InviteTeammatesModal';
 import CreateTeamModal from '../Modals/CreateTeamModal';
@@ -10,13 +11,14 @@ import SearchModal from '../Modals/SearchModal';
 import NotificationPopover from '../Popovers/NotificationPopover';
 import { FaSearch, FaBell, FaChevronRight, FaChevronDown, FaUserPlus, FaCog, FaBars, FaTimes, FaRegCheckCircle, FaRegFile, FaPlus, } from 'react-icons/fa';
 import { logout } from 'store/slices/authSlice';
-import { useDispatch } from 'react-redux';
 import { MdLogout } from 'react-icons/md';
 
 const Sidebar: React.FC = () => {
-    const dispatch = useDispatch();
+    const dispatch = useDispatch<AppDispatch>();
     const navigate = useNavigate();
     const { user } = useSelector((state: RootState) => state.auth);
+    const { notifications } = useSelector((state: RootState) => state.notifications);
+    const unreadCount = notifications.filter(n => !n.isRead).length;
     const isManager = user?.role === 'MANAGER';
     const [isOpen, setIsOpen] = useState(true);
     const [isMobileOpen, setIsMobileOpen] = useState(false);
@@ -27,6 +29,10 @@ const Sidebar: React.FC = () => {
     const [isSettingsOpen, setIsSettingsOpen] = useState(false);
     const [isSearchOpen, setIsSearchOpen] = useState(false);
     const [isNotificationOpen, setIsNotificationOpen] = useState(false);
+
+    useEffect(() => {
+        dispatch(fetchNotifications());
+    }, [dispatch]);
 
     useEffect(() => {
         console.log('Sidebar - isCreateTeamOpen changed to:', isCreateTeamOpen);
@@ -72,19 +78,19 @@ const Sidebar: React.FC = () => {
 
             <aside
                 className={`
-                    fixed md:sticky top-0 h-screen bg-[#FAFAFA] border-r border-gray-200
+                    fixed md:sticky top-0 h-screen bg-[#FAFAFA] dark:bg-[#1a1c23] border-r border-gray-200 dark:border-gray-800
                     transition-all duration-300 z-40
                     ${isOpen ? 'w-64' : 'w-20'}
                     ${isMobileOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}
                 `}
             >
-                <div className="p-4 border-b border-gray-200 flex items-center justify-between">
+                <div className="p-4 border-b border-gray-200 dark:border-gray-800 flex items-center justify-between">
                     {isOpen && (
                         <div className="flex items-center gap-2 cursor-pointer" onClick={() => navigate('/')}>
                             <div className="w-6 h-6 bg-yellow-400 rounded flex items-center justify-center text-sm">
                                 ❖
                             </div>
-                            <span className="font-semibold text-gray-800">Defcon systems</span>
+                            <span className="font-semibold text-gray-800 dark:text-gray-100">Defcon systems</span>
                         </div>
                     )}
                     <button
@@ -98,7 +104,7 @@ const Sidebar: React.FC = () => {
                 <nav className="p-3 space-y-1">
                     <div
                         onClick={() => setIsSearchOpen(true)}
-                        className={`flex items-center gap-3 px-3 py-2 text-gray-600 hover:bg-gray-200 rounded cursor-pointer ${!isOpen && 'justify-center'}`}
+                        className={`flex items-center gap-3 px-3 py-2 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-800 rounded cursor-pointer ${!isOpen && 'justify-center'}`}
                     >
                         <FaSearch size={16} />
                         {isOpen && <span className="text-sm">Search</span>}
@@ -106,16 +112,25 @@ const Sidebar: React.FC = () => {
 
                     <div
                         onClick={() => setIsNotificationOpen(!isNotificationOpen)}
-                        className={`flex items-center gap-3 px-3 py-2 text-gray-600 hover:bg-gray-200 rounded cursor-pointer ${!isOpen && 'justify-center'} ${isNotificationOpen ? 'bg-gray-200 text-gray-900' : ''}`}
+                        className={`flex items-center gap-3 px-3 py-2 text-gray-600 hover:bg-gray-200 rounded cursor-pointer relative ${!isOpen && 'justify-center'} ${isNotificationOpen ? 'bg-gray-200 text-gray-900' : ''}`}
                     >
-                        <FaBell size={16} />
+                        <div className="relative">
+                            <FaBell size={16} />
+                            {unreadCount > 0 && (
+                                <span className={`absolute -top-1.5 -right-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white ${!isOpen && 'top-0 right-0'}`}>
+                                    {unreadCount > 9 ? '9+' : unreadCount}
+                                </span>
+                            )}
+                        </div>
                         {isOpen && <span className="text-sm">Notifications</span>}
                     </div>
 
                     <NavLink
                         to="/tasks"
                         className={({ isActive }) =>
-                            `flex items-center gap-3 px-3 py-2 rounded transition-colors ${isActive ? 'bg-gray-200 text-gray-900' : 'text-gray-600 hover:bg-gray-200'
+                            `flex items-center gap-3 px-3 py-2 rounded transition-colors ${isActive
+                                ? 'bg-gray-200 dark:bg-gray-800 text-gray-900 dark:text-gray-100'
+                                : 'text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-800'
                             } ${!isOpen && 'justify-center'}`
                         }
                     >
@@ -142,7 +157,6 @@ const Sidebar: React.FC = () => {
                                     onClick={(e) => {
                                         e.stopPropagation();
                                         e.preventDefault();
-                                        console.log('Plus icon wrapper clicked!');
                                         setIsCreateTeamOpen(true);
                                     }}
                                 >
@@ -231,7 +245,6 @@ const Sidebar: React.FC = () => {
             <CreateTeamModal
                 isOpen={isCreateTeamOpen}
                 onClose={() => {
-                    console.log('Sidebar: CreateTeamModal onClose triggered');
                     setIsCreateTeamOpen(false);
                 }}
             />

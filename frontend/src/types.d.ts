@@ -49,7 +49,7 @@ export interface User {
     email: string;
     role: "MEMBER" | "MANAGER";
     avatar?: string;
-    teamMemberships?: { teamId: string }[];
+    teamMemberships?: { team: { name: string } }[];
 }
 
 //===== Project.tsx Interface ======

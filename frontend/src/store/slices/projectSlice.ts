@@ -12,7 +12,17 @@ interface Project {
     budget: number;
     spent: number;
     manager: { id: string; name: string };
-    teamMembers: any[];
+    priority?: string;
+    tasks?: { status: string }[];
+    team?: {
+        members: {
+            user: {
+                id: string;
+                name: string;
+                avatar?: string;
+            }
+        }[];
+    };
     _count?: { tasks: number };
 }
 

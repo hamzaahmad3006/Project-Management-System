@@ -26,133 +26,137 @@ export default function DashboardPage() {
     ];
 
     return (
-        <div className="space-y-6">
+        <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-500">
             {/* top stat cards */}
-            <div className="grid grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                 {stats.map((s, i) => (
-                    <div key={i} className="bg-white border rounded p-4">
-                        <div className="text-xs text-gray-400">{s.title}</div>
-                        <div className="text-2xl font-semibold mt-2">{s.value}</div>
-                        <div className="text-sm text-blue-500 mt-2">{s.meta}</div>
+                    <div key={i} className="bg-white dark:bg-[#1a1c23] border border-gray-100 dark:border-gray-800 rounded-xl p-5 shadow-sm hover:shadow-md transition-shadow">
+                        <div className="text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider">{s.title}</div>
+                        <div className="text-2xl font-bold mt-2 text-gray-900 dark:text-gray-100">{s.value}</div>
+                        <div className="text-sm font-medium text-blue-500 dark:text-blue-400 mt-2 flex items-center gap-1">
+                            <span className="text-[10px]">↑</span> {s.meta}
+                        </div>
                     </div>
                 ))}
             </div>
 
             {/* main chart + right column */}
-            <div className="grid grid-cols-3 gap-6">
-                <div className="col-span-2 bg-white border rounded p-6">
-                    <div className="flex justify-between items-start mb-4">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <div className="lg:col-span-2 bg-white dark:bg-[#1a1c23] border border-gray-100 dark:border-gray-800 rounded-xl p-6 shadow-sm">
+                    <div className="flex justify-between items-start mb-8">
                         <div>
-                            <div className="text-xs text-gray-400">Overview</div>
-                            <div className="text-3xl font-semibold mt-2">$127,289</div>
+                            <div className="text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider">Overview</div>
+                            <div className="text-3xl font-bold mt-2 text-gray-900 dark:text-gray-100">$127,289</div>
                         </div>
                         <div className="flex gap-2">
-                            <button className="px-3 py-1 text-xs border rounded-full">Billable</button>
-                            <button className="px-3 py-1 text-xs border rounded-full">Non-billable</button>
+                            <button className="px-3 py-1 text-xs font-medium border border-gray-200 dark:border-gray-700 rounded-full text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">Billable</button>
+                            <button className="px-3 py-1 text-xs font-medium border border-gray-200 dark:border-gray-700 rounded-full text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">Non-billable</button>
                         </div>
                     </div>
 
                     {/* simple bar chart using divs */}
-                    <div className="flex items-end gap-4 h-36">
+                    <div className="flex items-end justify-between gap-2 sm:gap-4 h-48 border-b border-gray-100 dark:border-gray-800 pb-1">
                         {bars.map((b, idx) => (
-                            <div key={idx} className="flex flex-col items-center gap-2">
+                            <div key={idx} className="flex-1 flex flex-col items-center gap-2 group">
                                 <div
-                                    className={`rounded-md ${b.highlight ? "bg-blue-600" : "bg-gray-200"}`}
-                                    style={{ height: `${(b.value / 100) * 140}px`, width: 28 }}
+                                    className={`w-full max-w-[28px] rounded-t-md transition-all duration-300 group-hover:opacity-80 ${b.highlight ? "bg-blue-600 dark:bg-blue-500" : "bg-gray-100 dark:bg-gray-800"}`}
+                                    style={{ height: `${(b.value / 100) * 160}px` }}
                                 />
-                                <div className="text-xs text-gray-500 mt-2">{b.label}</div>
+                                <div className="text-[10px] font-medium text-gray-500 dark:text-gray-500 mt-1">{b.label}</div>
                             </div>
                         ))}
                     </div>
 
                     {/* Timeline section */}
                     <div className="mt-8">
-                        <div className="text-sm text-gray-500 mb-4">Timeline</div>
-                        <div className="space-y-3">
+                        <div className="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-6">Timeline</div>
+                        <div className="space-y-4">
                             {/* timeline row - color blocks mimic events */}
-                            <div className="flex items-center gap-3">
-                                <div className="w-10 text-xs text-gray-400">10:00</div>
-                                <div className="flex-1 h-8 rounded bg-yellow-100 px-3 flex items-center">Contact customers with failed new payments</div>
+                            <div className="flex items-center gap-4">
+                                <div className="w-10 text-xs font-medium text-gray-400 dark:text-gray-500">10:00</div>
+                                <div className="flex-1 h-10 rounded-lg bg-yellow-50 dark:bg-yellow-900/10 border border-yellow-100 dark:border-yellow-900/20 px-4 flex items-center text-sm font-medium text-yellow-800 dark:text-yellow-400">
+                                    Contact customers with failed new payments
+                                </div>
                             </div>
 
-                            <div className="flex items-center gap-3">
-                                <div className="w-10 text-xs text-gray-400">11:00</div>
-                                <div className="flex-1 h-8 rounded bg-green-100 px-3 flex items-center">Dashboard: concept</div>
+                            <div className="flex items-center gap-4">
+                                <div className="w-10 text-xs font-medium text-gray-400 dark:text-gray-500">11:00</div>
+                                <div className="flex-1 h-10 rounded-lg bg-green-50 dark:bg-green-900/10 border border-green-100 dark:border-green-900/20 px-4 flex items-center text-sm font-medium text-green-800 dark:text-green-400">
+                                    Dashboard: concept
+                                </div>
                             </div>
 
-                            <div className="flex items-center gap-3">
-                                <div className="w-10 text-xs text-gray-400">12:00</div>
-                                <div className="flex-1 h-8 rounded bg-pink-100 px-3 flex items-center">Task detail modal</div>
+                            <div className="flex items-center gap-4">
+                                <div className="w-10 text-xs font-medium text-gray-400 dark:text-gray-500">12:00</div>
+                                <div className="flex-1 h-10 rounded-lg bg-pink-50 dark:bg-pink-900/10 border border-pink-100 dark:border-pink-900/20 px-4 flex items-center text-sm font-medium text-pink-800 dark:text-pink-400">
+                                    Task detail modal
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
                 {/* right column: top completed tasks + earnings */}
-                <aside className="bg-white border rounded p-4 space-y-6">
+                <aside className="bg-white dark:bg-[#1a1c23] border border-gray-100 dark:border-gray-800 rounded-xl p-5 shadow-sm space-y-8">
                     <div>
-                        <div className="flex justify-between items-center mb-3">
-                            <div className="text-sm font-medium">Top completed tasks</div>
-                            <button className="text-xs text-gray-500 border px-2 py-1 rounded">This week</button>
+                        <div className="flex justify-between items-center mb-5">
+                            <div className="text-sm font-bold text-gray-900 dark:text-gray-100">Top completed tasks</div>
+                            <button className="text-[10px] font-bold uppercase tracking-wider text-gray-400 dark:text-gray-500 border border-gray-200 dark:border-gray-700 px-2.5 py-1 rounded-full hover:bg-gray-50 dark:hover:bg-gray-800">This week</button>
                         </div>
 
-                        <ul className="space-y-3">
-                            <li className="flex items-center justify-between">
+                        <ul className="space-y-4">
+                            <li className="flex items-center justify-between group cursor-pointer">
                                 <div className="flex items-center gap-3">
-                                    <div className="w-8 h-8 rounded-full bg-cover" style={{ backgroundImage: "url('https://randomuser.me/api/portraits/women/65.jpg')" }} />
+                                    <div className="w-9 h-9 rounded-full bg-cover border-2 border-white dark:border-gray-800 shadow-sm" style={{ backgroundImage: "url('https://randomuser.me/api/portraits/women/65.jpg')" }} />
                                     <div>
-                                        <div className="font-medium">Hanna Rodgers</div>
-                                        <div className="text-xs text-gray-400">QA Lead</div>
+                                        <div className="text-sm font-bold text-gray-900 dark:text-gray-100 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">Hanna Rodgers</div>
+                                        <div className="text-[10px] font-medium text-gray-400 dark:text-gray-500">QA Lead</div>
                                     </div>
                                 </div>
-                                <div className="text-sm text-gray-600">24</div>
+                                <div className="text-sm font-bold text-gray-700 dark:text-gray-300 bg-gray-50 dark:bg-gray-800 px-2 py-1 rounded">24</div>
                             </li>
 
-                            <li className="flex items-center justify-between">
+                            <li className="flex items-center justify-between group cursor-pointer">
                                 <div className="flex items-center gap-3">
-                                    <div className="w-8 h-8 rounded-full bg-cover" style={{ backgroundImage: "url('https://randomuser.me/api/portraits/men/32.jpg')" }} />
+                                    <div className="w-9 h-9 rounded-full bg-cover border-2 border-white dark:border-gray-800 shadow-sm" style={{ backgroundImage: "url('https://randomuser.me/api/portraits/men/32.jpg')" }} />
                                     <div>
-                                        <div className="font-medium">Henry Rollins</div>
-                                        <div className="text-xs text-gray-400">Support</div>
+                                        <div className="text-sm font-bold text-gray-900 dark:text-gray-100 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">Henry Rollins</div>
+                                        <div className="text-[10px] font-medium text-gray-400 dark:text-gray-500">Support</div>
                                     </div>
                                 </div>
-                                <div className="text-sm text-gray-600">20</div>
+                                <div className="text-sm font-bold text-gray-700 dark:text-gray-300 bg-gray-50 dark:bg-gray-800 px-2 py-1 rounded">20</div>
                             </li>
-
-                            {/* more items... */}
                         </ul>
                     </div>
 
                     <div>
-                        <div className="flex justify-between items-center mb-3">
-                            <div className="text-sm font-medium">Top earning</div>
-                            <button className="text-xs text-gray-500 border px-2 py-1 rounded">This month</button>
+                        <div className="flex justify-between items-center mb-5">
+                            <div className="text-sm font-bold text-gray-900 dark:text-gray-100">Top earning</div>
+                            <button className="text-[10px] font-bold uppercase tracking-wider text-gray-400 dark:text-gray-500 border border-gray-200 dark:border-gray-700 px-2.5 py-1 rounded-full hover:bg-gray-50 dark:hover:bg-gray-800">This month</button>
                         </div>
 
-                        <ul className="space-y-3 text-sm">
-                            <li className="flex items-center justify-between">
+                        <ul className="space-y-4">
+                            <li className="flex items-center justify-between p-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors cursor-pointer">
                                 <div className="flex items-center gap-3">
-                                    <div className="w-8 h-8 rounded p-2 bg-green-50">💼</div>
+                                    <div className="w-9 h-9 rounded-lg bg-green-50 dark:bg-green-900/20 flex items-center justify-center text-lg">💼</div>
                                     <div>
-                                        <div className="font-medium">Development</div>
-                                        <div className="text-xs text-gray-400">72 completed tasks</div>
+                                        <div className="text-sm font-bold text-gray-900 dark:text-gray-100">Development</div>
+                                        <div className="text-[10px] font-medium text-gray-400 dark:text-gray-500">72 completed tasks</div>
                                     </div>
                                 </div>
-                                <div className="font-medium">$3,340.21</div>
+                                <div className="text-sm font-bold text-gray-900 dark:text-gray-100">$3,340.21</div>
                             </li>
 
-                            <li className="flex items-center justify-between">
+                            <li className="flex items-center justify-between p-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors cursor-pointer">
                                 <div className="flex items-center gap-3">
-                                    <div className="w-8 h-8 rounded p-2 bg-blue-50">📁</div>
+                                    <div className="w-9 h-9 rounded-lg bg-blue-50 dark:bg-blue-900/20 flex items-center justify-center text-lg">📁</div>
                                     <div>
-                                        <div className="font-medium">Directions</div>
-                                        <div className="text-xs text-gray-400">57 completed tasks</div>
+                                        <div className="text-sm font-bold text-gray-900 dark:text-gray-100">Directions</div>
+                                        <div className="text-[10px] font-medium text-gray-400 dark:text-gray-500">57 completed tasks</div>
                                     </div>
                                 </div>
-                                <div className="font-medium">$2,800.30</div>
+                                <div className="text-sm font-bold text-gray-900 dark:text-gray-100">$2,800.30</div>
                             </li>
-
-                            {/* ... */}
                         </ul>
                     </div>
                 </aside>

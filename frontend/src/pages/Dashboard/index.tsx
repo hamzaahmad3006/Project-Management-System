@@ -19,7 +19,7 @@ export default function Dashboard() {
             <Sidebar />
 
             {/* Main Content */}
-            <div className="flex-1 overflow-y-auto">
+            <div className="flex-1 overflow-y-auto bg-white dark:bg-[#12141c]">
                 <Routes>
                     <Route index element={< Home />} />
                     <Route path="tasks" element={< Tasks />} />

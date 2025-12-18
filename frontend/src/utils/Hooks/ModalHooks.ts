@@ -1,4 +1,4 @@
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 import React, { useState, useEffect } from "react";
 import api from "../../api/axios";
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
@@ -71,8 +71,8 @@ export const handleChangeProfile = async (
         window.toastify("Profile updated!", "success");
 
     } catch (err) {
-        console.error(err);
-        window.toastify("Profile update failed!", "error");
+        const error = err as AxiosError<{ message: string }>;
+        window.toastify(error.response?.data?.message || "Profile update failed!", "error");
     } finally {
         setLoading(false);
     }
@@ -117,7 +117,8 @@ export const useCreateProject = (onClose: () => void) => {
             setTeamId('');
             onClose();
         } catch (error) {
-            console.error('Failed to create project:', error);
+            const err = error as AxiosError<{ message: string }>;
+            window.toastify(err.response?.data?.message || "Failed to create project", "error");
         } finally {
             setIsLoading(false);
             window.toastify('Project created successfully', 'success');
@@ -178,7 +179,8 @@ export const useCreateTask = (onClose: () => void) => {
                 const response = await api.get('/auth/all-users');
                 setTeamMembers(response.data.users || response.data);
             } catch (error) {
-                console.error('Failed to fetch team members:', error);
+                const err = error as AxiosError<{ message: string }>;
+                window.toastify(err.response?.data?.message || "Failed to fetch team members", "error");
                 if (currentUser) {
                     setTeamMembers([{ id: currentUser.id, name: currentUser.name }]);
                 }
@@ -216,8 +218,8 @@ export const useCreateTask = (onClose: () => void) => {
             setPriority('MEDIUM');
             setStatus('TODO');
         } catch (error) {
-            console.error("Failed to create task:", error);
-            alert("Failed to create task. Please try again.");
+            const err = error as AxiosError<{ message: string }>;
+            window.toastify(err.response?.data?.message || "Failed to create task", "error");
         } finally {
             setIsLoading(false);
         }
@@ -270,7 +272,6 @@ export const useCreateTeam = (onClose: () => void) => {
     };
 
     const handleCreateTeam = async () => {
-        // Validation
         if (!teamName.trim()) {
             setError("Team name is required");
             return;
@@ -290,7 +291,7 @@ export const useCreateTeam = (onClose: () => void) => {
                 memberIds: selectedMembers,
             });
 
-            console.log("Team created successfully:", response.data);
+
             setSuccess(true);
 
             // Close modal after short delay to show success
@@ -300,9 +301,9 @@ export const useCreateTeam = (onClose: () => void) => {
                 setTeamName("");
                 setSelectedMembers([]);
             }, 1500);
-        } catch (err: unknown) {
-            console.error("Create team error:", err);
-            setError("Failed to create team");
+        } catch (err) {
+            const error = err as AxiosError<{ message: string }>;
+            setError(error.response?.data?.message || "Failed to create team");
         } finally {
             setLoading(false);
         }

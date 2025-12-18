@@ -7,6 +7,8 @@ import teamReducer from './slices/teamSlice';
 import budgetReducer from './slices/budgetSlice';
 import reportReducer from './slices/reportSlice';
 import dashboardReducer from './slices/dashboardSlice';
+import notificationReducer from './slices/notificationSlice';
+import themeReducer from './slices/themeSlice';
 
 export const store = configureStore({
     reducer: {
@@ -18,6 +20,8 @@ export const store = configureStore({
         budget: budgetReducer,
         reports: reportReducer,
         dashboard: dashboardReducer,
+        notifications: notificationReducer,
+        theme: themeReducer,
     },
 });
 
