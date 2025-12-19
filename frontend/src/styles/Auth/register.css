@@ -5,7 +5,7 @@
 
 @layer utilities {
     .register-container {
-        @apply min-h-screen w-full flex flex-col items-center justify-around bg-white px-4 py-8 font-inter
+        @apply min-h-screen w-full flex flex-col items-center justify-around bg-white dark:bg-[#12141c] px-4 py-8 font-inter transition-colors duration-300
     }
 
     .register-logo-main-div {
@@ -25,38 +25,38 @@
     }
 
     .register-title {
-        @apply text-center text-2xl font-medium mb-8 text-[#25272D]
+        @apply text-center text-2xl font-medium mb-8 text-[#25272D] dark:text-gray-100
     }
 
     .register-signin-btn {
-        @apply w-full bg-white border-solid !border-2 !border-[#E2E4E9] rounded-md py-2.5 px-4 flex items-center justify-center gap-3 text-sm font-medium text-[#25272D] hover:bg-gray-50 transition shadow-sm
+        @apply w-full bg-white dark:bg-gray-800 border-solid !border-2 !border-[#E2E4E9] dark:border-gray-700 rounded-md py-2.5 px-4 flex items-center justify-center gap-3 text-sm font-medium text-[#25272D] dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 transition shadow-sm
     }
 
     .register-email-label {
-        @apply block text-xs font-medium text-[#8F929C] mb-2
+        @apply block text-xs font-medium text-[#8F929C] dark:text-gray-500 mb-2
     }
 
     .register-email-input {
-        @apply w-full h-[36px] border border-[#E2E4E9] py-2.5 px-4 text-sm font-medium text-[#25272D] focus:outline-none focus:ring-2 focus:ring-blue-500
+        @apply w-full h-[36px] bg-white dark:bg-gray-800 border border-[#E2E4E9] dark:border-gray-700 py-2.5 px-4 text-sm font-medium text-[#25272D] dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-800 transition-all rounded-md
     }
 
     .register-password-label {
-        @apply block text-xs font-medium text-gray-600 mb-2
+        @apply block text-xs font-medium text-gray-600 dark:text-gray-400 mb-2
     }
 
     .register-password-input {
-        @apply w-full h-[36px] border border-[#E2E4E9] py-2.5 px-4 text-sm font-medium text-[#25272D] focus:outline-none focus:ring-2 focus:ring-blue-500
+        @apply w-full h-[36px] bg-white dark:bg-gray-800 border border-[#E2E4E9] dark:border-gray-700 py-2.5 px-4 text-sm font-medium text-[#25272D] dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-800 transition-all rounded-md
     }
 
     .register-continue-btn {
-        @apply w-full h-[36px] bg-[#6696F5] text-white py-2.5 rounded-md mt-5 hover:bg-blue-600 transition text-sm font-medium shadow-sm
+        @apply w-full h-[36px] bg-[#6696F5] dark:bg-blue-600 text-white py-2.5 rounded-md mt-5 hover:bg-blue-600 dark:hover:bg-blue-700 transition text-sm font-medium shadow-sm
     }
 
     .register-footer {
-        @apply mb-8 text-xs text-gray-500 flex flex-wrap gap-4 justify-center items-center
+        @apply mb-8 text-xs text-gray-500 dark:text-gray-500 flex flex-wrap gap-4 justify-center items-center
     }
 
     .register-footer-link {
-        @apply cursor-pointer hover:text-gray-700
+        @apply cursor-pointer hover:text-gray-700 dark:hover:text-gray-300 transition-colors
     }
 }

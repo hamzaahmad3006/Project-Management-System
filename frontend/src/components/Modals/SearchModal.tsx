@@ -1,10 +1,31 @@
-import React, { useEffect } from 'react';
-import { FaSearch, FaCheckCircle, FaUser, FaSortAmountDown, FaCalendarAlt } from 'react-icons/fa';
+import React, { useEffect, useState, useMemo } from 'react';
+import { FaSearch, FaCheckCircle, FaSortAmountDown, FaCalendarAlt, FaProjectDiagram } from 'react-icons/fa';
 import { CreateModalProps } from '../../types';
-import { RecentItem } from '../../types';
+import { useAppSelector, useAppDispatch } from '../../store/hooks';
+import { useNavigate } from 'react-router-dom';
+import { setCurrentProject } from '../../store/slices/projectSlice';
+import { fetchTasks } from '../../store/slices/taskSlice';
+import { fetchProjects } from '../../store/slices/projectSlice';
 
 
 const SearchModal: React.FC<CreateModalProps> = ({ isOpen, onClose }) => {
+    const dispatch = useAppDispatch();
+    const navigate = useNavigate();
+    const { tasks, loading: tasksLoading } = useAppSelector((state) => state.tasks);
+    const { projects, loading: projectsLoading } = useAppSelector((state) => state.projects);
+    const [searchTerm, setSearchTerm] = useState('');
+
+    const isLoading = tasksLoading || projectsLoading;
+
+    // Fetch data if missing or stale when modal opens
+    useEffect(() => {
+        if (isOpen) {
+            // Re-fetch to ensure we have latest data
+            dispatch(fetchTasks({}));
+            dispatch(fetchProjects());
+        }
+    }, [isOpen, dispatch]);
+
     // Close on escape key
     useEffect(() => {
         const handleKeyDown = (e: KeyboardEvent) => {
@@ -14,57 +35,65 @@ const SearchModal: React.FC<CreateModalProps> = ({ isOpen, onClose }) => {
         return () => window.removeEventListener('keydown', handleKeyDown);
     }, [isOpen, onClose]);
 
-    if (!isOpen) return null;
+    // Reset search term when modal closes
+    useEffect(() => {
+        if (!isOpen) setSearchTerm('');
+    }, [isOpen]);
 
-    const recentItems: RecentItem[] = [
-        {
-            id: '1',
-            title: 'Contact customers with failed new ayents or who churned',
-            subtitle: 'Dev/Directions',
-            date: '2 days ago',
-            avatar: 'https://i.pravatar.cc/150?u=1'
-        },
-        {
-            id: '2',
-            title: 'Reporting: Design concept of visual dashboard',
-            subtitle: 'Marketing',
-            date: '2 days ago',
-            avatar: 'https://i.pravatar.cc/150?u=2'
-        },
-        {
-            id: '3',
-            title: 'Task detail modal: ideas',
-            subtitle: 'Dev / Directions',
-            date: '2 days ago',
-            avatar: 'https://i.pravatar.cc/150?u=3'
-        },
-        {
-            id: '4',
-            title: 'Add Projects to templates and layouts [draft 2025]',
-            subtitle: 'Landing [empty]',
-            date: '2 days ago'
-        },
-        {
-            id: '5',
-            title: 'Reporting: Design concept of visual dashboard',
-            subtitle: 'QA progress',
-            date: '2 days ago',
-            avatar: 'https://i.pravatar.cc/150?u=5'
-        },
-        {
-            id: '6',
-            title: 'Help Docs: update screenshot',
-            subtitle: 'Design drafts',
-            date: '2 days ago'
-        },
-        {
-            id: '7',
-            title: 'Reporting: Design concept of visual dashboard',
-            subtitle: 'Dev/Directions',
-            date: '2 days ago',
-            avatar: 'https://i.pravatar.cc/150?u=7'
+    const searchResults = useMemo(() => {
+        const safeTasks = Array.isArray(tasks) ? tasks : [];
+        const safeProjects = Array.isArray(projects) ? projects : [];
+
+        if (!searchTerm.trim()) return [];
+
+        const normalizedTerm = searchTerm.toLowerCase().trim();
+
+        const filteredProjects = safeProjects.filter(p =>
+            (p.name && p.name.toLowerCase().includes(normalizedTerm)) ||
+            (p.description && p.description.toLowerCase().includes(normalizedTerm))
+        ).map(p => ({
+            id: p.id,
+            title: p.name,
+            subtitle: 'Project',
+            type: 'project' as const,
+            date: p.status,
+            avatar: p.team?.members?.[0]?.user?.avatar,
+            original: p
+        }));
+
+        const filteredTasks = safeTasks.filter(t =>
+            (t.name && t.name.toLowerCase().includes(normalizedTerm)) ||
+            (t.description && t.description.toLowerCase().includes(normalizedTerm))
+        ).map(t => ({
+            id: t.id,
+            title: t.name,
+            subtitle: t.project?.name || 'Task',
+            type: 'task' as const,
+            date: t.status,
+            avatar: t.assignedTo?.avatar,
+            original: t
+        }));
+
+        return [...filteredProjects, ...filteredTasks];
+    }, [searchTerm, tasks, projects]);
+
+    const handleSelect = (item: any) => {
+        if (item.type === 'project') {
+            dispatch(setCurrentProject(item.original));
+            navigate('/dashboard/board');
+        } else {
+            const project = projects.find(p => p.id === item.original.projectId);
+            if (project) {
+                dispatch(setCurrentProject(project));
+                navigate('/dashboard/board');
+            } else if (item.original.id) {
+                navigate('/dashboard/tasks');
+            }
         }
-    ];
+        onClose();
+    };
+
+    if (!isOpen) return null;
 
     return (
         <div className="fixed inset-0 z-50 flex items-start justify-center pt-20 px-4">
@@ -80,11 +109,13 @@ const SearchModal: React.FC<CreateModalProps> = ({ isOpen, onClose }) => {
             >
                 {/* Search Input Header */}
                 <div className="p-5 border-b border-gray-100 dark:border-gray-800 flex items-center gap-4">
-                    <FaSearch className="text-gray-400 dark:text-gray-500 text-lg" />
+                    <FaSearch className={`transition-colors duration-200 ${isLoading ? 'text-blue-500 animate-pulse' : 'text-gray-400 dark:text-gray-500'}`} />
                     <input
                         type="text"
-                        placeholder="Search, run a command or ask a question..."
+                        placeholder="Search projects or tasks..."
                         className="flex-1 text-lg text-gray-700 dark:text-gray-200 placeholder-gray-400 dark:placeholder:text-gray-600 outline-none bg-transparent"
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
                         autoFocus
                     />
                 </div>
@@ -92,34 +123,50 @@ const SearchModal: React.FC<CreateModalProps> = ({ isOpen, onClose }) => {
                 {/* Filters */}
                 <div className="px-4 py-2 border-b border-gray-100 dark:border-gray-800 flex items-center gap-2 overflow-x-auto no-scrollbar bg-gray-50/50 dark:bg-gray-800/10">
                     <FilterButton icon={<FaSortAmountDown />} label="Sort" />
-                    <FilterButton icon={<FaUser />} label="Created by: Yauhen Rymaszewski" active />
-                    <FilterButton icon={<FaCheckCircle />} label="Projects" />
+                    <FilterButton icon={<FaProjectDiagram />} label="Projects" />
+                    <FilterButton icon={<FaCheckCircle />} label="Tasks" />
                     <FilterButton icon={<FaCalendarAlt />} label="Date" />
                 </div>
 
                 {/* Content */}
-                <div className="flex-1 overflow-y-auto p-2 custom-scrollbar">
-                    <div className="px-3 py-2 text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-[0.1em]">Recent</div>
-                    <div className="space-y-0.5">
-                        {recentItems.map((item) => (
-                            <div key={item.id} className="group flex items-center gap-3 px-3 py-2.5 hover:bg-gray-50 dark:hover:bg-gray-800/30 rounded-lg cursor-pointer transition-colors">
-                                <div className="flex-shrink-0 text-gray-400 dark:text-gray-600 group-hover:text-blue-500 dark:group-hover:text-blue-400 transition-colors">
-                                    <FaCheckCircle size={16} />
-                                </div>
-                                <div className="flex-1 min-w-0">
-                                    <div className="text-sm font-bold text-gray-800 dark:text-gray-200 truncate">{item.title}</div>
-                                    <div className="text-xs text-gray-500 dark:text-gray-500 flex items-center gap-1.5 mt-0.5">
-                                        <span className="font-semibold">{item.subtitle}</span>
-                                        <span className="w-1 h-1 bg-gray-300 dark:bg-gray-700 rounded-full"></span>
-                                        <span>{item.date}</span>
-                                    </div>
-                                </div>
-                                {item.avatar && (
-                                    <img src={item.avatar} alt="User" className="w-6 h-6 rounded-full border border-gray-200 dark:border-gray-700" />
-                                )}
+                <div className="flex-1 overflow-y-auto p-2 custom-scrollbar min-h-[200px]">
+                    {searchTerm.trim() ? (
+                        <>
+                            <div className="px-3 py-2 text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-[0.1em] flex justify-between items-center">
+                                <span>{searchResults.length > 0 ? `Results (${searchResults.length})` : 'No results found'}</span>
+                                {isLoading && <span className="animate-spin h-3 w-3 border-2 border-blue-500 border-t-transparent rounded-full"></span>}
                             </div>
-                        ))}
-                    </div>
+                            <div className="space-y-0.5">
+                                {searchResults.map((item) => (
+                                    <div
+                                        key={`${item.type}-${item.id}`}
+                                        onClick={() => handleSelect(item)}
+                                        className="group flex items-center gap-3 px-3 py-2.5 hover:bg-gray-50 dark:hover:bg-gray-800/30 rounded-lg cursor-pointer transition-colors"
+                                    >
+                                        <div className="flex-shrink-0 text-gray-400 dark:text-gray-600 group-hover:text-blue-500 dark:group-hover:text-blue-400 transition-colors">
+                                            {item.type === 'project' ? <FaProjectDiagram size={16} /> : <FaCheckCircle size={16} />}
+                                        </div>
+                                        <div className="flex-1 min-w-0">
+                                            <div className="text-sm font-bold text-gray-800 dark:text-gray-200 truncate">{item.title}</div>
+                                            <div className="text-xs text-gray-500 dark:text-gray-500 flex items-center gap-1.5 mt-0.5">
+                                                <span className="font-semibold">{item.subtitle}</span>
+                                                <span className="w-1 h-1 bg-gray-300 dark:bg-gray-700 rounded-full"></span>
+                                                <span className="uppercase text-[10px] tracking-wider">{item.date?.replace('_', ' ')}</span>
+                                            </div>
+                                        </div>
+                                        {item.avatar && (
+                                            <img src={item.avatar} alt="User" className="w-6 h-6 rounded-full border border-gray-200 dark:border-gray-700" />
+                                        )}
+                                    </div>
+                                ))}
+                            </div>
+                        </>
+                    ) : (
+                        <div className="p-8 text-center mt-10">
+                            <FaSearch className="mx-auto text-4xl text-gray-200 dark:text-gray-800 mb-4" />
+                            <p className="text-gray-400 dark:text-gray-500 text-sm">Type to search for projects or tasks</p>
+                        </div>
+                    )}
                 </div>
 
                 {/* Footer */}
@@ -127,13 +174,6 @@ const SearchModal: React.FC<CreateModalProps> = ({ isOpen, onClose }) => {
                     <div className="flex items-center gap-1.5">
                         <kbd className="px-1.5 py-0.5 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded shadow-sm text-gray-900 dark:text-gray-100">↵</kbd>
                         <span>Select</span>
-                    </div>
-                    <div className="flex items-center gap-1.5">
-                        <div className="flex gap-1">
-                            <kbd className="px-1.5 py-0.5 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded shadow-sm text-gray-900 dark:text-gray-100 font-sans">Ctrl</kbd>
-                            <kbd className="px-1.5 py-0.5 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded shadow-sm text-gray-900 dark:text-gray-100">↵</kbd>
-                        </div>
-                        <span>Open</span>
                     </div>
                 </div>
             </div>

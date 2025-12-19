@@ -68,7 +68,7 @@ const Register: React.FC = () => {
             {/* Main Content - Center */}
             <div className="register-card">
                 {/* Title */}
-                <h2 className="register-title text-center text-2xl font-semibold mb-8 text-[#25272D]">Sign up</h2>
+                <h2 className="register-title text-center text-2xl font-bold mb-8 text-gray-800 dark:text-gray-100 uppercase tracking-tight">Sign up</h2>
 
                 {/* Google Button */}
                 <button className="register-signin-btn" onClick={handleSinginWithGoogle}>
@@ -89,14 +89,14 @@ const Register: React.FC = () => {
                 </button>
 
                 {/* Email Section */}
-                <div className="register-email-section mt-8">
-                    <label className="register-email-label">Email</label>
+                <div className="register-email-section mt-10">
+                    <label className="register-email-label uppercase tracking-wider font-bold">Email</label>
                     <input
                         type="email"
                         placeholder="Enter your email address..."
                         className="register-email-input"
                     />
-                    <p className="text-xs text-gray-400 mt-2">
+                    <p className="text-[11px] text-gray-400 dark:text-gray-500 mt-2.5 leading-relaxed">
                         Use an organization email to easily collaborate with teammates
                     </p>
                 </div>
@@ -108,8 +108,8 @@ const Register: React.FC = () => {
             </div>
 
             {/* Footer - Bottom */}
-            <div className="register-footer ">
-                <span>© Defcon systems</span>
+            <div className="register-footer mt-12">
+                <span className="opacity-50">© Defcon systems</span>
                 <span className="register-footer-link">Privacy</span>
                 <span className="register-footer-link">Support</span>
                 <span className="register-footer-link">Pricing</span>

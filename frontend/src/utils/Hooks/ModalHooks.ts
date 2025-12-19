@@ -6,9 +6,8 @@ import { createProject } from '../../store/slices/projectSlice';
 import { getTeams } from '../../store/slices/teamSlice';
 import { createTask } from '../../store/slices/taskSlice';
 import { fetchAllUsers } from '../../store/slices/authSlice';
-import { UserProfile } from "../../types";
+import { UserProfile, TeamMember, User, TaskStatus, TaskPriority } from "../../types";
 import { fetchProjects } from '../../store/slices/projectSlice';
-import { TeamMember, User } from '../../types';
 
 
 export const handleChange = (
@@ -151,8 +150,8 @@ export const useCreateTask = (onClose: () => void) => {
 
     const [name, setName] = useState('');
     const [description, setDescription] = useState('');
-    const [status, setStatus] = useState('TODO');
-    const [priority, setPriority] = useState('MEDIUM');
+    const [status, setStatus] = useState<TaskStatus>('TODO');
+    const [priority, setPriority] = useState<TaskPriority>('MEDIUM');
     const [dueDate, setDueDate] = useState('');
     const [assigneeId, setAssigneeId] = useState('');
     const [projectId, setProjectId] = useState('');
@@ -170,25 +169,24 @@ export const useCreateTask = (onClose: () => void) => {
         }
     }, [projects, projectId]);
 
-    // Fetch team members when project changes
+    // Extract team members when project changes
     useEffect(() => {
-        const fetchTeamMembers = async () => {
-            if (!projectId) return;
+        if (!projectId || projects.length === 0) {
+            setTeamMembers([]);
+            return;
+        }
 
-            try {
-                const response = await api.get('/auth/all-users');
-                setTeamMembers(response.data.users || response.data);
-            } catch (error) {
-                const err = error as AxiosError<{ message: string }>;
-                window.toastify(err.response?.data?.message || "Failed to fetch team members", "error");
-                if (currentUser) {
-                    setTeamMembers([{ id: currentUser.id, name: currentUser.name }]);
-                }
-            }
-        };
-
-        fetchTeamMembers();
-    }, [projectId, currentUser]);
+        const project = projects.find(p => p.id === projectId);
+        if (project?.team?.members) {
+            const members = project.team.members.map((m: { user: { id: string, name: string } }) => ({
+                id: m.user.id,
+                name: m.user.name
+            }));
+            setTeamMembers(members);
+        } else {
+            setTeamMembers([]);
+        }
+    }, [projectId, projects]);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -204,7 +202,7 @@ export const useCreateTask = (onClose: () => void) => {
                 description,
                 status,
                 priority,
-                dueDate: dueDate || undefined,
+                dueDate: dueDate || null,
                 assigneeId: assigneeId || undefined,
                 projectId,
             })).unwrap();

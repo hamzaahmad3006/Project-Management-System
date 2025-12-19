@@ -4,6 +4,7 @@ import {
     FaTh, FaCalendarAlt, FaStream, FaPlus, FaChevronDown, FaChevronRight, FaChevronLeft,
     FaCheckCircle, FaRegCircle, FaRegComment, FaPaperclip, FaUserCircle
 } from 'react-icons/fa';
+import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
 import CreateProjectModal from '../../components/Modals/CreateProjectModal';
 import TaskDetailPanel from '../../components/Dashboard/TaskDetailPanel';
 import { useAppDispatch } from '../../store/hooks';
@@ -12,78 +13,25 @@ import { Task, Section } from '../../types';
 
 
 
+import { useProjectBoard } from '../../utils/Hooks/DashBoardHooks';
+
 const ProjectBoard: React.FC = () => {
-    const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
-    const [selectedTask, setSelectedTask] = useState<Task | null>(null);
-    const [activeView, setActiveView] = useState('Table');
-    const [collapsedSections, setCollapsedSections] = useState<string[]>(['postpone', 'qa']); // Set default collapsed sections
+    const {
+        loading,
+        activeView,
+        setActiveView,
+        collapsedSections,
+        toggleSection,
+        isCreateModalOpen,
+        setIsCreateModalOpen,
+        selectedTask,
+        setSelectedTask,
+        handleAddTask,
+        handleDragEnd,
+        sections
+    } = useProjectBoard();
 
-    const dispatch = useAppDispatch();
-    const handleAddTask = (taskName: string, sectionId: string) => {
-        const newTaskData = {
-            name: taskName,
-            sectionId: sectionId, // Kis column mein ban raha hai (e.g., Backlog ID)
-            projectId: "current_project_id",
-        };
-        // Redux action dispatch karo
-        dispatch(createTask(newTaskData));
-    };
-    const toggleSection = (sectionId: string) => {
-        setCollapsedSections(prev =>
-            prev.includes(sectionId)
-                ? prev.filter(id => id !== sectionId)
-                : [...prev, sectionId]
-        );
-    };
-
-    // Mock Data
-    const sections: Section[] = [
-        {
-            id: 'backlog',
-            title: 'Backlog',
-            count: 4,
-            color: 'gray',
-            tasks: [
-                { id: '1', name: 'Contact customers with failed new payents or who churned', status: 'Backlog', dueDate: 'Aug 6', label: ['design', 'design'], assignee: { name: 'Henry', avatar: 'https://i.pravatar.cc/150?u=henry' }, comments: 2, attachments: 5 },
-                { id: '2', name: 'Reporting: Design concept of visual dashboard', status: 'Backlog', dueDate: 'Sep 20', label: ['bug', 'API'], assignee: { name: 'Henry', avatar: 'https://i.pravatar.cc/150?u=henry' } },
-                { id: '3', name: 'Task detail modal: ideas', status: 'Backlog', label: ['mobile'], assignee: { name: 'Billy', avatar: 'https://i.pravatar.cc/150?u=billy' }, attachments: 2 },
-                { id: '4', name: 'Reporting: Design concept of visual dashboard', status: 'Backlog', dueDate: 'Aug 23', label: ['design'], assignee: { name: 'Hanna', avatar: 'https://i.pravatar.cc/150?u=hanna' }, comments: 2 },
-            ]
-        },
-        {
-            id: 'postpone',
-            title: 'Postpone',
-            count: 6,
-            color: 'red',
-            tasks: []
-        },
-        {
-            id: 'inprogress',
-            title: 'In progress',
-            count: 4,
-            color: 'green',
-            tasks: [
-                { id: '5', name: 'Lead feedback sessions', status: 'In progress', dueDate: 'Aug 6', label: ['design', 'design'], assignee: { name: 'Alex', avatar: 'https://i.pravatar.cc/150?u=alex' }, comments: 1 },
-                { id: '6', name: 'Add Projects to templates and layouts [draft 2023]', status: 'In progress', assignee: { name: 'Henry', avatar: 'https://i.pravatar.cc/150?u=henry' }, label: ['design'] },
-                { id: '7', name: 'Extension: show totals', status: 'In progress', assignee: { name: 'Alice', avatar: 'https://i.pravatar.cc/150?u=alice' }, comments: 2 },
-                { id: '8', name: 'Help Docs: update screenshot', status: 'In progress', label: ['plan', 'bug'], assignee: { name: 'Billy', avatar: 'https://i.pravatar.cc/150?u=billy' } },
-            ]
-        },
-        {
-            id: 'qa',
-            title: 'QA',
-            count: 4,
-            color: 'orange',
-            tasks: [
-                { id: '9', name: 'Invoices: fixed-fee projects', status: 'QA', label: ['design', 'design'], assignee: { name: 'Adam', avatar: 'https://i.pravatar.cc/150?u=adam' }, comments: 2, attachments: 5 },
-                { id: '10', name: 'Time: search - not last response with results appears', status: 'QA', dueDate: 'Sep 8', label: ['bug'], assignee: { name: 'Henry', avatar: 'https://i.pravatar.cc/150?u=henry' }, comments: 5 },
-                { id: '11', name: 'Pricing page: new iteration and few mockups and ideas', status: 'QA' },
-                { id: '12', name: '@dev QA: regression ( before/after release)', status: 'QA', dueDate: 'Nov 3', assignee: { name: 'Alex', avatar: 'https://i.pravatar.cc/150?u=alex' } },
-            ]
-        }
-    ];
-
-    // Mock Calendar Events for October 2024
+    // Mock Calendar Events (can be moved to hook later)
     const calendarEvents = [
         { id: '1', title: 'Contact customers wi...', date: 25, color: 'bg-orange-100 ring-1 ring-orange-200 text-orange-700' },
         { id: '2', title: 'Task detail modal', date: 25, color: 'bg-pink-100 ring-1 ring-pink-200 text-pink-700' },
@@ -103,6 +51,7 @@ const ProjectBoard: React.FC = () => {
         { id: '16', title: 'Dashboard: concept', date: 5, color: 'bg-green-100 ring-1 ring-green-200 text-green-700' },
         { id: '17', title: 'Contact customers wi...', date: 5, color: 'bg-orange-100 ring-1 ring-orange-200 text-orange-700' },
     ];
+
 
     return (
         <div className="flex flex-col h-full bg-white dark:bg-[#12141c]">
@@ -191,110 +140,128 @@ const ProjectBoard: React.FC = () => {
             {/* Content Switcher */}
             <div className="flex-1 overflow-x-auto bg-white dark:bg-[#12141c] p-6">
                 {activeView === 'Board' ? (
-                    <div className="flex items-start h-full gap-6 min-w-max">
-                        {sections.map(section => (
-                            <div
-                                key={section.id}
-                                className={`flex flex-col h-full ${section.id === 'postpone' ? 'w-10 items-center bg-gray-50 dark:bg-[#1a1c23] rounded-lg pt-4' : 'w-72'}`}
-                            >
-                                {/* Column Header */}
-                                {section.id === 'postpone' ? (
-                                    <div className="h-full flex flex-col items-center">
-                                        <div className="w-2 h-2 rounded-full bg-red-500 mb-6"></div>
-                                        <div className="rotate-90 text-sm font-semibold text-gray-500 dark:text-gray-400 whitespace-nowrap tracking-wide origin-center translate-y-8">
-                                            {section.title} <span className="ml-2 font-normal">{section.count}</span>
-                                        </div>
-                                    </div>
-                                ) : (
-                                    <div className="flex items-center gap-2 mb-4">
-                                        <div className={`w-2 h-2 rounded-full bg-${section.color}-500`}></div>
-                                        <h3 className="font-semibold text-gray-800 dark:text-gray-100">{section.title}</h3>
-                                        <span className="text-gray-400 dark:text-gray-500 text-sm">{section.count}</span>
-                                        <div className="ml-auto flex gap-2 text-gray-400 dark:text-gray-500">
-                                            <FaPlus size={12} className="cursor-pointer hover:text-gray-600 dark:hover:text-gray-300" />
-                                            <FaEllipsisH size={12} className="cursor-pointer hover:text-gray-600 dark:hover:text-gray-300" />
-                                        </div>
-                                    </div>
-                                )}
-
-                                {/* Tasks Container */}
-                                {section.id !== 'postpone' && (
-                                    <div className="flex-1 space-y-3 overflow-y-auto pr-1">
-                                        {section.tasks.map(task => (
-                                            <div
-                                                key={task.id}
-                                                onClick={() => setSelectedTask(task)}
-                                                className="bg-white dark:bg-[#1a1c23] border border-gray-200 dark:border-gray-800 rounded-lg p-3 hover:shadow-md dark:hover:border-gray-700 transition-all cursor-pointer group"
-                                            >
-                                                <h4 className="text-sm font-medium text-gray-800 dark:text-gray-100 mb-2 leading-tight">{task.name}</h4>
-
-                                                {/* Labels */}
-                                                {(task.label?.length || 0) > 0 && (
-                                                    <div className="flex flex-wrap gap-1 mb-3">
-                                                        {task.label?.map((lbl, i) => (
-                                                            <span
-                                                                key={i}
-                                                                className={`px-1.5 py-0.5 text-[10px] font-medium rounded 
-                                                                    ${lbl === 'design' ? 'bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400' :
-                                                                        lbl === 'bug' ? 'bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400' :
-                                                                            lbl === 'API' ? 'bg-orange-50 dark:bg-orange-900/30 text-orange-600 dark:text-orange-400' :
-                                                                                lbl === 'plan' ? 'bg-yellow-50 dark:bg-yellow-900/30 text-yellow-600 dark:text-yellow-400' :
-                                                                                    'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400'}`}
-                                                            >
-                                                                {lbl}
-                                                            </span>
-                                                        ))}
-                                                    </div>
-                                                )}
-
-                                                {/* Footer */}
-                                                <div className="flex items-center justify-between mt-2 pt-2 border-t border-gray-50 dark:border-gray-800">
-                                                    <div className="flex items-center gap-2">
-                                                        {task.assignee && (
-                                                            <div className="flex items-center gap-1.5">
-                                                                <img src={task.assignee.avatar} alt={task.assignee.name} className="w-5 h-5 rounded-full" />
-                                                                <span className="text-xs text-gray-500 dark:text-gray-400">{task.assignee.name}</span>
-                                                            </div>
-                                                        )}
-                                                    </div>
-
-                                                    <div className="flex items-center gap-3 text-gray-400 dark:text-gray-500">
-                                                        {task.comments && (
-                                                            <div className="flex items-center gap-1 text-xs">
-                                                                <FaRegComment size={10} /> {task.comments}
-                                                            </div>
-                                                        )}
-                                                        {task.attachments && (
-                                                            <div className="flex items-center gap-1 text-xs">
-                                                                <FaPaperclip size={10} /> {task.attachments}
-                                                            </div>
-                                                        )}
-                                                        {task.dueDate && (
-                                                            <div className="text-[10px] text-gray-400 dark:text-gray-500">
-                                                                {task.dueDate}
-                                                            </div>
-                                                        )}
+                    <DragDropContext onDragEnd={handleDragEnd}>
+                        <div className="flex items-start h-full gap-6 min-w-max">
+                            {sections.map(section => (
+                                <Droppable key={section.id} droppableId={section.id}>
+                                    {(provided, snapshot) => (
+                                        <div
+                                            {...provided.droppableProps}
+                                            ref={provided.innerRef}
+                                            className={`flex flex-col h-full transition-colors duration-200 
+                                                ${section.id === 'postpone' ? 'w-10 items-center rounded-lg pt-4' : 'w-72'}
+                                                ${snapshot.isDraggingOver ? (section.id === 'postpone' ? 'bg-red-50 dark:bg-red-900/20' : 'bg-blue-50/50 dark:bg-blue-900/10') : (section.id === 'postpone' ? 'bg-gray-50 dark:bg-[#1a1c23]' : '')}`}
+                                        >
+                                            {/* Column Header */}
+                                            {section.id === 'postpone' ? (
+                                                <div className="flex-1 flex flex-col items-center pointer-events-none">
+                                                    <div className="w-2 h-2 rounded-full bg-red-500 mb-6 font-bold"></div>
+                                                    <div className="rotate-90 text-sm font-semibold text-gray-500 dark:text-gray-400 whitespace-nowrap tracking-wide origin-center translate-y-8">
+                                                        {section.title} <span className="ml-2 font-normal">{section.count}</span>
                                                     </div>
                                                 </div>
-                                            </div>
-                                        ))}
-                                        {/* Add Task Button */}
-                                        <button
-                                            onClick={() => handleAddTask("New Task", section.id)}
-                                            className="flex items-center gap-2 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 text-sm py-1 w-full transition-colors"
-                                        >
-                                            <FaPlus size={12} /> Add task
-                                        </button>
-                                    </div>
-                                )}
-                            </div>
-                        ))}
+                                            ) : (
+                                                <>
+                                                    <div className="flex items-center gap-2 mb-4 px-1">
+                                                        <div className={`w-2 h-2 rounded-full bg-${section.color}-500`}></div>
+                                                        <h3 className="font-semibold text-gray-800 dark:text-gray-100">{section.title}</h3>
+                                                        <span className="text-gray-400 dark:text-gray-500 text-sm">{section.count}</span>
+                                                        <div className="ml-auto flex gap-2 text-gray-400 dark:text-gray-500">
+                                                            <FaPlus size={12} className="cursor-pointer hover:text-gray-600 dark:hover:text-gray-300" />
+                                                            <FaEllipsisH size={12} className="cursor-pointer hover:text-gray-600 dark:hover:text-gray-300" />
+                                                        </div>
+                                                    </div>
 
-                        {/* Add Section Button */}
-                        <button className="flex items-center gap-2 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 text-sm font-medium pt-1 whitespace-nowrap transition-colors">
-                            <FaPlus size={12} /> Add section
-                        </button>
-                    </div>
+                                                    {/* Tasks List */}
+                                                    <div className="flex-1 space-y-3 overflow-y-auto pr-1">
+                                                        {section.tasks.map((task, index) => (
+                                                            <Draggable key={task.id} draggableId={task.id} index={index}>
+                                                                {(provided, snapshot) => (
+                                                                    <div
+                                                                        ref={provided.innerRef}
+                                                                        {...provided.draggableProps}
+                                                                        {...provided.dragHandleProps}
+                                                                        onClick={() => setSelectedTask(task)}
+                                                                        className={`bg-white dark:bg-[#1a1c23] border rounded-lg p-3 hover:shadow-md transition-all cursor-pointer group
+                                                                            ${snapshot.isDragging ? 'shadow-2xl border-blue-500 scale-105 z-50' : 'border-gray-200 dark:border-gray-800'}`}
+                                                                    >
+                                                                        <h4 className="text-sm font-medium text-gray-800 dark:text-gray-100 mb-2 leading-tight">{task.name}</h4>
+
+                                                                        {/* Labels */}
+                                                                        {(task.label?.length || 0) > 0 && (
+                                                                            <div className="flex flex-wrap gap-1 mb-3">
+                                                                                {task.label?.map((lbl, i) => (
+                                                                                    <span
+                                                                                        key={i}
+                                                                                        className={`px-1.5 py-0.5 text-[10px] font-medium rounded 
+                                                                                            ${lbl === 'design' ? 'bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400' :
+                                                                                                lbl === 'bug' ? 'bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400' :
+                                                                                                    lbl === 'API' ? 'bg-orange-50 dark:bg-orange-900/30 text-orange-600 dark:text-orange-400' :
+                                                                                                        lbl === 'plan' ? 'bg-yellow-50 dark:bg-yellow-900/30 text-yellow-600 dark:text-yellow-400' :
+                                                                                                            'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400'}`}
+                                                                                    >
+                                                                                        {lbl}
+                                                                                    </span>
+                                                                                ))}
+                                                                            </div>
+                                                                        )}
+
+                                                                        {/* Footer */}
+                                                                        <div className="flex items-center justify-between mt-2 pt-2 border-t border-gray-50 dark:border-gray-800">
+                                                                            <div className="flex items-center gap-2">
+                                                                                {task.assignedTo && (
+                                                                                    <div className="flex items-center gap-1.5">
+                                                                                        <img src={task.assignedTo.avatar || "https://ui-avatars.com/api/?name=" + task.assignedTo.name} alt={task.assignedTo.name} className="w-5 h-5 rounded-full" />
+                                                                                        <span className="text-xs text-gray-500 dark:text-gray-400">{task.assignedTo.name}</span>
+                                                                                    </div>
+                                                                                )}
+                                                                            </div>
+
+                                                                            <div className="flex items-center gap-3 text-gray-400 dark:text-gray-500">
+                                                                                {task.comments && (
+                                                                                    <div className="flex items-center gap-1 text-xs">
+                                                                                        <FaRegComment size={10} /> {task.comments}
+                                                                                    </div>
+                                                                                )}
+                                                                                {task.attachments && (
+                                                                                    <div className="flex items-center gap-1 text-xs">
+                                                                                        <FaPaperclip size={10} /> {task.attachments}
+                                                                                    </div>
+                                                                                )}
+                                                                                {task.dueDate && (
+                                                                                    <div className="text-[10px] text-gray-400 dark:text-gray-500">
+                                                                                        {task.dueDate}
+                                                                                    </div>
+                                                                                )}
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                )}
+                                                            </Draggable>
+                                                        ))}
+                                                        {provided.placeholder}
+                                                        {/* Add Task Button */}
+                                                        <button
+                                                            onClick={() => handleAddTask("New Task", section.id)}
+                                                            className="flex items-center gap-2 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 text-sm py-1 w-full transition-colors"
+                                                        >
+                                                            <FaPlus size={12} /> Add task
+                                                        </button>
+                                                    </div>
+                                                </>
+                                            )}
+                                            {provided.placeholder}
+                                        </div>
+                                    )}
+                                </Droppable>
+                            ))}
+
+                            {/* Add Section Button */}
+                            <button className="flex items-center gap-2 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 text-sm font-medium pt-1 whitespace-nowrap transition-colors">
+                                <FaPlus size={12} /> Add section
+                            </button>
+                        </div>
+                    </DragDropContext>
                 ) : activeView === 'Calendar' ? (
                     // Calendar View Content
                     <div className="flex flex-col h-full min-w-[800px]">
@@ -346,7 +313,7 @@ const ProjectBoard: React.FC = () => {
                                     return (
                                         <div key={i} className={`border-b border-r border-gray-100 dark:border-gray-800/50 p-2 relative ${!isCurrentMonth ? 'bg-gray-50/50 dark:bg-gray-900/20' : 'bg-white dark:bg-[#1a1c23]'}`}>
                                             <span className={`text-xs w-6 h-6 flex items-center justify-center rounded-full mb-1
-                                                ${!isCurrentMonth ? 'text-gray-400 dark:text-gray-600' : isToday ? 'bg-blue-500 text-white font-bold shadow-sm' : 'text-gray-700 dark:text-gray-300'}`}>
+                                                            ${!isCurrentMonth ? 'text-gray-400 dark:text-gray-600' : isToday ? 'bg-blue-500 text-white font-bold shadow-sm' : 'text-gray-700 dark:text-gray-300'}`}>
                                                 {dayNum}
                                             </span>
 
@@ -354,7 +321,7 @@ const ProjectBoard: React.FC = () => {
                                                 {events.map((event, idx) => (
                                                     <div
                                                         key={`${event.id}-${idx}`}
-                                                        onClick={(e) => { e.stopPropagation(); /* Mocking task selection from calendar */ setSelectedTask({ id: event.id, name: event.title, status: 'In progress' } as Task); }}
+                                                        onClick={(e) => { e.stopPropagation(); /* Mocking task selection from calendar */ setSelectedTask({ id: event.id, name: event.title, status: 'IN_PROGRESS', priority: 'MEDIUM' } as Task); }}
                                                         className={`text-[10px] px-2 py-1 rounded truncate shadow-sm cursor-pointer hover:opacity-80 transition-opacity ${event.color} dark:bg-opacity-20 dark:text-opacity-90`}
                                                     >
                                                         {event.title}
@@ -425,10 +392,10 @@ const ProjectBoard: React.FC = () => {
                                                     </div>
                                                 </div>
                                                 <div className="col-span-2 flex items-center gap-2">
-                                                    {task.assignee ? (
+                                                    {task.assignedTo ? (
                                                         <>
-                                                            <img src={task.assignee.avatar} alt={task.assignee.name} className="w-5 h-5 rounded-full border border-transparent dark:border-gray-700" />
-                                                            <span className="text-gray-600 dark:text-gray-400 text-xs">{task.assignee.name}</span>
+                                                            <img src={task.assignedTo.avatar || "https://ui-avatars.com/api/?name=" + task.assignedTo.name} alt={task.assignedTo.name} className="w-5 h-5 rounded-full border border-transparent dark:border-gray-700" />
+                                                            <span className="text-gray-600 dark:text-gray-400 text-xs">{task.assignedTo.name}</span>
                                                         </>
                                                     ) : (
                                                         <FaUserCircle className="text-gray-300 dark:text-gray-600 opacity-0 group-hover:opacity-100 transition-opacity" size={20} />
@@ -442,7 +409,7 @@ const ProjectBoard: React.FC = () => {
                                                         <span
                                                             key={idx}
                                                             className={`px-2 py-0.5 rounded text-xs font-medium 
-                                                        ${lbl === 'design' ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400' :
+                                                                    ${lbl === 'design' ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400' :
                                                                     lbl === 'bug' ? 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400' :
                                                                         lbl === 'mobile' ? 'bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-400' :
                                                                             lbl === 'API' ? 'bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400' :

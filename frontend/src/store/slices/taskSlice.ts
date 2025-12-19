@@ -1,26 +1,17 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import api from '../../api/axios';
-
-interface Task {
-    id: string;
-    title: string;
-    description?: string;
-    status: 'TODO' | 'IN_PROGRESS' | 'COMPLETED' | 'CANCELED';
-    priority: 'LOW' | 'MEDIUM' | 'HIGH';
-    dueDate?: string;
-    projectId: string;
-    assignedTo?: { id: string; name: string; avatar?: string };
-    project?: { id: string; name: string };
-}
+import { Task } from '../../types';
 
 interface TaskState {
     tasks: Task[];
+    currentTask: Task | null;
     loading: boolean;
     error: string | null;
 }
 
 const initialState: TaskState = {
     tasks: [],
+    currentTask: null,
     loading: false,
     error: null,
 };
@@ -28,31 +19,46 @@ const initialState: TaskState = {
 // Consolidated createTask action
 export const createTask = createAsyncThunk(
     'tasks/createTask',
-    async (taskData: any, { rejectWithValue }) => {
+    async (taskData: Partial<Task>, { rejectWithValue }) => {
         try {
             const response = await api.post('/tasks', taskData);
             return response.data;
         } catch (error: any) {
-            return rejectWithValue(error.response?.data?.message || 'Failed to create task');
+            const message = error.response?.data?.error || error.response?.data?.message || 'Failed to create task';
+            return rejectWithValue(message);
         }
     }
 );
 
 export const fetchTasks = createAsyncThunk(
     'tasks/fetchTasks',
-    async (filters: any = {}, { rejectWithValue }) => {
+    async (filters: Record<string, string | undefined> = {}, { rejectWithValue }) => {
         try {
             const response = await api.get('/tasks', { params: filters });
             return response.data.tasks;
         } catch (error: any) {
-            return rejectWithValue(error.response?.data?.message || 'Failed to fetch tasks');
+            const message = error.response?.data?.error || error.response?.data?.message || 'Failed to fetch tasks';
+            return rejectWithValue(message);
+        }
+    }
+);
+
+export const fetchTaskById = createAsyncThunk(
+    'tasks/fetchTaskById',
+    async (id: string, { rejectWithValue }) => {
+        try {
+            const response = await api.get(`/tasks/${id}`);
+            return response.data.task;
+        } catch (error: any) {
+            const message = error.response?.data?.error || error.response?.data?.message || 'Failed to fetch task details';
+            return rejectWithValue(message);
         }
     }
 );
 
 export const updateTask = createAsyncThunk(
     'tasks/updateTask',
-    async ({ id, data }: { id: string; data: any }, { rejectWithValue }) => {
+    async ({ id, data }: { id: string; data: Partial<Task> }, { rejectWithValue }) => {
         try {
             const response = await api.put(`/tasks/${id}`, data);
             return response.data.task;
@@ -77,7 +83,18 @@ export const deleteTask = createAsyncThunk(
 const taskSlice = createSlice({
     name: 'tasks',
     initialState,
-    reducers: {},
+    reducers: {
+        clearCurrentTask: (state) => {
+            state.currentTask = null;
+        },
+        updateTaskStatusOptimistic: (state, action: { payload: { id: string; status: Task['status'] } }) => {
+            const { id, status } = action.payload;
+            const index = state.tasks.findIndex(t => t.id === id);
+            if (index !== -1) {
+                state.tasks[index].status = status;
+            }
+        },
+    },
     extraReducers: (builder) => {
         builder
             .addCase(fetchTasks.pending, (state) => {
@@ -102,8 +119,21 @@ const taskSlice = createSlice({
             })
             .addCase(deleteTask.fulfilled, (state, action) => {
                 state.tasks = state.tasks.filter((t) => t.id !== action.payload);
+            })
+            // Fetch Single Task
+            .addCase(fetchTaskById.pending, (state) => {
+                state.loading = true;
+            })
+            .addCase(fetchTaskById.fulfilled, (state, action) => {
+                state.loading = false;
+                state.currentTask = action.payload;
+            })
+            .addCase(fetchTaskById.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload as string;
             });
     },
 });
 
+export const { clearCurrentTask, updateTaskStatusOptimistic } = taskSlice.actions;
 export default taskSlice.reducer;

@@ -6,7 +6,7 @@
 
 @layer utilities {
     .login-container {
-        @apply min-h-screen w-full flex items-center justify-center flex-col bg-gray-50 p-4 font-inter
+        @apply min-h-screen w-full flex items-center justify-center flex-col bg-gray-50 dark:bg-[#12141c] p-4 font-inter transition-colors duration-300
     }
 
     .login-logo-main-div {
@@ -22,13 +22,13 @@
     }
 
     .login-card {
-        @apply w-full max-w-6xl bg-white shadow-md grid grid-cols-1 md:grid-cols-2 overflow-hidden
+        @apply w-full max-w-6xl bg-white dark:bg-[#1a1c23] shadow-md dark:shadow-none grid grid-cols-1 md:grid-cols-2 overflow-hidden dark:border dark:border-gray-800 rounded-xl
     }
 
     /*====== Left Section ====== */
 
     .login-left-section-main-div {
-        @apply p-10 bg-[#FCF9F7] border-r border-gray-200 flex flex-col justify-center
+        @apply p-10 bg-[#FCF9F7] dark:bg-[#16181d] border-r border-gray-200 dark:border-gray-800 flex flex-col justify-center
     }
 
     .login-left-section-title {
@@ -36,7 +36,7 @@
     }
 
     .login-left-section-title-text {
-        @apply text-[16px] font-medium text-gray-800
+        @apply text-[16px] font-medium text-gray-800 dark:text-gray-200
     }
 
     .login-left-section-title-badge {
@@ -56,15 +56,15 @@
     }
 
     .login-left-section-description-text {
-        @apply text-gray-600 font-normal text-sm leading-relaxed max-w-[390px]
+        @apply text-gray-600 dark:text-gray-400 font-normal text-sm leading-relaxed max-w-[390px]
     }
 
     .login-left-section-box {
-        @apply mt-10 w-full h-56 bg-[#FCF9F7] shadow-2xl flex items-end justify-center
+        @apply mt-10 w-full h-56 bg-[#FCF9F7] dark:bg-[#16181d] shadow-2xl dark:shadow-none flex items-end justify-center
     }
 
     .login-left-section-box-inner {
-        @apply w-40 h-10 bg-white shadow-2xl shadow-gray-700
+        @apply w-40 h-10 bg-white dark:bg-gray-800 shadow-2xl shadow-gray-700 dark:shadow-black
     }
 
     /*====== Right Section ====== */
@@ -74,15 +74,15 @@
     }
 
     .login-right-section-title {
-        @apply text-xl font-bold text-gray-800 mb-6
+        @apply text-xl font-bold text-gray-800 dark:text-gray-100 mb-6
     }
 
     .login-right-section-description {
-        @apply text-gray-600 font-normal text-sm leading-relaxed max-w-[390px]
+        @apply text-gray-600 dark:text-gray-400 font-normal text-sm leading-relaxed max-w-[390px]
     }
 
     .login-right-section-description-text {
-        @apply text-gray-600 font-normal text-sm leading-relaxed max-w-[390px]
+        @apply text-gray-600 dark:text-gray-400 font-normal text-sm leading-relaxed max-w-[390px]
     }
 
     .login-right-section-description-text-span {
@@ -98,11 +98,11 @@
     }
 
     .login-right-section-label {
-        @apply text-sm font-medium text-[#2F2F2F]
+        @apply text-sm font-medium text-[#2F2F2F] dark:text-gray-300
     }
 
     .login-right-section-input {
-        @apply w-full mt-1 mb-4 px-4 py-2 border rounded-md focus:ring-2 focus:ring-blue-300 outline-none
+        @apply w-full mt-1 mb-4 px-4 py-2 border dark:border-gray-700 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-300 dark:focus:ring-blue-800 outline-none transition-all
     }
 
     .login-right-section-password {
@@ -110,15 +110,15 @@
     }
 
     .login-right-section-password-label {
-        @apply text-sm font-medium text-[#2F2F2F]
+        @apply text-sm font-medium text-[#2F2F2F] dark:text-gray-300
     }
 
     .login-right-section-forgot-password-button {
-        @apply text-sm text-[#8E94BB] hover:text-blue-600 transition
+        @apply text-sm text-[#8E94BB] dark:text-gray-500 hover:text-blue-600 dark:hover:text-blue-400 transition
     }
 
     .login-right-section-button {
-        @apply w-full bg-[#6696F5] text-white py-2 rounded-md font-semibold hover:bg-blue-600 transition
+        @apply w-full bg-[#6696F5] dark:bg-blue-600 text-white py-2 rounded-md font-semibold hover:bg-blue-600 dark:hover:bg-blue-700 transition-all shadow-sm
     }
 
     .login-right-section-google-microsoft {
@@ -126,11 +126,11 @@
     }
 
     .login-right-section-google-microsoft-button {
-        @apply flex items-center gap-2 border px-4 py-2 text-[#F57D2C] rounded-md hover:bg-gray-100 transition
+        @apply flex items-center gap-2 border dark:border-gray-700 px-4 py-2 text-[#F57D2C] rounded-md bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 transition-all
     }
 
     .login-right-section-sso {
-        @apply w-full inline-flex border-solid justify-center text-sm text-[#2F2F2F] !border !border-[#E2E2E2] appearance-none outline-none mt-4 py-2 rounded-md hover:bg-gray-100 transition
+        @apply w-full inline-flex border-solid justify-center text-sm text-[#2F2F2F] dark:text-gray-300 !border !border-[#E2E2E2] dark:border-gray-700 appearance-none outline-none mt-4 py-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 transition-all bg-white dark:bg-gray-800
     }
 
     .login-right-section-or {
@@ -138,10 +138,10 @@
     }
 
     .login-right-section-or-span {
-        @apply px-2 text-gray-500 text-sm
+        @apply px-2 text-gray-500 dark:text-gray-500 text-sm
     }
 
     .login-right-section-or-span-span {
-        @apply px-2 text-gray-500 text-sm
+        @apply px-2 text-gray-500 dark:text-gray-500 text-sm
     }
 }

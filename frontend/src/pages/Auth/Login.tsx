@@ -142,9 +142,9 @@ const Login: React.FC = () => {
 
 
                     <div className="login-right-section-or">
-                        <div className="flex-1 h-px bg-gray-300" />
+                        <div className="flex-1 h-px bg-gray-300 dark:bg-gray-700" />
                         <span className="login-right-section-or-span">OR</span>
-                        <div className="flex-1 h-px bg-gray-300" />
+                        <div className="flex-1 h-px bg-gray-300 dark:bg-gray-700" />
                     </div>
 
 
@@ -152,7 +152,7 @@ const Login: React.FC = () => {
                         Don't have an account?
                     </p>
                     <div className="flex items-center justify-center">
-                        <button onClick={() => navigate('/auth/register')} className="w-[170px] text-[#F57D2C] font-medium text-sm inline-flex border-solid justify-center !border !border-[#E2E2E2] appearance-none outline-none mt-4 py-2 rounded-md hover:bg-gray-100 transition">
+                        <button onClick={() => navigate('/auth/register')} className="w-[170px] text-[#F57D2C] font-semibold text-sm inline-flex border-solid justify-center !border !border-[#E2E2E2] dark:!border-gray-700 appearance-none outline-none mt-4 py-2.5 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 transition shadow-sm bg-white dark:bg-gray-800">
                             Sign up for free
                         </button>
                     </div>

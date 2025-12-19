@@ -107,6 +107,9 @@ const projectSlice = createSlice({
         clearCurrentProject: (state) => {
             state.currentProject = null;
         },
+        setCurrentProject: (state, action) => {
+            state.currentProject = action.payload;
+        },
     },
     extraReducers: (builder) => {
         builder
@@ -159,5 +162,5 @@ const projectSlice = createSlice({
     },
 });
 
-export const { clearCurrentProject } = projectSlice.actions;
+export const { clearCurrentProject, setCurrentProject } = projectSlice.actions;
 export default projectSlice.reducer;

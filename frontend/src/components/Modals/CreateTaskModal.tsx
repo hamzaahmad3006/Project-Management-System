@@ -1,6 +1,6 @@
 import React from 'react';
 import { FaTimes, FaUser, FaRegFlag, FaCalendarAlt, FaLayerGroup } from 'react-icons/fa';
-import { CreateModalProps } from '../../types';
+import { CreateModalProps, TaskPriority, TaskStatus } from '../../types';
 import { useCreateTask } from '../../utils/Hooks/ModalHooks';
 
 
@@ -95,7 +95,7 @@ const CreateTaskModal: React.FC<CreateModalProps> = ({ isOpen, onClose }) => {
                             <label className="block text-xs uppercase tracking-wider font-semibold text-gray-500 dark:text-gray-400">Status</label>
                             <select
                                 value={status}
-                                onChange={(e) => setStatus(e.target.value)}
+                                onChange={(e) => setStatus(e.target.value as TaskStatus)}
                                 className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md focus:outline-none focus:border-blue-500 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 text-sm appearance-none"
                             >
                                 <option value="TODO" className="dark:bg-[#1a1c23]">To Do</option>
@@ -111,7 +111,7 @@ const CreateTaskModal: React.FC<CreateModalProps> = ({ isOpen, onClose }) => {
                             <div className="relative">
                                 <select
                                     value={priority}
-                                    onChange={(e) => setPriority(e.target.value)}
+                                    onChange={(e) => setPriority(e.target.value as TaskPriority)}
                                     className="w-full pl-8 pr-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md focus:outline-none focus:border-blue-500 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 text-sm appearance-none"
                                 >
                                     <option value="LOW" className="dark:bg-[#1a1c23]">Low</option>

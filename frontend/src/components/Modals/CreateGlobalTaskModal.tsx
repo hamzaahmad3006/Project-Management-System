@@ -3,7 +3,7 @@ import { FaTimes, FaUser, FaRegFlag, FaCalendarAlt, FaLayerGroup, FaColumns, FaP
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import { createTask } from '../../store/slices/taskSlice';
 import { fetchProjects } from '../../store/slices/projectSlice';
-import { CreateModalProps } from '../../types';
+import { CreateModalProps, TaskPriority, TaskStatus } from '../../types';
 
 const CreateGlobalTaskModal: React.FC<CreateModalProps> = ({ isOpen, onClose }) => {
     const dispatch = useAppDispatch();
@@ -12,8 +12,8 @@ const CreateGlobalTaskModal: React.FC<CreateModalProps> = ({ isOpen, onClose }) 
     // Form State
     const [name, setName] = useState('');
     const [description, setDescription] = useState('');
-    const [status, setStatus] = useState('TODO');
-    const [priority, setPriority] = useState('MEDIUM');
+    const [status, setStatus] = useState<TaskStatus>('TODO');
+    const [priority, setPriority] = useState<TaskPriority>('MEDIUM');
     const [dueDate, setDueDate] = useState('');
     const [assigneeId, setAssigneeId] = useState('');
     const [projectId, setProjectId] = useState('');
@@ -38,29 +38,43 @@ const CreateGlobalTaskModal: React.FC<CreateModalProps> = ({ isOpen, onClose }) 
         e.preventDefault();
 
         if (!projectId) {
-            alert("Please select a project");
+            window.toastify("Please select a project", "error");
             return;
         }
 
-        // Dispatch action
-        await dispatch(createTask({
-            name,
-            description,
-            status,
-            priority,
-            dueDate,
-            assigneeId,
-            sectionId: sectionId || 'backlog', // Fallback
-            projectId
-        }));
+        if (!name.trim()) {
+            window.toastify("Task name is required", "error");
+            return;
+        }
 
-        onClose();
-        resetForm();
+        try {
+            // Dispatch action and unwrap to catch errors
+            await dispatch(createTask({
+                name,
+                description,
+                status,
+                priority,
+                dueDate: dueDate || undefined,
+                projectId,
+                assigneeId: assigneeId || undefined,
+                // sectionId will be handled by the backend (choosing default section)
+            })).unwrap();
+
+            window.toastify("Task created successfully", "success");
+            onClose();
+            resetForm();
+        } catch (err: any) {
+            window.toastify(err || "Failed to create task", "error");
+        }
     };
 
     const resetForm = () => {
         setName('');
         setDescription('');
+        setStatus('TODO');
+        setPriority('MEDIUM');
+        setDueDate('');
+        setAssigneeId('');
         setProjectId('');
         setSectionId('');
         setFiles([]);
@@ -91,7 +105,10 @@ const CreateGlobalTaskModal: React.FC<CreateModalProps> = ({ isOpen, onClose }) 
                                 </label>
                                 <select
                                     value={projectId}
-                                    onChange={(e) => setProjectId(e.target.value)}
+                                    onChange={(e) => {
+                                        setProjectId(e.target.value);
+                                        setAssigneeId(''); // Reset assignee when project changes
+                                    }}
                                     className="w-full px-3 py-2 border border-blue-200 dark:border-blue-800/50 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500/20 bg-white dark:bg-gray-800 text-sm text-gray-800 dark:text-gray-100"
                                     required
                                 >
@@ -102,21 +119,25 @@ const CreateGlobalTaskModal: React.FC<CreateModalProps> = ({ isOpen, onClose }) 
                                 </select>
                             </div>
 
-                            {/* Section Selector */}
+                            {/* Assignee Selector (Filtered by Project Team) */}
                             <div className="space-y-1.5">
                                 <label className="text-xs uppercase tracking-wider font-bold text-blue-800 dark:text-blue-300 flex items-center gap-2">
-                                    <FaColumns /> Section
+                                    <FaUser /> Assignee
                                 </label>
                                 <select
-                                    value={sectionId}
-                                    onChange={(e) => setSectionId(e.target.value)}
-                                    className="w-full px-3 py-2 border border-blue-200 dark:border-blue-800/50 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500/20 bg-white dark:bg-gray-800 text-sm text-gray-800 dark:text-gray-100"
+                                    value={assigneeId}
+                                    onChange={(e) => setAssigneeId(e.target.value)}
+                                    className="w-full px-3 py-2 border border-blue-200 dark:border-blue-800/50 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500/20 bg-white dark:bg-gray-800 text-sm text-gray-800 dark:text-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
+                                    disabled={!projectId}
                                 >
-                                    <option value="" className="dark:bg-gray-800">Default (Backlog)</option>
-                                    <option value="backlog" className="dark:bg-gray-800">Backlog</option>
-                                    <option value="todo" className="dark:bg-gray-800">To Do</option>
-                                    <option value="inprogress" className="dark:bg-gray-800">In Progress</option>
-                                    <option value="done" className="dark:bg-gray-800">Done</option>
+                                    <option value="" className="dark:bg-gray-800">
+                                        {!projectId ? 'Select a project first...' : 'Unassigned'}
+                                    </option>
+                                    {projectId && projects.find(p => p.id === projectId)?.team?.members?.map((m: { user: { id: string, name: string } }) => (
+                                        <option key={m.user.id} value={m.user.id} className="dark:bg-gray-800">
+                                            {m.user.name}
+                                        </option>
+                                    ))}
                                 </select>
                             </div>
                         </div>
@@ -147,18 +168,19 @@ const CreateGlobalTaskModal: React.FC<CreateModalProps> = ({ isOpen, onClose }) 
                         </div>
 
                         {/* Metadata Grid */}
-                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                             {/* Status */}
                             <div className="space-y-1.5">
-                                <label className="block text-xs font-semibold text-gray-500 dark:text-gray-400">Status</label>
+                                <label className="block text-xs font-semibold text-blue-600 dark:text-blue-400">Board Status</label>
                                 <select
                                     value={status}
-                                    onChange={(e) => setStatus(e.target.value)}
-                                    className="w-full px-2 py-2 border border-gray-300 dark:border-gray-700 rounded-md text-sm bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 focus:border-blue-500"
+                                    onChange={(e) => setStatus(e.target.value as TaskStatus)}
+                                    className="w-full px-2 py-2 border border-blue-100 dark:border-blue-900/30 rounded-md text-sm bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 focus:border-blue-500"
                                 >
-                                    <option value="TODO" className="dark:bg-gray-800">To Do</option>
+                                    <option value="TODO" className="dark:bg-gray-800">Backlog (To Do)</option>
                                     <option value="IN_PROGRESS" className="dark:bg-gray-800">In Progress</option>
-                                    <option value="COMPLETED" className="dark:bg-gray-800">Completed</option>
+                                    <option value="COMPLETED" className="dark:bg-gray-800">QA (Completed)</option>
+                                    <option value="CANCELED" className="dark:bg-gray-800">Postpone (Canceled)</option>
                                 </select>
                             </div>
 
@@ -168,7 +190,7 @@ const CreateGlobalTaskModal: React.FC<CreateModalProps> = ({ isOpen, onClose }) 
                                 <div className="relative">
                                     <select
                                         value={priority}
-                                        onChange={(e) => setPriority(e.target.value)}
+                                        onChange={(e) => setPriority(e.target.value as TaskPriority)}
                                         className="w-full pl-7 pr-2 py-2 border border-gray-300 dark:border-gray-700 rounded-md text-sm bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 appearance-none focus:border-blue-500"
                                     >
                                         <option value="LOW" className="dark:bg-gray-800">Low</option>
@@ -190,23 +212,6 @@ const CreateGlobalTaskModal: React.FC<CreateModalProps> = ({ isOpen, onClose }) 
                                         className="w-full pl-7 pr-2 py-2 border border-gray-300 dark:border-gray-700 rounded-md text-sm bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 focus:border-blue-500 [color-scheme:light] dark:[color-scheme:dark]"
                                     />
                                     <FaCalendarAlt className="absolute left-2.5 top-2.5 text-gray-400 dark:text-gray-500" size={12} />
-                                </div>
-                            </div>
-
-                            {/* Assignee */}
-                            <div className="space-y-1.5">
-                                <label className="block text-xs font-semibold text-gray-500 dark:text-gray-400">Assignee</label>
-                                <div className="relative">
-                                    <select
-                                        value={assigneeId}
-                                        onChange={(e) => setAssigneeId(e.target.value)}
-                                        className="w-full pl-7 pr-2 py-2 border border-gray-300 dark:border-gray-700 rounded-md text-sm bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 appearance-none focus:border-blue-500"
-                                    >
-                                        <option value="" className="dark:bg-gray-800">Unassigned</option>
-                                        <option value="user1" className="dark:bg-gray-800">Me</option>
-                                        <option value="user2" className="dark:bg-gray-800">John Doe</option>
-                                    </select>
-                                    <FaUser className="absolute left-2.5 top-2.5 text-gray-400 dark:text-gray-500" size={12} />
                                 </div>
                             </div>
                         </div>

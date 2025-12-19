@@ -5,12 +5,29 @@ import {
     FaRegCheckCircle, FaRegComment
 } from 'react-icons/fa';
 
+import { useAppDispatch, useAppSelector } from '../../store/hooks';
+import { fetchTaskById, clearCurrentTask } from '../../store/slices/taskSlice';
+import { Task } from '../../types';
+
 interface TaskDetailPanelProps {
-    task: any; // Using any for now, ideally strictly typed
+    task: Task;
     onClose: () => void;
 }
 
-const TaskDetailPanel: React.FC<TaskDetailPanelProps> = ({ task, onClose }) => {
+const TaskDetailPanel: React.FC<TaskDetailPanelProps> = ({ task: initialTask, onClose }) => {
+    const dispatch = useAppDispatch();
+    const { currentTask } = useAppSelector(state => state.tasks);
+
+    React.useEffect(() => {
+        if (initialTask?.id) {
+            dispatch(fetchTaskById(initialTask.id));
+        }
+        return () => {
+            dispatch(clearCurrentTask());
+        };
+    }, [initialTask?.id, dispatch]);
+
+    const task: Task = currentTask || initialTask;
     if (!task) return null;
 
     return (
@@ -37,7 +54,7 @@ const TaskDetailPanel: React.FC<TaskDetailPanelProps> = ({ task, onClose }) => {
             <div className="flex-1 overflow-y-auto p-8 custom-scrollbar">
                 {/* Title */}
                 <h2 className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-8 leading-tight">
-                    {task.name || "Reporting: Design concept of visual dashboard"}
+                    {task.name}
                 </h2>
 
                 {/* Properties Grid */}
@@ -45,35 +62,43 @@ const TaskDetailPanel: React.FC<TaskDetailPanelProps> = ({ task, onClose }) => {
                     {/* Status */}
                     <div className="text-gray-500 dark:text-gray-400 pt-1">Status</div>
                     <div>
-                        <span className="inline-flex items-center gap-2 px-3 py-1 rounded bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 font-medium text-xs border border-green-200 dark:border-green-800">
+                        <span className="inline-flex items-center gap-2 px-3 py-1 rounded bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 font-medium text-xs border border-green-200 dark:border-green-800 uppercase">
                             <span className="w-1.5 h-1.5 rounded-full bg-green-500"></span>
-                            {task.status || "In progress"}
+                            {task.status?.replace('_', ' ')}
                         </span>
                     </div>
 
                     {/* Assignee */}
                     <div className="text-gray-500 dark:text-gray-400 pt-1">Assignee</div>
                     <div className="flex items-center gap-2">
-                        <img
-                            src={task.assignee?.avatar || "https://i.pravatar.cc/150?u=eugeniusz"}
-                            alt="Assignee"
-                            className="w-6 h-6 rounded-full border border-gray-100 dark:border-gray-700"
-                        />
-                        <span className="text-gray-900 dark:text-gray-100 font-medium">{task.assignee?.name || "Eugeniusz Rymaszewski"}</span>
+                        {task.assignedTo ? (
+                            <>
+                                <img
+                                    src={task.assignedTo.avatar || "https://ui-avatars.com/api/?name=" + task.assignedTo.name}
+                                    alt="Assignee"
+                                    className="w-6 h-6 rounded-full border border-gray-100 dark:border-gray-700"
+                                />
+                                <span className="text-gray-900 dark:text-gray-100 font-medium">{task.assignedTo.name}</span>
+                            </>
+                        ) : (
+                            <span className="text-gray-400 italic">Unassigned</span>
+                        )}
                     </div>
 
                     {/* Priority */}
                     <div className="text-gray-500 dark:text-gray-400 pt-1">Priority</div>
                     <div>
-                        <span className="inline-block px-2 py-0.5 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 text-xs rounded font-medium border border-green-200 dark:border-green-800">
-                            Low
+                        <span className={`inline-block px-2 py-0.5 text-xs rounded font-medium border ${task.priority === 'HIGH' ? 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 border-red-200 dark:border-red-800' :
+                            task.priority === 'MEDIUM' ? 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-400 border-yellow-200 dark:border-yellow-800' :
+                                'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 border-green-200 dark:border-green-800'
+                            }`}>
+                            {task.priority || 'MEDIUM'}
                         </span>
                     </div>
 
                     {/* Due Date */}
-                    <div className="text-gray-500 dark:text-gray-400 pt-1">Due date</div>
                     <div className="text-gray-900 dark:text-gray-100">
-                        {task.dueDate || "Oct 24"}
+                        {task.dueDate ? new Date(task.dueDate).toLocaleDateString() : "No due date"}
                     </div>
 
                     {/* Tags */}
@@ -98,12 +123,11 @@ const TaskDetailPanel: React.FC<TaskDetailPanelProps> = ({ task, onClose }) => {
                     <span className="text-xs text-gray-300 dark:text-gray-600">Show 2 empty fields</span>
                 </div>
 
-                {/* Description */}
                 <div className="mb-8">
                     <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-2">Description</h3>
-                    <p className="text-gray-800 dark:text-gray-300 text-sm leading-relaxed">
-                        This task involves updating the time page to handle empty weeks, implementing changes for time off, and making some minor adjustments. It's currently in progress, with a high priority, and is part of the project.
-                    </p>
+                    <div className="text-gray-800 dark:text-gray-300 text-sm leading-relaxed whitespace-pre-wrap min-h-[50px] p-2 rounded bg-gray-50/50 dark:bg-gray-800/30 border border-gray-100 dark:border-gray-800/50">
+                        {task.description || "No description provided."}
+                    </div>
                 </div>
 
                 {/* Attachments */}

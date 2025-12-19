@@ -24,7 +24,7 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, onEdit, onDelete }) => {
     return (
         <div className="bg-white rounded-lg shadow p-4 hover:shadow-md transition-shadow">
             <div className="flex justify-between items-start mb-3">
-                <h3 className="font-semibold text-gray-800 truncate flex-1">{task.title}</h3>
+                <h3 className="font-semibold text-gray-800 truncate flex-1">{task.name}</h3>
                 <div className="flex gap-2 ml-2">
                     <button onClick={() => onEdit(task)} className="text-gray-400 hover:text-indigo-600">
                         <FaEdit />

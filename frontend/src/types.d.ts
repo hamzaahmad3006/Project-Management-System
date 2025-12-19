@@ -53,15 +53,23 @@ export interface User {
 }
 
 //===== Project.tsx Interface ======
+export type TaskStatus = 'TODO' | 'IN_PROGRESS' | 'COMPLETED' | 'CANCELED';
+export type TaskPriority = 'LOW' | 'MEDIUM' | 'HIGH';
+
 export interface Task {
     id: string;
     name: string;
-    project?: string;
+    description?: string;
+    project?: any;
+    projectId?: string;
+    assignedToId?: string;
+    assigneeId?: string; // For creation payload
     subtasks?: string;
-    status: string;
-    priority?: string;
-    dueDate?: string;
+    status: TaskStatus;
+    priority: TaskPriority;
+    dueDate?: string | null;
     label?: string[];
+    assignedTo?: { id: string, name: string, avatar?: string };
     assignee?: { name: string, avatar: string };
     comments?: number;
     attachments?: number;
