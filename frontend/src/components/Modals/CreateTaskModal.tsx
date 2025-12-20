@@ -21,6 +21,8 @@ const CreateTaskModal: React.FC<CreateModalProps> = ({ isOpen, onClose }) => {
         setAssigneeId,
         projectId,
         setProjectId,
+        budget,
+        setBudget,
         isLoading,
         teamMembers,
         handleSubmit
@@ -89,7 +91,7 @@ const CreateTaskModal: React.FC<CreateModalProps> = ({ isOpen, onClose }) => {
                     </div>
 
                     {/* Metadata Row */}
-                    <div className="grid grid-cols-2 gap-4">
+                    <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                         {/* Status */}
                         <div className="space-y-1.5">
                             <label className="block text-xs uppercase tracking-wider font-semibold text-gray-500 dark:text-gray-400">Status</label>
@@ -154,6 +156,18 @@ const CreateTaskModal: React.FC<CreateModalProps> = ({ isOpen, onClose }) => {
                                 </select>
                                 <FaUser className="absolute left-2.5 top-3 text-gray-400 dark:text-gray-500" size={12} />
                             </div>
+                        </div>
+
+                        {/* Budget */}
+                        <div className="space-y-1.5">
+                            <label className="block text-xs uppercase tracking-wider font-semibold text-gray-500 dark:text-gray-400">Budget ($)</label>
+                            <input
+                                type="number"
+                                value={budget}
+                                onChange={(e) => setBudget(parseFloat(e.target.value) || 0)}
+                                placeholder="0"
+                                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md focus:outline-none focus:border-blue-500 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 text-sm transition-shadow"
+                            />
                         </div>
                     </div>
 

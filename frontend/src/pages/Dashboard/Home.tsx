@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '../../store/store';
 import { fetchKPIs, fetchRecentActivity } from '../../store/slices/dashboardSlice';
+import { fetchProjects, setSelectedProjectId } from '../../store/slices/projectSlice';
 import { FaArrowUp, FaArrowDown, FaFilter, FaCalendar } from 'react-icons/fa';
 import { Chart as ChartJS, ArcElement, CategoryScale, LinearScale, PointElement, LineElement, Filler, Tooltip, Legend } from 'chart.js';
 import { Doughnut, Line } from 'react-chartjs-2';
@@ -14,14 +15,20 @@ const Dashboard: React.FC = () => {
 
     // Get data from Redux store
     const { kpis, recentActivity, loading: dashboardLoading } = useSelector((state: RootState) => state.dashboard);
+    const { projects, selectedProjectId } = useSelector((state: RootState) => state.projects);
     const theme = useSelector((state: RootState) => state.theme.theme);
     const isDark = theme === 'dark' || (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
 
     useEffect(() => {
-        // Fetch data on component mount
-        dispatch(fetchKPIs());
-        dispatch(fetchRecentActivity());
+        // Fetch projects on mount for the dropdown
+        dispatch(fetchProjects());
     }, [dispatch]);
+
+    useEffect(() => {
+        // Fetch data whenever selected project changes
+        dispatch(fetchKPIs(selectedProjectId === 'all' ? undefined : selectedProjectId));
+        dispatch(fetchRecentActivity(selectedProjectId === 'all' ? undefined : selectedProjectId));
+    }, [dispatch, selectedProjectId]);
 
     const loading = dashboardLoading;
 
@@ -99,8 +106,17 @@ const Dashboard: React.FC = () => {
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
                 <h1 className="text-2xl font-semibold text-gray-900 dark:text-gray-100">Dashboard</h1>
                 <div className="flex flex-wrap items-center gap-2 sm:gap-4">
-                    <select className="px-3 py-2 border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 rounded-lg text-sm flex-grow md:flex-grow-0">
-                        <option>All Projects</option>
+                    <select
+                        value={selectedProjectId}
+                        onChange={(e) => dispatch(setSelectedProjectId(e.target.value))}
+                        className="px-3 py-2 border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 rounded-lg text-sm outline-none focus:ring-2 focus:ring-blue-500/20 transition-all cursor-pointer min-w-[150px]"
+                    >
+                        <option value="all">All Projects</option>
+                        {projects.map((project) => (
+                            <option key={project.id} value={project.id}>
+                                {project.name}
+                            </option>
+                        ))}
                     </select>
                     <button className="flex items-center gap-2 px-3 py-2 border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded-lg text-sm hover:bg-gray-50 dark:hover:bg-gray-700 flex-grow md:flex-grow-0 justify-center">
                         <FaFilter size={14} />
@@ -290,6 +306,7 @@ const Dashboard: React.FC = () => {
                                     <th className="pb-3 font-medium">Subtasks</th>
                                     <th className="pb-3 font-medium">Status</th>
                                     <th className="pb-3 font-medium">Priority</th>
+                                    <th className="pb-3 font-medium">Budget</th>
                                     <th className="pb-3 font-medium">Start Date</th>
                                     <th className="pb-3 font-medium">End Date</th>
                                 </tr>
@@ -316,6 +333,7 @@ const Dashboard: React.FC = () => {
                                                 {task.priority}
                                             </span>
                                         </td>
+                                        <td className="py-3 text-blue-600 dark:text-blue-400 font-medium">${task.budget?.toLocaleString() || '0'}</td>
                                         <td className="py-3 text-gray-600 dark:text-gray-400">{task.dueDate ? new Date(task.dueDate).toLocaleDateString() : 'N/A'}</td>
                                         <td className="py-3 text-gray-600 dark:text-gray-400">{task.dueDate ? new Date(task.dueDate).toLocaleDateString() : 'N/A'}</td>
                                     </tr>

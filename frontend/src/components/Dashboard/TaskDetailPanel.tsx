@@ -7,7 +7,8 @@ import {
 
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import { fetchTaskById, clearCurrentTask } from '../../store/slices/taskSlice';
-import { Task } from '../../types';
+import { fetchComments, addComment, clearComments } from '../../store/slices/commentSlice';
+import { Task, Comment } from '../../types';
 
 interface TaskDetailPanelProps {
     task: Task;
@@ -18,14 +19,28 @@ const TaskDetailPanel: React.FC<TaskDetailPanelProps> = ({ task: initialTask, on
     const dispatch = useAppDispatch();
     const { currentTask } = useAppSelector(state => state.tasks);
 
+    const { comments } = useAppSelector(state => state.comments);
+    const { user: currentUser } = useAppSelector(state => state.auth);
+    const [commentText, setCommentText] = React.useState('');
+
     React.useEffect(() => {
         if (initialTask?.id) {
             dispatch(fetchTaskById(initialTask.id));
+            dispatch(fetchComments(initialTask.id));
         }
         return () => {
             dispatch(clearCurrentTask());
+            dispatch(clearComments());
         };
     }, [initialTask?.id, dispatch]);
+
+    const handleSendComment = (e?: React.FormEvent) => {
+        if (e) e.preventDefault();
+        if (!commentText.trim() || !task?.id) return;
+
+        dispatch(addComment({ taskId: task.id, content: commentText.trim() }));
+        setCommentText('');
+    };
 
     const task: Task = currentTask || initialTask;
     if (!task) return null;
@@ -195,25 +210,70 @@ const TaskDetailPanel: React.FC<TaskDetailPanelProps> = ({ task: initialTask, on
                         </div>
                     </div>
                 </div>
+
+                {/* Comments List */}
+                <div className="mb-8 mt-12">
+                    <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-6 flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                            Comments <span className="bg-gray-100 dark:bg-gray-800 px-2 py-0.5 rounded-full text-[10px] font-bold text-gray-400">{comments?.length || 0}</span>
+                        </div>
+                    </h3>
+
+                    <div className="space-y-6">
+                        {comments.length > 0 ? (
+                            comments.map((c: Comment) => (
+                                <div key={c.id} className="flex gap-4 group">
+                                    <img
+                                        src={c.author.avatar || `https://ui-avatars.com/api/?name=${c.author.name}`}
+                                        className="w-10 h-10 rounded-full border border-gray-100 dark:border-gray-800 flex-shrink-0"
+                                        alt={c.author.name}
+                                    />
+                                    <div className="flex-1 space-y-1.5">
+                                        <div className="flex items-center justify-between">
+                                            <span className="text-sm font-bold text-gray-900 dark:text-gray-100">{c.author.name}</span>
+                                            <span className="text-[10px] text-gray-400 uppercase tracking-tighter">
+                                                {new Date(c.createdAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                                            </span>
+                                        </div>
+                                        <div className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed bg-gray-50/50 dark:bg-gray-800/20 p-3 rounded-xl rounded-tl-none border border-gray-100 dark:border-gray-800/50">
+                                            {c.content}
+                                        </div>
+                                    </div>
+                                </div>
+                            ))
+                        ) : (
+                            <div className="text-center py-10">
+                                <FaRegComment size={32} className="mx-auto text-gray-200 dark:text-gray-800 mb-3" />
+                                <p className="text-xs text-gray-400 italic">No comments yet. Start the conversation!</p>
+                            </div>
+                        )}
+                    </div>
+                </div>
             </div>
 
             {/* Footer Comment Input */}
-            <div className="p-4 border-t border-gray-100 dark:border-gray-800 bg-white dark:bg-[#1a1c23]">
+            <form onSubmit={handleSendComment} className="p-4 border-t border-gray-100 dark:border-gray-800 bg-white dark:bg-[#1a1c23]">
                 <div className="flex items-center gap-3">
-                    <img src="https://i.pravatar.cc/150?u=me" className="w-8 h-8 rounded-full border border-gray-200 dark:border-gray-700" />
+                    <img
+                        src={currentUser?.avatar || `https://ui-avatars.com/api/?name=${currentUser?.name || 'User'}`}
+                        className="w-8 h-8 rounded-full border border-gray-200 dark:border-gray-700"
+                        alt="Me"
+                    />
                     <div className="flex-1 relative">
                         <input
                             type="text"
+                            value={commentText}
+                            onChange={(e) => setCommentText(e.target.value)}
+                            onKeyDown={(e) => e.key === 'Enter' && handleSendComment()}
                             placeholder="Add a comment..."
                             className="w-full pl-4 pr-10 py-2 border border-gray-200 dark:border-gray-800 rounded-lg text-sm bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 focus:outline-none focus:border-blue-500 dark:focus:border-blue-400 transition-colors"
                         />
                         <div className="absolute right-3 top-2.5 text-gray-400 dark:text-gray-500 flex gap-2">
-                            <span className="text-xs hover:text-gray-600 dark:hover:text-gray-300 cursor-pointer">@</span>
-                            <span className="text-xs hover:text-gray-600 dark:hover:text-gray-300 cursor-pointer">☺</span>
+                            <button type="submit" disabled={!commentText.trim()} className="text-xs hover:text-blue-500 transition-colors disabled:opacity-30 disabled:hover:text-gray-400 font-bold">POST</button>
                         </div>
                     </div>
                 </div>
-            </div>
+            </form>
         </div>
     );
 };

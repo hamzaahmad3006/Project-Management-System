@@ -87,6 +87,7 @@ export const useCreateProject = (onClose: () => void) => {
     const [name, setName] = useState('');
     const [description, setDescription] = useState('');
     const [teamId, setTeamId] = useState('');
+    const [budget, setBudget] = useState<number>(0);
     const [isLoading, setIsLoading] = useState(false);
 
     useEffect(() => {
@@ -106,7 +107,7 @@ export const useCreateProject = (onClose: () => void) => {
             await dispatch(createProject({
                 name,
                 description,
-                budget: 0,
+                budget,
                 teamId: teamId || undefined
             })).unwrap();
 
@@ -114,6 +115,7 @@ export const useCreateProject = (onClose: () => void) => {
             setName('');
             setDescription('');
             setTeamId('');
+            setBudget(0);
             onClose();
         } catch (error) {
             const err = error as AxiosError<{ message: string }>;
@@ -136,6 +138,8 @@ export const useCreateProject = (onClose: () => void) => {
         setDescription,
         teamId,
         setTeamId,
+        budget,
+        setBudget,
         isLoading,
         handleCreate
     };
@@ -155,6 +159,7 @@ export const useCreateTask = (onClose: () => void) => {
     const [dueDate, setDueDate] = useState('');
     const [assigneeId, setAssigneeId] = useState('');
     const [projectId, setProjectId] = useState('');
+    const [budget, setBudget] = useState<number>(0);
     const [isLoading, setIsLoading] = useState(false);
     const [teamMembers, setTeamMembers] = useState<TeamMember[]>([]);
 
@@ -205,6 +210,7 @@ export const useCreateTask = (onClose: () => void) => {
                 dueDate: dueDate || null,
                 assigneeId: assigneeId || undefined,
                 projectId,
+                budget,
             })).unwrap();
 
             onClose();
@@ -215,6 +221,7 @@ export const useCreateTask = (onClose: () => void) => {
             setDueDate('');
             setPriority('MEDIUM');
             setStatus('TODO');
+            setBudget(0);
         } catch (error) {
             const err = error as AxiosError<{ message: string }>;
             window.toastify(err.response?.data?.message || "Failed to create task", "error");
@@ -239,6 +246,8 @@ export const useCreateTask = (onClose: () => void) => {
         setAssigneeId,
         projectId,
         setProjectId,
+        budget,
+        setBudget,
         isLoading,
         teamMembers,
         handleSubmit

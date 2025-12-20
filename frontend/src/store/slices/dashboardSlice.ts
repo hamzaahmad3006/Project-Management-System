@@ -28,9 +28,10 @@ const initialState: DashboardState = {
 // Fetch KPIs
 export const fetchKPIs = createAsyncThunk(
     'dashboard/fetchKPIs',
-    async (_, { rejectWithValue }) => {
+    async (projectId: string | undefined, { rejectWithValue }) => {
         try {
-            const response = await api.get('/dashboard/kpis');
+            const params = projectId && projectId !== 'all' ? { projectId } : {};
+            const response = await api.get('/dashboard/kpis', { params });
             return response.data;
         } catch (error: any) {
             return rejectWithValue(error.response?.data?.message || 'Failed to fetch KPIs');
@@ -41,9 +42,10 @@ export const fetchKPIs = createAsyncThunk(
 // Fetch Recent Activity
 export const fetchRecentActivity = createAsyncThunk(
     'dashboard/fetchRecentActivity',
-    async (_, { rejectWithValue }) => {
+    async (projectId: string | undefined, { rejectWithValue }) => {
         try {
-            const response = await api.get('/dashboard/recent-activity');
+            const params = projectId && projectId !== 'all' ? { projectId } : {};
+            const response = await api.get('/dashboard/recent-activity', { params });
             return response.data.recentActivity;
         } catch (error: any) {
             return rejectWithValue(error.response?.data?.message || 'Failed to fetch recent activity');

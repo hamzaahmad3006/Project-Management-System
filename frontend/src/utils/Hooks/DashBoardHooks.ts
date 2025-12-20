@@ -6,7 +6,7 @@ import { Task, Section, TaskStatus } from '../../types';
 export const useProjectBoard = () => {
     const dispatch = useAppDispatch();
     const { tasks, loading, error } = useAppSelector(state => state.tasks);
-    const { currentProject } = useAppSelector(state => state.projects);
+    const { currentProject, selectedProjectId } = useAppSelector(state => state.projects);
 
     const [activeView, setActiveView] = useState('Board');
     const [collapsedSections, setCollapsedSections] = useState<string[]>(['postpone', 'qa']);
@@ -14,12 +14,20 @@ export const useProjectBoard = () => {
     const [selectedTask, setSelectedTask] = useState<Task | null>(null);
 
     useEffect(() => {
-        // Fetch tasks for the current project if available, otherwise fetch all
-        dispatch(fetchTasks(currentProject ? { projectId: currentProject.id } : {}));
-    }, [dispatch, currentProject?.id]);
+        // Use global selectedProjectId if set, otherwise fallback to currentProject
+        const projectIdToFetch = (selectedProjectId && selectedProjectId !== 'all')
+            ? selectedProjectId
+            : currentProject?.id;
+
+        dispatch(fetchTasks(projectIdToFetch ? { projectId: projectIdToFetch } : {}));
+    }, [dispatch, currentProject?.id, selectedProjectId]);
 
     const handleAddTask = (taskName: string, sectionId: string) => {
-        if (!currentProject) {
+        const activeProjectId = (selectedProjectId && selectedProjectId !== 'all')
+            ? selectedProjectId
+            : currentProject?.id;
+
+        if (!activeProjectId) {
             window.toastify("Please select a project first", "error");
             return;
         }
@@ -29,7 +37,7 @@ export const useProjectBoard = () => {
             status: 'TODO' as const,
             priority: 'MEDIUM' as const,
             sectionId: sectionId,
-            projectId: currentProject.id,
+            projectId: activeProjectId,
         };
         dispatch(createTaskAction(newTaskData));
     };
@@ -115,6 +123,84 @@ export const useProjectBoard = () => {
         ];
     }, [tasks]);
 
+    const [currentDate, setCurrentDate] = useState(new Date());
+
+    // Transform raw tasks into calendar events (Assign Date -> Green, Due Date -> Red)
+    const calendarEvents = useMemo(() => {
+        return tasks.flatMap(t => {
+            const events = [];
+            const dueDate = t.dueDate ? new Date(t.dueDate) : null;
+            const assignDate = t.createdAt ? new Date(t.createdAt) : null;
+            const projectName = t.project?.name || 'No Project';
+
+            // 1. Assign Date Event (Green Badge)
+            if (assignDate) {
+                events.push({
+                    id: `${t.id}-assign`,
+                    title: projectName,
+                    taskName: t.name,
+                    date: assignDate.getUTCDate(),
+                    month: assignDate.getUTCMonth(),
+                    year: assignDate.getUTCFullYear(),
+                    type: 'assign',
+                    color: 'bg-green-600 text-white',
+                    task: t
+                });
+            }
+
+            // 2. Due Date Event (Red Badge)
+            if (dueDate) {
+                events.push({
+                    id: `${t.id}-due`,
+                    title: projectName,
+                    taskName: t.name,
+                    date: dueDate.getUTCDate(),
+                    month: dueDate.getUTCMonth(),
+                    year: dueDate.getUTCFullYear(),
+                    type: 'due',
+                    color: 'bg-red-600 text-white',
+                    task: t
+                });
+            }
+
+            return events;
+        });
+    }, [tasks]);
+
+    // Helper to generate calendar grid
+    const calendarDays = useMemo(() => {
+        const year = currentDate.getFullYear();
+        const month = currentDate.getMonth();
+        const firstDayOfMonth = new Date(year, month, 1).getDay(); // 0-6 (Sun-Sat)
+        const daysInMonth = new Date(year, month + 1, 0).getDate();
+        const prevMonthLastDay = new Date(year, month, 0).getDate();
+
+        // Adjust Sun=0 to Mon=0 for Mon-Sun grid
+        const offset = (firstDayOfMonth + 6) % 7;
+
+        return Array.from({ length: 42 }).map((_, i) => {
+            const date = new Date(year, month, i - offset + 1);
+            return {
+                day: date.getDate(),
+                month: date.getMonth(),
+                year: date.getFullYear(),
+                isCurrentMonth: date.getMonth() === month
+            };
+        });
+    }, [currentDate]);
+
+    const handlePrevMonth = () => {
+        setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() - 1, 1));
+    };
+
+    const handleNextMonth = () => {
+        setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 1));
+    };
+
+    const handleGoToToday = () => {
+        setCurrentDate(new Date());
+    };
+
     return {
         tasks,
         loading,
@@ -129,6 +215,12 @@ export const useProjectBoard = () => {
         setSelectedTask,
         handleAddTask,
         handleDragEnd,
-        sections: dynamicSections
+        sections: dynamicSections,
+        calendarEvents,
+        currentDate,
+        calendarDays,
+        handlePrevMonth,
+        handleNextMonth,
+        handleGoToToday
     };
 };

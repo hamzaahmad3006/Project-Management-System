@@ -18,6 +18,8 @@ const CreateProjectModal: React.FC<CreateModalProps> = ({ isOpen, onClose }) => 
         setDescription,
         teamId,
         setTeamId,
+        budget,
+        setBudget,
         isLoading,
         handleCreate
     } = useCreateProject(onClose);
@@ -67,8 +69,8 @@ const CreateProjectModal: React.FC<CreateModalProps> = ({ isOpen, onClose }) => 
                         </div>
                     </div>
 
-                    {/* Team & Privacy Row */}
-                    <div className="grid grid-cols-2 gap-4">
+                    {/* Team, Privacy & Budget Row */}
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                         {/* Team */}
                         <div className="space-y-1.5">
                             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Select a team</label>
@@ -100,6 +102,18 @@ const CreateProjectModal: React.FC<CreateModalProps> = ({ isOpen, onClose }) => 
                                 </select>
                                 <FaChevronDown size={12} className="absolute right-3 top-3 text-gray-400 dark:text-gray-500 pointer-events-none" />
                             </div>
+                        </div>
+
+                        {/* Budget */}
+                        <div className="space-y-1.5">
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Budget ($)</label>
+                            <input
+                                type="number"
+                                placeholder="0"
+                                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md focus:outline-none focus:border-blue-500 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 text-sm transition-shadow"
+                                value={budget}
+                                onChange={(e) => setBudget(parseFloat(e.target.value) || 0)}
+                            />
                         </div>
                     </div>
 

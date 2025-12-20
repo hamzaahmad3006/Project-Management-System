@@ -13,14 +13,19 @@ import {
 const Tasks: React.FC = () => {
     const dispatch = useAppDispatch();
     const { tasks, loading } = useAppSelector((state) => state.tasks);
+    const { selectedProjectId } = useAppSelector((state) => state.projects);
 
     const [viewMode, setViewMode] = useState<'KANBAN' | 'LIST'>('KANBAN');
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
     const [searchTerm, setSearchTerm] = useState('');
 
     useEffect(() => {
-        dispatch(fetchTasks({}));
-    }, [dispatch]);
+        const filters: any = {};
+        if (selectedProjectId && selectedProjectId !== 'all') {
+            filters.projectId = selectedProjectId;
+        }
+        dispatch(fetchTasks(filters));
+    }, [dispatch, selectedProjectId]);
 
     const handleDragEnd = async (result: DropResult) => {
         const { destination, source, draggableId } = result;
@@ -157,12 +162,16 @@ const Tasks: React.FC = () => {
 
                                                             {/* Footer Row */}
                                                             <div className="flex items-center justify-between pt-3 border-t border-gray-50 dark:border-gray-800 mt-auto">
-                                                                {/* Left: Metadata */}
                                                                 <div className="flex items-center gap-3 text-gray-400 dark:text-gray-500">
                                                                     <div className="flex items-center gap-1 text-xs" title="Due Date">
                                                                         <FaCalendarAlt size={10} />
                                                                         <span>{task.dueDate ? new Date(task.dueDate).toLocaleDateString(undefined, { month: 'short', day: 'numeric' }) : 'No Date'}</span>
                                                                     </div>
+                                                                    {task.budget && task.budget > 0 ? (
+                                                                        <div className="flex items-center gap-1 text-[10px] font-bold text-green-600 dark:text-green-400 bg-green-50 dark:bg-green-900/20 px-1.5 py-0.5 rounded border border-green-100 dark:border-green-900/30">
+                                                                            ${task.budget.toLocaleString()}
+                                                                        </div>
+                                                                    ) : null}
                                                                     <div className="flex items-center gap-1 text-xs">
                                                                         <FaCheckSquare size={12} /> <span className="text-[10px]">2/7</span>
                                                                     </div>

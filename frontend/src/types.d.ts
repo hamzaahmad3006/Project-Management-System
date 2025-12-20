@@ -62,6 +62,7 @@ export interface Task {
     description?: string;
     project?: any;
     projectId?: string;
+    budget?: number;
     assignedToId?: string;
     assigneeId?: string; // For creation payload
     subtasks?: string;
@@ -73,6 +74,21 @@ export interface Task {
     assignee?: { name: string, avatar: string };
     comments?: number;
     attachments?: number;
+    createdAt?: string;
+    comments_list?: Comment[];
+}
+
+export interface Comment {
+    id: string;
+    content: string;
+    createdAt: string;
+    updatedAt: string;
+    taskId: string;
+    author: {
+        id: string;
+        name: string;
+        avatar?: string;
+    };
 }
 
 export interface Section {
@@ -91,6 +107,7 @@ export interface DashboardTask {
     status: string;
     priority: string;
     dueDate?: string;
+    budget?: number;
 }
 
 //===== Notification.tsx Popover Props Interface ======

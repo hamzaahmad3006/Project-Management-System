@@ -28,30 +28,18 @@ const ProjectBoard: React.FC = () => {
         setSelectedTask,
         handleAddTask,
         handleDragEnd,
-        sections
+        sections,
+        calendarEvents,
+        currentDate,
+        calendarDays,
+        handlePrevMonth,
+        handleNextMonth,
+        handleGoToToday
     } = useProjectBoard();
 
-    // Mock Calendar Events (can be moved to hook later)
-    const calendarEvents = [
-        { id: '1', title: 'Contact customers wi...', date: 25, color: 'bg-orange-100 ring-1 ring-orange-200 text-orange-700' },
-        { id: '2', title: 'Task detail modal', date: 25, color: 'bg-pink-100 ring-1 ring-pink-200 text-pink-700' },
-        { id: '3', title: 'Reporting: Design co...', date: 25, color: 'bg-blue-100 ring-1 ring-blue-200 text-blue-700' },
-        { id: '4', title: 'Task detail modal', date: 26, color: 'bg-pink-100 ring-1 ring-pink-200 text-pink-700' },
-        { id: '5', title: 'Dashboard: concept', date: 26, color: 'bg-green-100 ring-1 ring-green-200 text-green-700' },
-        { id: '6', title: 'Help Docs: update scr...', date: 29, color: 'bg-gray-100 ring-1 ring-gray-200 text-gray-700' },
-        { id: '7', title: 'Extension: show totals', date: 29, color: 'bg-green-100 ring-1 ring-green-200 text-green-700' },
-        { id: '8', title: 'Contact customers wi...', date: 30, color: 'bg-orange-100 ring-1 ring-orange-200 text-orange-700' },
-        { id: '9', title: 'Extension: show totals', date: 30, color: 'bg-green-100 ring-1 ring-green-200 text-green-700' },
-        { id: '10', title: 'Contact customers wi...', date: 31, color: 'bg-orange-100 ring-1 ring-orange-200 text-orange-700' },
-        { id: '11', title: 'Task detail modal', date: 31, color: 'bg-pink-100 ring-1 ring-pink-200 text-pink-700' },
-        { id: '12', title: 'Reporting: Design co...', date: 31, color: 'bg-blue-100 ring-1 ring-blue-200 text-blue-700' },
-        { id: '13', title: 'Contact customers wi...', date: 4, color: 'bg-orange-100 ring-1 ring-orange-200 text-orange-700' },
-        { id: '14', title: 'Task detail modal', date: 4, color: 'bg-pink-100 ring-1 ring-pink-200 text-pink-700' },
-        { id: '15', title: 'Reporting: Design co...', date: 4, color: 'bg-blue-100 ring-1 ring-blue-200 text-blue-700' },
-        { id: '16', title: 'Dashboard: concept', date: 5, color: 'bg-green-100 ring-1 ring-green-200 text-green-700' },
-        { id: '17', title: 'Contact customers wi...', date: 5, color: 'bg-orange-100 ring-1 ring-orange-200 text-orange-700' },
-    ];
-
+    const currentYear = currentDate.getFullYear();
+    const currentMonth = currentDate.getMonth();
+    const today = new Date();
 
     return (
         <div className="flex flex-col h-full bg-white dark:bg-[#12141c]">
@@ -138,7 +126,7 @@ const ProjectBoard: React.FC = () => {
 
 
             {/* Content Switcher */}
-            <div className="flex-1 overflow-x-auto bg-white dark:bg-[#12141c] p-6">
+            <div className="flex-1 overflow-auto bg-white dark:bg-[#12141c] p-6">
                 {activeView === 'Board' ? (
                     <DragDropContext onDragEnd={handleDragEnd}>
                         <div className="flex items-start h-full gap-6 min-w-max">
@@ -264,67 +252,76 @@ const ProjectBoard: React.FC = () => {
                     </DragDropContext>
                 ) : activeView === 'Calendar' ? (
                     // Calendar View Content
-                    <div className="flex flex-col h-full min-w-[800px]">
+                    <div className="flex flex-col min-w-[800px] p-2 pb-12">
                         {/* Calendar Controls */}
                         <div className="flex items-center justify-between mb-4">
                             <div className="flex items-center gap-2">
-                                <h2 className="text-lg font-semibold text-gray-800 dark:text-gray-100">October 2024</h2>
+                                <h2 className="text-lg font-semibold text-gray-800 dark:text-gray-100 capitalize">
+                                    {currentDate.toLocaleString('default', { month: 'long', year: 'numeric' })}
+                                </h2>
                                 <FaChevronDown size={12} className="text-gray-500 dark:text-gray-400" />
                             </div>
                             <div className="flex items-center gap-2">
                                 <div className="flex items-center border border-gray-300 dark:border-gray-700 rounded overflow-hidden">
                                     <button className="px-3 py-1 text-sm text-gray-600 dark:text-gray-300 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-750 border-r border-gray-300 dark:border-gray-700">Month</button>
-                                    <button className="px-3 py-1 text-sm text-gray-600 dark:text-gray-300 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-750">Today</button>
+                                    <button
+                                        onClick={handleGoToToday}
+                                        className="px-3 py-1 text-sm text-gray-600 dark:text-gray-300 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-750"
+                                    >Today</button>
                                 </div>
                                 <div className="flex items-center gap-1 text-gray-400 dark:text-gray-500 ml-2">
-                                    <button className="p-1 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"><FaChevronLeft size={14} /></button>
-                                    <button className="p-1 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"><FaChevronRight size={14} /></button>
+                                    <button
+                                        onClick={handlePrevMonth}
+                                        className="p-1 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
+                                    ><FaChevronLeft size={14} /></button>
+                                    <button
+                                        onClick={handleNextMonth}
+                                        className="p-1 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
+                                    ><FaChevronRight size={14} /></button>
                                 </div>
                             </div>
                         </div>
 
                         {/* Calendar Grid */}
-                        <div className="flex-1 border border-gray-200 dark:border-gray-800 rounded-lg overflow-hidden flex flex-col bg-white dark:bg-[#1a1c23]">
+                        <div className="flex-1 border border-gray-100 dark:border-gray-800/10 rounded-xl overflow-hidden flex flex-col bg-white dark:bg-[#0f1117] shadow-sm">
                             {/* Days Header */}
-                            <div className="grid grid-cols-7 border-b border-gray-200 dark:border-gray-800 text-center py-2 bg-white dark:bg-[#1a1c23]">
+                            <div className="grid grid-cols-7 border-b border-gray-50 dark:border-gray-800/10 py-3 bg-gray-50/50 dark:bg-gray-900/10">
                                 {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map(day => (
-                                    <div key={day} className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">{day}</div>
+                                    <div key={day} className="text-[10px] font-bold text-gray-400 dark:text-gray-600 uppercase tracking-widest text-center">{day}</div>
                                 ))}
                             </div>
 
                             {/* Calendar Days */}
-                            <div className="flex-1 grid grid-cols-7 grid-rows-5">
-                                {Array.from({ length: 35 }).map((_, i) => {
-
-                                    let dayNum = i - 3;
-                                    let isCurrentMonth = true;
-
-                                    if (dayNum < 1) {
-                                        dayNum = 31 + dayNum;
-                                        isCurrentMonth = false;
-                                    } else if (dayNum > 31) {
-                                        dayNum = dayNum - 31; // Next month dates
-                                        isCurrentMonth = false;
-                                    }
-
-                                    const isToday = isCurrentMonth && dayNum === 13;
-                                    const events = calendarEvents.filter(e => e.date === dayNum && isCurrentMonth);
+                            <div className="flex-1 grid grid-cols-7">
+                                {calendarDays.map((cell, i) => {
+                                    const dayNum = cell.day;
+                                    const isCurrentMonth = cell.isCurrentMonth;
+                                    const isToday = dayNum === today.getDate() && cell.month === today.getMonth() && cell.year === today.getFullYear();
+                                    const events = calendarEvents.filter(e => e.date === dayNum && e.month === cell.month && e.year === cell.year);
 
                                     return (
-                                        <div key={i} className={`border-b border-r border-gray-100 dark:border-gray-800/50 p-2 relative ${!isCurrentMonth ? 'bg-gray-50/50 dark:bg-gray-900/20' : 'bg-white dark:bg-[#1a1c23]'}`}>
-                                            <span className={`text-xs w-6 h-6 flex items-center justify-center rounded-full mb-1
-                                                            ${!isCurrentMonth ? 'text-gray-400 dark:text-gray-600' : isToday ? 'bg-blue-500 text-white font-bold shadow-sm' : 'text-gray-700 dark:text-gray-300'}`}>
-                                                {dayNum}
-                                            </span>
+                                        <div
+                                            key={i}
+                                            className={`border-b border-r border-gray-50 dark:border-gray-800/10 p-2.5 relative min-h-[180px] hover:bg-gray-50/20 dark:hover:bg-gray-800/5 transition-colors flex flex-col ${!isCurrentMonth ? 'bg-gray-50/20 dark:bg-gray-900/5' : 'bg-white dark:bg-[#0f1117]'}`}
+                                        >
+                                            <div className="flex justify-end mb-2.5">
+                                                <span className={`text-[11px] font-bold w-6 h-6 flex items-center justify-center rounded-full transition-all
+                                                                ${!isCurrentMonth ? 'text-gray-200 dark:text-gray-800' : isToday ? 'bg-blue-500 text-white shadow-lg shadow-blue-500/20' : 'text-gray-400 dark:text-gray-600'}`}>
+                                                    {dayNum}
+                                                </span>
+                                            </div>
 
-                                            <div className="space-y-1">
+                                            <div className="space-y-1.5 overflow-y-auto no-scrollbar pb-1">
                                                 {events.map((event, idx) => (
                                                     <div
                                                         key={`${event.id}-${idx}`}
-                                                        onClick={(e) => { e.stopPropagation(); /* Mocking task selection from calendar */ setSelectedTask({ id: event.id, name: event.title, status: 'IN_PROGRESS', priority: 'MEDIUM' } as Task); }}
-                                                        className={`text-[10px] px-2 py-1 rounded truncate shadow-sm cursor-pointer hover:opacity-80 transition-opacity ${event.color} dark:bg-opacity-20 dark:text-opacity-90`}
+                                                        onClick={(e) => { e.stopPropagation(); setSelectedTask(event.task); }}
+                                                        className={`px-2 py-1 rounded shadow-sm cursor-pointer hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 ${event.color} flex flex-col min-w-0`}
                                                     >
-                                                        {event.title}
+                                                        <div className="text-[10px] font-bold leading-tight truncate">{event.title}</div>
+                                                        <div className="text-[8px] opacity-90 font-medium tracking-tight">
+                                                            {event.type === 'assign' ? 'Assigned' : 'Due Date'}
+                                                        </div>
                                                     </div>
                                                 ))}
                                             </div>

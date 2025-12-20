@@ -9,6 +9,7 @@ import reportReducer from './slices/reportSlice';
 import dashboardReducer from './slices/dashboardSlice';
 import notificationReducer from './slices/notificationSlice';
 import themeReducer from './slices/themeSlice';
+import commentReducer from './slices/commentSlice';
 
 export const store = configureStore({
     reducer: {
@@ -22,6 +23,7 @@ export const store = configureStore({
         dashboard: dashboardReducer,
         notifications: notificationReducer,
         theme: themeReducer,
+        comments: commentReducer,
     },
 });
 

@@ -11,13 +11,16 @@ import SearchModal from '../Modals/SearchModal';
 import NotificationPopover from '../Popovers/NotificationPopover';
 import { FaSearch, FaBell, FaChevronRight, FaChevronDown, FaUserPlus, FaCog, FaBars, FaTimes, FaRegCheckCircle, FaRegFile, FaPlus, } from 'react-icons/fa';
 import { logout } from 'store/slices/authSlice';
+import { fetchProjects, setSelectedProjectId } from '../../store/slices/projectSlice';
 import { MdLogout } from 'react-icons/md';
+import { PanelLeft, LayoutGrid } from 'lucide-react';
 
 const Sidebar: React.FC = () => {
     const dispatch = useDispatch<AppDispatch>();
     const navigate = useNavigate();
     const { user } = useSelector((state: RootState) => state.auth);
     const { notifications } = useSelector((state: RootState) => state.notifications);
+    const { projects, selectedProjectId } = useSelector((state: RootState) => state.projects);
     const unreadCount = notifications.filter(n => !n.isRead).length;
     const isManager = user?.role === 'MANAGER';
     const [isOpen, setIsOpen] = useState(true);
@@ -32,6 +35,7 @@ const Sidebar: React.FC = () => {
 
     useEffect(() => {
         dispatch(fetchNotifications());
+        dispatch(fetchProjects());
     }, [dispatch]);
 
     useEffect(() => {
@@ -95,11 +99,13 @@ const Sidebar: React.FC = () => {
                     )}
                     <button
                         onClick={() => setIsOpen(!isOpen)}
-                        className="p-1 hover:bg-gray-200 rounded hidden md:block"
+                        className="flex items-center gap-3 px-3 py-2 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-800 rounded md:block"
                     >
-                        <img src='/assets/SidebarIcon.png' alt="Logo" />
+                        <PanelLeft size={20} />
+
                     </button>
                 </div>
+
 
                 <nav className="p-3 space-y-1">
                     <div
@@ -225,7 +231,8 @@ const Sidebar: React.FC = () => {
 
                     <div
                         onClick={() => dispatch(logout())}
-                        className="flex items-center gap-3 px-3 py-2 text-gray-600 hover:bg-gray-200 rounded cursor-pointer">
+                        className={`flex items-center gap-3 px-3 py-2 text-gray-600 hover:bg-gray-200 rounded cursor-pointer ${!isOpen && "justify-center"
+                            }`}>
                         <MdLogout size={16} />
                         {isOpen && <span className="text-sm">Logout</span>}
                     </div>

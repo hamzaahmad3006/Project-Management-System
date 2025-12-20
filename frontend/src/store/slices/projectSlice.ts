@@ -29,6 +29,7 @@ interface Project {
 interface ProjectState {
     projects: Project[];
     currentProject: Project | null;
+    selectedProjectId: string; // Global project filter
     loading: boolean;
     error: string | null;
 }
@@ -36,6 +37,7 @@ interface ProjectState {
 const initialState: ProjectState = {
     projects: [],
     currentProject: null,
+    selectedProjectId: 'all',
     loading: false,
     error: null,
 };
@@ -110,6 +112,9 @@ const projectSlice = createSlice({
         setCurrentProject: (state, action) => {
             state.currentProject = action.payload;
         },
+        setSelectedProjectId: (state, action) => {
+            state.selectedProjectId = action.payload;
+        },
     },
     extraReducers: (builder) => {
         builder
@@ -162,5 +167,5 @@ const projectSlice = createSlice({
     },
 });
 
-export const { clearCurrentProject, setCurrentProject } = projectSlice.actions;
+export const { clearCurrentProject, setCurrentProject, setSelectedProjectId } = projectSlice.actions;
 export default projectSlice.reducer;
