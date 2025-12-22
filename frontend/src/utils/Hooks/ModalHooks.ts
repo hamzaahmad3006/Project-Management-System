@@ -104,11 +104,17 @@ export const useCreateProject = (onClose: () => void) => {
 
         setIsLoading(true);
         try {
+            const today = new Date();
+            const endDate = new Date();
+            endDate.setDate(today.getDate() + 30);
+
             await dispatch(createProject({
                 name,
                 description,
                 budget,
-                teamId: teamId || undefined
+                teamId: teamId || undefined,
+                startDate: today.toISOString(),
+                endDate: endDate.toISOString()
             })).unwrap();
 
             // Reset

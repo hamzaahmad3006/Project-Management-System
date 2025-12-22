@@ -1,22 +1,7 @@
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
+import { AxiosError } from 'axios';
 import api from '../../api/axios';
-
-export interface Notification {
-    id: string;
-    userId: string;
-    type: string;
-    title: string;
-    message: string;
-    data: any;
-    isRead: boolean;
-    createdAt: string;
-}
-
-interface NotificationState {
-    notifications: Notification[];
-    loading: boolean;
-    error: string | null;
-}
+import { Notification, NotificationState } from '../../types';
 
 const initialState: NotificationState = {
     notifications: [],
@@ -28,10 +13,11 @@ export const fetchNotifications = createAsyncThunk(
     'notifications/fetchAll',
     async (_, { rejectWithValue }) => {
         try {
-            const response = await api.get('/notifications');
+            const response = await api.get<{ notifications: Notification[] }>('/notifications');
             return response.data.notifications;
-        } catch (error: any) {
-            return rejectWithValue(error.response?.data?.message || 'Failed to fetch notifications');
+        } catch (err: unknown) {
+            const error = err as AxiosError<{ message: string }>;
+            return rejectWithValue(error.response?.data?.message || error.message || 'Failed to fetch notifications');
         }
     }
 );
@@ -40,10 +26,11 @@ export const markNotificationAsRead = createAsyncThunk(
     'notifications/markAsRead',
     async (id: string, { rejectWithValue }) => {
         try {
-            const response = await api.put(`/notifications/${id}/read`);
+            const response = await api.put<{ notification: Notification }>(`/notifications/${id}/read`);
             return response.data.notification;
-        } catch (error: any) {
-            return rejectWithValue(error.response?.data?.message || 'Failed to mark as read');
+        } catch (err: unknown) {
+            const error = err as AxiosError<{ message: string }>;
+            return rejectWithValue(error.response?.data?.message || error.message || 'Failed to mark as read');
         }
     }
 );
@@ -52,10 +39,11 @@ export const acceptTeamInvitation = createAsyncThunk(
     'notifications/acceptInvitation',
     async (token: string, { rejectWithValue }) => {
         try {
-            const response = await api.get(`/teams/invitation/${token}/accept`);
+            const response = await api.get<{ message: string }>(`/teams/invitation/${token}/accept`);
             return response.data.message;
-        } catch (error: any) {
-            return rejectWithValue(error.response?.data?.message || 'Failed to accept invitation');
+        } catch (err: unknown) {
+            const error = err as AxiosError<{ message: string }>;
+            return rejectWithValue(error.response?.data?.message || error.message || 'Failed to accept invitation');
         }
     }
 );
@@ -64,10 +52,11 @@ export const declineTeamInvitation = createAsyncThunk(
     'notifications/declineInvitation',
     async (token: string, { rejectWithValue }) => {
         try {
-            const response = await api.get(`/teams/invitation/${token}/decline`);
+            const response = await api.get<{ message: string }>(`/teams/invitation/${token}/decline`);
             return response.data.message;
-        } catch (error: any) {
-            return rejectWithValue(error.response?.data?.message || 'Failed to decline invitation');
+        } catch (err: unknown) {
+            const error = err as AxiosError<{ message: string }>;
+            return rejectWithValue(error.response?.data?.message || error.message || 'Failed to decline invitation');
         }
     }
 );
@@ -84,8 +73,9 @@ const notificationSlice = createSlice({
         builder
             .addCase(fetchNotifications.pending, (state) => {
                 state.loading = true;
+                state.error = null;
             })
-            .addCase(fetchNotifications.fulfilled, (state, action) => {
+            .addCase(fetchNotifications.fulfilled, (state, action: PayloadAction<Notification[]>) => {
                 state.loading = false;
                 state.notifications = action.payload;
             })
@@ -93,7 +83,7 @@ const notificationSlice = createSlice({
                 state.loading = false;
                 state.error = action.payload as string;
             })
-            .addCase(markNotificationAsRead.fulfilled, (state, action) => {
+            .addCase(markNotificationAsRead.fulfilled, (state, action: PayloadAction<Notification>) => {
                 const index = state.notifications.findIndex(n => n.id === action.payload.id);
                 if (index !== -1) {
                     state.notifications[index] = action.payload;

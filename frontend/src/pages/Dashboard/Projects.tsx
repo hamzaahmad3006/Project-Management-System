@@ -39,7 +39,7 @@ const Projects: React.FC = () => {
 
                             <div className="mb-4">
                                 <div className="flex justify-between text-xs text-gray-500 dark:text-gray-400 mb-1">
-                                    <span>Progress</span>
+                                    <span>Work Progress</span>
                                     <span>{Math.round(project.progress)}%</span>
                                 </div>
                                 <div className="w-full bg-gray-200 dark:bg-gray-800 rounded-full h-2">
@@ -47,6 +47,24 @@ const Projects: React.FC = () => {
                                         className="bg-indigo-600 h-2 rounded-full transition-all duration-500"
                                         style={{ width: `${project.progress}%` }}
                                     ></div>
+                                </div>
+                            </div>
+
+                            {/* Budget Utilization */}
+                            <div className="mb-4">
+                                <div className="flex justify-between text-xs text-gray-500 dark:text-gray-400 mb-1">
+                                    <span>Budget Used</span>
+                                    <span>{project.budget > 0 ? Math.round((project.spent / project.budget) * 100) : 0}%</span>
+                                </div>
+                                <div className="w-full bg-gray-200 dark:bg-gray-800 rounded-full h-2">
+                                    <div
+                                        className={`h-2 rounded-full transition-all duration-500 ${project.spent > project.budget ? 'bg-red-500' : 'bg-emerald-500'}`}
+                                        style={{ width: `${Math.min(100, project.budget > 0 ? (project.spent / project.budget) * 100 : 0)}%` }}
+                                    ></div>
+                                </div>
+                                <div className="flex justify-between mt-1">
+                                    <span className="text-[10px] text-gray-400">Spent: ${project.spent.toLocaleString()}</span>
+                                    <span className="text-[10px] text-gray-400">Total: ${project.budget.toLocaleString()}</span>
                                 </div>
                             </div>
 

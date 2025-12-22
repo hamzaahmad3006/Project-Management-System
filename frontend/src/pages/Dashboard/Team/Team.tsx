@@ -1,21 +1,48 @@
 import CreateTeamModal from "components/Modals/CreateTeamModal";
 import React, { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { NavLink, Outlet, useParams } from "react-router-dom";
+import { fetchProjects } from "store/slices/projectSlice";
+import { getTeams } from "store/slices/teamSlice";
+import { AppDispatch, RootState } from "store/store";
 
 export default function Team() {
+    const dispatch = useDispatch<AppDispatch>();
+    const { teamId: teamIdFromUrl } = useParams();
     const [isCreateTeamOpen, setIsCreateTeamOpen] = useState(false);
+    const { allTeams } = useSelector((state: RootState) => state.team);
+    const { selectedProjectId, projects } = useSelector((state: RootState) => state.projects);
 
+    useEffect(() => {
+        dispatch(getTeams());
+        dispatch(fetchProjects());
+    }, [dispatch]);
+
+    // Priority:
+    // 1. teamId from URL (if any, though we reverted to /team)
+    // 2. teamId from selectedProjectId
+    // 3. Fallback to first team
+    const team = (() => {
+        if (teamIdFromUrl) return allTeams.find(t => t.id === teamIdFromUrl);
+        if (selectedProjectId !== 'all') {
+            const project = projects.find(p => p.id === selectedProjectId);
+            if (project?.teamId) {
+                return allTeams.find(t => t.id === project.teamId);
+            }
+        }
+        return allTeams[0];
+    })();
 
     return (
         <div className="flex w-full h-screen bg-white dark:bg-[#12141c]">
-
-
             {/* Main area */}
             <main className="flex-1 p-8 overflow-auto custom-scrollbar">
                 {/* Header (team name) */}
                 <div className="flex items-center justify-between mb-6">
                     <div>
-                        <h1 className="text-2xl font-semibold text-gray-900 dark:text-gray-100">Defcon / Directions</h1>
+                        <h1 className="text-2xl font-semibold text-gray-900 dark:text-gray-100">
+                            Defcon / {team?.name || 'Loading...'}
+                        </h1>
                         <div className="text-sm text-gray-500 dark:text-gray-400">Teamspace overview</div>
                     </div>
 

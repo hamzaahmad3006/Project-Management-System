@@ -4,11 +4,11 @@ import { AppDispatch, RootState } from '../../store/store';
 import { fetchKPIs, fetchRecentActivity } from '../../store/slices/dashboardSlice';
 import { fetchProjects, setSelectedProjectId } from '../../store/slices/projectSlice';
 import { FaArrowUp, FaArrowDown, FaFilter, FaCalendar } from 'react-icons/fa';
-import { Chart as ChartJS, ArcElement, CategoryScale, LinearScale, PointElement, LineElement, Filler, Tooltip, Legend } from 'chart.js';
-import { Doughnut, Line } from 'react-chartjs-2';
+import { Chart as ChartJS, ArcElement, CategoryScale, LinearScale, PointElement, LineElement, BarElement, Filler, Tooltip, Legend } from 'chart.js';
+import { Doughnut, Line, Bar } from 'react-chartjs-2';
 import { DashboardTask } from 'types';
 
-ChartJS.register(ArcElement, CategoryScale, LinearScale, PointElement, LineElement, Filler, Tooltip, Legend);
+ChartJS.register(ArcElement, CategoryScale, LinearScale, PointElement, LineElement, BarElement, Filler, Tooltip, Legend);
 
 const Dashboard: React.FC = () => {
     const dispatch = useDispatch<AppDispatch>();
@@ -56,27 +56,51 @@ const Dashboard: React.FC = () => {
         }]
     };
 
-    // Budget Chart Data
+    // Budget Chart Data (Real)
     const budgetData = {
-        labels: ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', '23', '24', '25', '26', '27', '28', '29', '30'],
+        labels: ['Total Budget', 'Total Spent'],
         datasets: [
             {
-                label: 'Actual',
-                data: [567, 580, 590, 600, 610, 620, 640, 660, 680, 700, 720, 740, 760, 780, 800, 820, 840, 860, 880, 900, 920, 940, 960, 980, 1000, 1020, 1030, 1035, 1040, 1053],
-                borderColor: isDark ? '#3b82f6' : '#1E3A8A',
-                backgroundColor: isDark ? 'rgba(59, 130, 246, 0.1)' : 'rgba(30, 58, 138, 0.1)',
-                fill: true,
-                tension: 0.4
-            },
-            {
-                label: 'Expenses',
-                data: [587, 600, 610, 620, 630, 640, 660, 680, 700, 720, 740, 760, 780, 800, 820, 840, 860, 880, 900, 920, 940, 960, 980, 1000, 1020, 1040, 1050, 1055, 1060, 1053],
-                borderColor: isDark ? '#60A5FA' : '#60A5FA',
-                backgroundColor: isDark ? 'rgba(96, 165, 250, 0.2)' : 'rgba(96, 165, 250, 0.2)',
-                fill: true,
-                tension: 0.4
+                label: 'Project Budget',
+                data: [kpis?.projects?.totalBudget || 0, kpis?.projects?.totalSpent || 0],
+                backgroundColor: [
+                    isDark ? '#3b82f6' : '#1E3A8A', // Budget color
+                    kpis?.projects?.totalSpent && kpis.projects.totalSpent > kpis.projects.totalBudget ? '#ef4444' : '#10b981' // Spent color (Red if over, Green if under)
+                ],
+                borderRadius: 8,
+                barThickness: 40,
             }
         ]
+    };
+
+    const budgetOptions = {
+        responsive: true,
+        plugins: {
+            legend: { display: false },
+            tooltip: {
+                callbacks: {
+                    label: (context: any) => `$${context.raw.toLocaleString()}`
+                }
+            }
+        },
+        scales: {
+            y: {
+                beginAtZero: true,
+                grid: {
+                    color: isDark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.05)',
+                },
+                ticks: {
+                    color: isDark ? '#9ca3af' : '#6b7280',
+                    callback: (value: any) => `$${value.toLocaleString()}`
+                }
+            },
+            x: {
+                grid: { display: false },
+                ticks: {
+                    color: isDark ? '#9ca3af' : '#6b7280',
+                }
+            }
+        }
     };
 
     const getStatusBadge = (status: string) => {
@@ -266,25 +290,22 @@ const Dashboard: React.FC = () => {
                 {/* Budget Chart */}
                 <div className="bg-white dark:bg-[#1a1c23] border border-gray-200 dark:border-gray-800 rounded-lg p-6">
                     <div className="flex items-center justify-between mb-4">
-                        <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Budget and Expenses</h3>
-                        <span className="text-green-600 text-sm font-medium">+85.2%</span>
+                        <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Budget vs. Spend</h3>
+                        <div className="flex items-center gap-1 text-[10px] bg-green-50 dark:bg-green-900/20 text-green-600 px-2 py-0.5 rounded">
+                            {kpis?.projects?.totalSpent && kpis.projects.totalBudget ? Math.round((kpis.projects.totalSpent / kpis.projects.totalBudget) * 100) : 0}% Consumed
+                        </div>
                     </div>
-                    <Line data={budgetData} options={{
-                        responsive: true,
-                        plugins: { legend: { display: false } },
-                        scales: {
-                            y: { display: false },
-                            x: { display: false }
-                        }
-                    }} />
-                    <div className="flex gap-4 mt-4 text-sm">
+                    <div className="h-48">
+                        <Bar data={budgetData} options={budgetOptions} />
+                    </div>
+                    <div className="flex gap-4 mt-6 text-[11px]">
                         <div className="flex items-center gap-2">
-                            <div className="w-3 h-3 bg-blue-900 rounded-full"></div>
-                            <span className="text-gray-700 dark:text-gray-300">Actual</span>
+                            <div className={`w-3 h-3 rounded-full ${isDark ? 'bg-[#3b82f6]' : 'bg-[#1E3A8A]'}`}></div>
+                            <span className="text-gray-600 dark:text-gray-400">Project Budget</span>
                         </div>
                         <div className="flex items-center gap-2">
-                            <div className="w-3 h-3 bg-blue-400 rounded-full"></div>
-                            <span className="text-gray-700 dark:text-gray-300">Expenses</span>
+                            <div className={`w-3 h-3 rounded-full ${kpis?.projects?.totalSpent && kpis.projects.totalSpent > kpis.projects.totalBudget ? 'bg-[#ef4444]' : 'bg-[#10b981]'}`}></div>
+                            <span className="text-gray-600 dark:text-gray-400">Actual Spent</span>
                         </div>
                     </div>
                 </div>

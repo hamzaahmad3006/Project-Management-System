@@ -1,38 +1,7 @@
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
+import { AxiosError } from 'axios';
 import api from '../../api/axios';
-
-interface Project {
-    id: string;
-    name: string;
-    description?: string;
-    status: string;
-    progress: number;
-    startDate: string;
-    endDate: string;
-    budget: number;
-    spent: number;
-    manager: { id: string; name: string };
-    priority?: string;
-    tasks?: { status: string }[];
-    team?: {
-        members: {
-            user: {
-                id: string;
-                name: string;
-                avatar?: string;
-            }
-        }[];
-    };
-    _count?: { tasks: number };
-}
-
-interface ProjectState {
-    projects: Project[];
-    currentProject: Project | null;
-    selectedProjectId: string; // Global project filter
-    loading: boolean;
-    error: string | null;
-}
+import { Project, ProjectState, CreateProjectData, UpdateProjectData } from '../../types';
 
 const initialState: ProjectState = {
     projects: [],
@@ -46,22 +15,24 @@ export const fetchProjects = createAsyncThunk(
     'projects/fetchProjects',
     async (_, { rejectWithValue }) => {
         try {
-            const response = await api.get('/projects');
+            const response = await api.get<{ projects: Project[] }>('/projects');
             return response.data.projects;
-        } catch (error: any) {
-            return rejectWithValue(error.response?.data?.message || 'Failed to fetch projects');
+        } catch (err: unknown) {
+            const error = err as AxiosError<{ message: string }>;
+            return rejectWithValue(error.response?.data?.message || error.message || 'Failed to fetch projects');
         }
     }
 );
 
 export const createProject = createAsyncThunk(
     'projects/createProject',
-    async (projectData: any, { rejectWithValue }) => {
+    async (projectData: CreateProjectData, { rejectWithValue }) => {
         try {
-            const response = await api.post('/projects', projectData);
+            const response = await api.post<{ project: Project }>('/projects', projectData);
             return response.data.project;
-        } catch (error: any) {
-            return rejectWithValue(error.response?.data?.message || 'Failed to create project');
+        } catch (err: unknown) {
+            const error = err as AxiosError<{ message: string }>;
+            return rejectWithValue(error.response?.data?.message || error.message || 'Failed to create project');
         }
     }
 );
@@ -70,22 +41,24 @@ export const fetchProjectById = createAsyncThunk(
     'projects/fetchProjectById',
     async (id: string, { rejectWithValue }) => {
         try {
-            const response = await api.get(`/projects/${id}`);
+            const response = await api.get<{ project: Project }>(`/projects/${id}`);
             return response.data.project;
-        } catch (error: any) {
-            return rejectWithValue(error.response?.data?.message || 'Failed to fetch project');
+        } catch (err: unknown) {
+            const error = err as AxiosError<{ message: string }>;
+            return rejectWithValue(error.response?.data?.message || error.message || 'Failed to fetch project');
         }
     }
 );
 
 export const updateProject = createAsyncThunk(
     'projects/updateProject',
-    async ({ id, data }: { id: string; data: any }, { rejectWithValue }) => {
+    async ({ id, data }: { id: string; data: UpdateProjectData }, { rejectWithValue }) => {
         try {
-            const response = await api.put(`/projects/${id}`, data);
+            const response = await api.put<{ project: Project }>(`/projects/${id}`, data);
             return response.data.project;
-        } catch (error: any) {
-            return rejectWithValue(error.response?.data?.message || 'Failed to update project');
+        } catch (err: unknown) {
+            const error = err as AxiosError<{ message: string }>;
+            return rejectWithValue(error.response?.data?.message || error.message || 'Failed to update project');
         }
     }
 );
@@ -96,8 +69,9 @@ export const deleteProject = createAsyncThunk(
         try {
             await api.delete(`/projects/${id}`);
             return id;
-        } catch (error: any) {
-            return rejectWithValue(error.response?.data?.message || 'Failed to delete project');
+        } catch (err: unknown) {
+            const error = err as AxiosError<{ message: string }>;
+            return rejectWithValue(error.response?.data?.message || error.message || 'Failed to delete project');
         }
     }
 );
@@ -109,10 +83,10 @@ const projectSlice = createSlice({
         clearCurrentProject: (state) => {
             state.currentProject = null;
         },
-        setCurrentProject: (state, action) => {
+        setCurrentProject: (state, action: PayloadAction<Project | null>) => {
             state.currentProject = action.payload;
         },
-        setSelectedProjectId: (state, action) => {
+        setSelectedProjectId: (state, action: PayloadAction<string>) => {
             state.selectedProjectId = action.payload;
         },
     },
@@ -121,8 +95,9 @@ const projectSlice = createSlice({
             // Fetch All Projects
             .addCase(fetchProjects.pending, (state) => {
                 state.loading = true;
+                state.error = null;
             })
-            .addCase(fetchProjects.fulfilled, (state, action) => {
+            .addCase(fetchProjects.fulfilled, (state, action: PayloadAction<Project[]>) => {
                 state.loading = false;
                 state.projects = action.payload;
             })
@@ -131,7 +106,7 @@ const projectSlice = createSlice({
                 state.error = action.payload as string;
             })
             // Create Project
-            .addCase(createProject.fulfilled, (state, action) => {
+            .addCase(createProject.fulfilled, (state, action: PayloadAction<Project>) => {
                 state.projects.unshift(action.payload);
             })
             // Fetch Single Project
@@ -139,7 +114,7 @@ const projectSlice = createSlice({
                 state.loading = true;
                 state.error = null;
             })
-            .addCase(fetchProjectById.fulfilled, (state, action) => {
+            .addCase(fetchProjectById.fulfilled, (state, action: PayloadAction<Project>) => {
                 state.loading = false;
                 state.currentProject = action.payload;
             })
@@ -148,7 +123,7 @@ const projectSlice = createSlice({
                 state.error = action.payload as string;
             })
             // Update Project
-            .addCase(updateProject.fulfilled, (state, action) => {
+            .addCase(updateProject.fulfilled, (state, action: PayloadAction<Project>) => {
                 const index = state.projects.findIndex((p) => p.id === action.payload.id);
                 if (index !== -1) {
                     state.projects[index] = action.payload;
@@ -158,7 +133,7 @@ const projectSlice = createSlice({
                 }
             })
             // Delete Project
-            .addCase(deleteProject.fulfilled, (state, action) => {
+            .addCase(deleteProject.fulfilled, (state, action: PayloadAction<string>) => {
                 state.projects = state.projects.filter((p) => p.id !== action.payload);
                 if (state.currentProject?.id === action.payload) {
                     state.currentProject = null;

@@ -15,9 +15,50 @@ export interface Team {
     name: string;
 }
 
+
+interface TeamStat {
+    title: string;
+    value: string | number;
+    meta: string;
+}
+
+interface TeamMemberStat {
+    id: string;
+    name: string;
+    avatar?: string;
+    role: string;
+    completedTasks: number;
+}
+
+interface TeamProjectStat {
+    id: string;
+    name: string;
+    spent: number;
+    completedTasks: number;
+}
+
+interface RecentActivity {
+    id: string;
+    name: string;
+    updatedAt: string;
+    status: string;
+}
+
+interface TeamStats {
+    stats: TeamStat[];
+    overview: {
+        totalSpent: string;
+        chartData: { label: string; value: number }[];
+    };
+    topMembers: TeamMemberStat[];
+    topProjects: TeamProjectStat[];
+    recentActivities: RecentActivity[];
+}
+
 export interface TeamState {
     members: TeamMember[];
     allTeams: Team[];
+    stats: TeamStats | null;
     loading: boolean;
     error: string | null;
 }
@@ -25,6 +66,7 @@ export interface TeamState {
 const initialState: TeamState = {
     members: [],
     allTeams: [],
+    stats: null,
     loading: false,
     error: null,
 };
@@ -33,10 +75,11 @@ export const fetchTeamMembers = createAsyncThunk(
     'team/fetchMembers',
     async (_, { rejectWithValue }) => {
         try {
+            // This endpoint in server.ts is likely linked to getTeam which returns teams
             const response = await api.get('/teams');
             return response.data.users;
         } catch (error: any) {
-            return rejectWithValue(error.response?.data?.message || 'Failed to fetch team members');
+            return rejectWithValue(error.response?.data?.message || 'Failed to fetch teams');
         }
     }
 );
@@ -48,10 +91,34 @@ export const getTeams = createAsyncThunk(
             const response = await api.get('/teams');
             return response.data.users;
         } catch (error: any) {
-            return rejectWithValue(error.response?.data?.message || 'Failed to fetch team members')
+            return rejectWithValue(error.response?.data?.message || 'Failed to fetch teams')
         }
     }
 )
+
+export const fetchTeamMembersById = createAsyncThunk(
+    'team/fetchMembersById',
+    async (teamId: string, { rejectWithValue }) => {
+        try {
+            const response = await api.get(`/teams/getTeamMembers?teamId=${teamId}`);
+            return response.data.users;
+        } catch (error: any) {
+            return rejectWithValue(error.response?.data?.message || 'Failed to fetch team members');
+        }
+    }
+);
+
+export const fetchTeamStats = createAsyncThunk(
+    'team/fetchStats',
+    async (teamId: string, { rejectWithValue }) => {
+        try {
+            const response = await api.get(`/teams/${teamId}/stats`);
+            return response.data;
+        } catch (error: any) {
+            return rejectWithValue(error.response?.data?.message || 'Failed to fetch team stats');
+        }
+    }
+);
 
 const teamSlice = createSlice({
     name: 'team',
@@ -80,6 +147,32 @@ const teamSlice = createSlice({
                 state.allTeams = action.payload;
             })
             .addCase(getTeams.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload as string;
+            })
+
+            // fetch stats
+            .addCase(fetchTeamStats.pending, (state) => {
+                state.loading = true;
+            })
+            .addCase(fetchTeamStats.fulfilled, (state, action) => {
+                state.loading = false;
+                state.stats = action.payload;
+            })
+            .addCase(fetchTeamStats.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload as string;
+            })
+
+            // fetch members by id
+            .addCase(fetchTeamMembersById.pending, (state) => {
+                state.loading = true;
+            })
+            .addCase(fetchTeamMembersById.fulfilled, (state, action) => {
+                state.loading = false;
+                state.members = action.payload;
+            })
+            .addCase(fetchTeamMembersById.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.payload as string;
             })

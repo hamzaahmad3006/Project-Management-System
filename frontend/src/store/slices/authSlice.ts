@@ -1,27 +1,7 @@
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
+import axios, { AxiosError } from 'axios';
 import api from '../../api/axios';
-
-interface User {
-    id: string;
-    email: string;
-    name: string;
-    role: 'MEMBER' | 'MANAGER';
-    avatar?: string;
-    teamMemberships?: {
-        team: {
-            name: string;
-        };
-    }[];
-}
-
-interface AuthState {
-    user: User | null;
-    token: string | null;
-    isAuthenticated: boolean;
-    loading: boolean;
-    error: string | null;
-    allUsers: User[];
-}
+import { User, AuthState, LoginCredentials, RegisterData, GoogleAuthData, AuthResponse } from '../../types';
 
 const initialState: AuthState = {
     user: null,
@@ -32,68 +12,71 @@ const initialState: AuthState = {
     allUsers: [],
 };
 
-export const loginwithgoogle = createAsyncThunk(
+export const loginwithgoogle = createAsyncThunk<AuthResponse, GoogleAuthData>(
     '/auth/google',
-    async (googleData: any, { rejectWithValue }) => {
+    async (googleData, { rejectWithValue }) => {
         try {
-            const response = await api.post('/auth/google', googleData)
+            const response = await api.post<AuthResponse>('/auth/google', googleData)
             localStorage.setItem('token', response.data.token)
             return response.data
         }
-        catch (err: any) {
-            return rejectWithValue(err.response?.data?.message || 'Login failed')
+        catch (err: unknown) {
+            const error = err as AxiosError<{ message: string }>;
+            return rejectWithValue(error.response?.data?.message || 'Login failed')
         }
     }
 )
 
-export const login = createAsyncThunk(
+export const login = createAsyncThunk<AuthResponse, LoginCredentials>(
     'auth/login',
-    async (credentials: any, { rejectWithValue }) => {
+    async (credentials, { rejectWithValue }) => {
         try {
-            const response = await api.post('/auth/login', credentials);
+            const response = await api.post<AuthResponse>('/auth/login', credentials);
             localStorage.setItem('token', response.data.token);
             return response.data;
-        } catch (error: any) {
+        } catch (err: unknown) {
+            const error = err as AxiosError<{ message: string }>;
             return rejectWithValue(error.response?.data?.message || 'Login failed');
         }
     }
 );
 
-
-
-export const register = createAsyncThunk(
+export const register = createAsyncThunk<AuthResponse, RegisterData>(
     'auth/register',
-    async (userData: any, { rejectWithValue }) => {
+    async (userData, { rejectWithValue }) => {
         try {
-            const response = await api.post('/auth/register', userData);
+            const response = await api.post<AuthResponse>('/auth/register', userData);
             localStorage.setItem('token', response.data.token);
             return response.data;
-        } catch (error: any) {
+        } catch (err: unknown) {
+            const error = err as AxiosError<{ message: string }>;
             return rejectWithValue(error.response?.data?.message || 'Registration failed');
         }
     }
 );
 
-export const fetchProfile = createAsyncThunk(
+export const fetchProfile = createAsyncThunk<User, void>(
     'auth/fetchProfile',
     async (_, { rejectWithValue }) => {
         try {
-            const response = await api.get('/auth/profile');
+            const response = await api.get<User>('/auth/profile');
             return response.data;
-        } catch (error: any) {
+        } catch (err: unknown) {
+            const error = err as AxiosError<{ message: string }>;
             return rejectWithValue(error.response?.data?.message || 'Failed to fetch profile');
         }
     }
 );
 
-export const fetchAllUsers = createAsyncThunk(
+export const fetchAllUsers = createAsyncThunk<User[], void>(
     'auth/fetchAllUsers',
     async (_, { rejectWithValue }) => {
         try {
-            const response = await api.get('/auth/all-users'); // backend endpoint to get all users
-            return response.data.users; // assume backend returns { users: [...] }
-        } catch (error: unknown) {
-            return rejectWithValue((error as Error).message || 'Failed to fetch users');
+            const response = await api.get<{ users: User[] }>('/auth/all-users');
+            return response.data.users;
+        } catch (err: unknown) {
+            const error = err as AxiosError<{ message: string }>;
+            return rejectWithValue(error.response?.data?.message || error.message || 'Failed to fetch users');
         }
     }
 );

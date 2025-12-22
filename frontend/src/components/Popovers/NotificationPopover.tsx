@@ -95,16 +95,16 @@ const NotificationPopover: React.FC<NotificationPopoverProps> = ({ isOpen, onClo
                                         </div>
 
                                         {/* Type: TEAM_INVITATION (Accept/Decline) */}
-                                        {notif.type === 'TEAM_INVITATION' && !notif.isRead && (
+                                        {notif.type === 'TEAM_INVITATION' && !notif.isRead && notif.data && (
                                             <div className="flex gap-3 pt-3">
                                                 <button
-                                                    onClick={() => handleAccept(notif.data.token, notif.id)}
+                                                    onClick={() => handleAccept(notif.data!.token, notif.id)}
                                                     className="px-6 py-1.5 bg-yellow-400 hover:bg-yellow-500 dark:bg-yellow-500 dark:hover:bg-yellow-600 text-gray-900 dark:text-gray-900 text-xs font-bold rounded shadow-sm transition-all transform active:scale-95"
                                                 >
                                                     Accept
                                                 </button>
                                                 <button
-                                                    onClick={() => handleDecline(notif.data.token, notif.id)}
+                                                    onClick={() => handleDecline(notif.data!.token, notif.id)}
                                                     className="px-6 py-1.5 border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-400 text-xs font-bold rounded hover:bg-gray-100 dark:hover:bg-gray-800 transition-all transform active:scale-95"
                                                 >
                                                     Decline

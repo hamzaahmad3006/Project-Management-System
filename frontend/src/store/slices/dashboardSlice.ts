@@ -11,6 +11,8 @@ interface DashboardState {
         };
         projects: {
             active: number;
+            totalBudget: number;
+            totalSpent: number;
         };
     } | null;
     recentActivity: any[];

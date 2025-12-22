@@ -431,55 +431,143 @@ const ProjectBoard: React.FC = () => {
                         ))}
                     </div>
                 ) : (
-                    // Timeline View Content
-                    <div className="flex flex-col h-full min-w-[800px]">
-                        <div className="flex items-center justify-between mb-4">
-                            <h2 className="text-lg font-semibold text-gray-800 dark:text-gray-100">October - December 2024</h2>
-                            <div className="flex items-center gap-2">
-                                <span className="text-sm text-gray-500 dark:text-gray-400">View by:</span>
-                                <select className="text-sm bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded px-2 py-1 text-gray-700 dark:text-gray-200 outline-none focus:ring-2 focus:ring-blue-500/50">
-                                    <option>Months</option>
-                                    <option>Weeks</option>
-                                </select>
-                            </div>
-                        </div>
-
-                        <div className="flex-1 border border-gray-200 dark:border-gray-800 rounded-lg overflow-hidden flex flex-col bg-white dark:bg-[#1a1c23]">
-                            {/* Timeline Header */}
-                            <div className="flex border-b border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-800/50">
-                                <div className="w-1/4 p-3 font-semibold text-xs text-gray-500 dark:text-gray-400 uppercase border-r border-gray-200 dark:border-gray-800">Task Name</div>
-                                <div className="flex-1 grid grid-cols-3">
-                                    <div className="p-3 font-semibold text-xs text-gray-500 dark:text-gray-400 uppercase text-center border-r border-gray-200 dark:border-gray-800">Oct</div>
-                                    <div className="p-3 font-semibold text-xs text-gray-500 dark:text-gray-400 uppercase text-center border-r border-gray-200 dark:border-gray-800">Nov</div>
-                                    <div className="p-3 font-semibold text-xs text-gray-500 dark:text-gray-400 uppercase text-center">Dec</div>
+                    // Hourly Timeline View (Daily Schedule)
+                    <div className="flex flex-col h-full overflow-hidden bg-white dark:bg-[#12141c]">
+                        {/* Timeline Header Section */}
+                        <div className="flex items-center justify-between mb-6">
+                            <div className="flex items-center gap-4">
+                                <h2 className="text-xl font-bold text-gray-800 dark:text-gray-100">
+                                    {currentDate.toLocaleDateString('en-GB', { day: 'numeric', month: 'long' })}
+                                </h2>
+                                <div className="flex items-center gap-1">
+                                    <button className="p-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300" onClick={handlePrevMonth}>
+                                        <FaChevronLeft size={12} />
+                                    </button>
+                                    <button className="p-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300" onClick={handleNextMonth}>
+                                        <FaChevronRight size={12} />
+                                    </button>
                                 </div>
                             </div>
 
-                            {/* Timeline Body */}
-                            <div className="flex-1 overflow-y-auto relative no-scrollbar">
-                                {sections.flatMap(s => s.tasks).slice(0, 8).map((task, i) => (
-                                    <div key={task.id} className="flex border-b border-gray-100 dark:border-gray-800/50 h-12 items-center hover:bg-gray-50/50 dark:hover:bg-gray-800/20 transition-colors">
-                                        <div className="w-1/4 p-3 text-sm text-gray-700 dark:text-gray-300 truncate border-r border-gray-200 dark:border-gray-800">{task.name}</div>
-                                        <div className="flex-1 relative h-full">
-                                            <div
-                                                className={`absolute top-3 h-6 rounded shadow-sm opacity-90 hover:opacity-100 transition-opacity cursor-pointer ${i % 2 === 0 ? 'bg-blue-400 dark:bg-blue-600' : 'bg-indigo-400 dark:bg-indigo-600'}`}
-                                                style={{
-                                                    left: `${(i * 10) % 60}%`,
-                                                    width: `${20 + (i * 5)}%`
-                                                }}
-                                            ></div>
-                                        </div>
-                                    </div>
-                                ))}
+                            <div className="flex items-center gap-3">
+                                <div className="px-4 py-1.5 bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-lg text-sm font-medium text-gray-600 dark:text-gray-400 shadow-sm">
+                                    8:00 - 17:00
+                                </div>
+                                <button
+                                    onClick={handleGoToToday}
+                                    className="px-4 py-1.5 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg text-sm font-semibold text-gray-700 dark:text-gray-200 hover:shadow-md transition-all active:scale-95 shadow-sm"
+                                >
+                                    Now
+                                </button>
+                            </div>
+                        </div>
 
-                                {/* Day Divider Lines (Mock) */}
-                                <div className="absolute inset-0 flex pointer-events-none">
-                                    <div className="w-1/4 border-r border-gray-200 dark:border-gray-800"></div>
-                                    <div className="flex-1 grid grid-cols-12">
-                                        {Array.from({ length: 12 }).map((_, i) => (
-                                            <div key={i} className="border-r border-gray-100/50 dark:border-gray-800/30"></div>
-                                        ))}
-                                    </div>
+                        {/* Hourly Timeline Grid */}
+                        <div className="flex-1 flex flex-col min-w-[1000px] bg-white dark:bg-[#12141c] rounded-2xl border border-gray-100 dark:border-gray-800/50 shadow-sm overflow-hidden">
+                            {/* Hours Label Bar */}
+                            <div className="flex bg-gray-50/50 dark:bg-gray-800/30 border-b border-gray-100 dark:border-gray-800/50">
+                                {Array.from({ length: 10 }).map((_, i) => {
+                                    const hour = 8 + i;
+                                    return (
+                                        <div key={hour} className="flex-1 py-3 text-center border-r border-gray-100 dark:border-gray-800/30">
+                                            <span className="text-[11px] font-bold text-gray-400 dark:text-gray-600 uppercase tracking-tighter">
+                                                {hour}:00
+                                            </span>
+                                        </div>
+                                    );
+                                })}
+                            </div>
+
+                            {/* Timeline Body Area */}
+                            <div className="relative flex-1 bg-white dark:bg-[#12141c]">
+                                {/* Horizontal Grid Lines (Hidden mostly, we use borders) */}
+                                <div className="absolute inset-0 flex">
+                                    {Array.from({ length: 10 }).map((_, i) => (
+                                        <div key={i} className="flex-1 border-r border-gray-50 dark:border-gray-800/20"></div>
+                                    ))}
+                                </div>
+
+                                {/* Task Rows Area */}
+                                <div className="relative p-6 space-y-4">
+                                    {(() => {
+                                        // Logic to arrange tasks in rows without overlap
+                                        const timelineTasks = sections.flatMap(s => s.tasks).filter(t => t.dueDate || t.createdAt);
+
+                                        // Create mapped objects instead of mutating originals
+                                        const processedTasks = timelineTasks.map(task => {
+                                            const hashStr = (task.id + task.name).split('').reduce((a, b) => { a = ((a << 5) - a) + b.charCodeAt(0); return a & a }, 0);
+                                            const startHourOffset = Math.abs(hashStr % 7);
+                                            const duration = (Math.abs(hashStr % 3) + 1);
+
+                                            const taskStart = 8 + startHourOffset;
+                                            const taskEnd = taskStart + duration;
+
+                                            return {
+                                                task,
+                                                visual: { start: taskStart, end: taskEnd, duration }
+                                            };
+                                        });
+
+                                        const rows: any[][] = [];
+
+                                        processedTasks.forEach(pt => {
+                                            // Find a row
+                                            let placed = false;
+                                            for (const row of rows) {
+                                                const hasOverlap = row.some(existing => {
+                                                    const e = existing.visual;
+                                                    const t = pt.visual;
+                                                    return !(t.end <= e.start || t.start >= e.end);
+                                                });
+                                                if (!hasOverlap) {
+                                                    row.push(pt);
+                                                    placed = true;
+                                                    break;
+                                                }
+                                            }
+                                            if (!placed) rows.push([pt]);
+                                        });
+
+                                        return rows.map((row, rowIndex) => (
+                                            <div key={rowIndex} className="relative h-14 w-full">
+                                                {row.map(pt => {
+                                                    const { task, visual: v } = pt;
+                                                    const leftPercent = ((v.start - 8) / 10) * 100;
+                                                    const widthPercent = (v.duration / 10) * 100;
+
+                                                    // Determine colors based on task metadata
+                                                    const colorClasses = [
+                                                        'bg-amber-50 border-amber-500 text-amber-800',
+                                                        'bg-emerald-50 border-emerald-500 text-emerald-800',
+                                                        'bg-cyan-50 border-cyan-500 text-cyan-800',
+                                                        'bg-rose-50 border-rose-500 text-rose-800',
+                                                        'bg-slate-50 border-slate-500 text-slate-800'
+                                                    ];
+                                                    const colorIdx = Math.abs((task.id.length + task.name.length) % colorClasses.length);
+                                                    const colorStyle = colorClasses[colorIdx];
+
+                                                    return (
+                                                        <div
+                                                            key={task.id}
+                                                            onClick={() => setSelectedTask(task)}
+                                                            className={`absolute top-0 h-10 px-4 flex flex-col justify-center rounded-xl border-l-[4px] shadow-sm hover:shadow-md transition-all cursor-pointer group ${colorStyle.split(' ')[0]} ${colorStyle.split(' ')[1]}`}
+                                                            style={{
+                                                                left: `${leftPercent}%`,
+                                                                width: `calc(${widthPercent}% - 8px)`,
+                                                            }}
+                                                        >
+                                                            <div className="font-bold text-[11px] truncate leading-tight dark:opacity-90">
+                                                                {task.name}
+                                                            </div>
+                                                            <div className="text-[9px] font-medium opacity-60 tracking-tight">
+                                                                {v.start}:00 - {v.end}:00
+                                                            </div>
+                                                        </div>
+                                                    );
+                                                })}
+                                            </div>
+                                        ));
+                                    })()}
                                 </div>
                             </div>
                         </div>

@@ -2,14 +2,30 @@ import React, { useEffect } from "react";
 import { useAppDispatch, useAppSelector } from "store/hooks";
 import { fetchProjects } from "../../../store/slices/projectSlice";
 import Loader from "components/Loaders/Loader";
+import { useParams } from "react-router-dom";
 
 export default function ProjectTab() {
+    const { teamId: teamIdFromUrl } = useParams();
     const dispatch = useAppDispatch();
-    const { projects, loading } = useAppSelector(state => state.projects);
+    const { projects, selectedProjectId, loading } = useAppSelector(state => state.projects);
+    const { allTeams } = useAppSelector(state => state.team);
 
     useEffect(() => {
         dispatch(fetchProjects());
     }, [dispatch]);
+
+    // Determine target team ID
+    const teamId = (() => {
+        if (teamIdFromUrl) return teamIdFromUrl;
+        if (selectedProjectId !== 'all') {
+            const project = projects.find(p => p.id === selectedProjectId);
+            if (project?.teamId) return project.teamId;
+            return null;
+        }
+        return null; // Show all projects if 'all' is selected
+    })();
+
+    const filteredProjects = projects.filter(p => !teamId || p.teamId === teamId);
 
     const getStatusColor = (status: string) => {
         switch (status.toLowerCase()) {
@@ -39,12 +55,8 @@ export default function ProjectTab() {
 
     return (
         <div className="flex w-full h-screen bg-white dark:bg-[#12141c]">
-
-
             {/* RIGHT MAIN CONTENT */}
-            <main className="flex-1 p-0 animate-in fade-in slide-in-from-bottom-2 duration-500">
-
-
+            <main className="flex-1 p-0 animate-in fade-in slide-in-from-bottom-2 duration-500 overflow-auto custom-scrollbar">
                 {/* PROJECT TABLE */}
                 <div className="border border-gray-200 dark:border-gray-800 rounded-xl overflow-hidden shadow-sm bg-white dark:bg-[#1a1c23]">
                     <table className="w-full text-sm">
@@ -60,8 +72,8 @@ export default function ProjectTab() {
                         </thead>
 
                         <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
-                            {projects.length > 0 ? (
-                                projects.map((item, index) => {
+                            {filteredProjects.length > 0 ? (
+                                filteredProjects.map((item, index) => {
                                     const progress = calculateProgress(item.tasks);
                                     return (
                                         <tr key={index} className="hover:bg-gray-50 dark:hover:bg-gray-800/30 transition-colors">
@@ -133,7 +145,7 @@ export default function ProjectTab() {
                                     <td colSpan={6} className="p-10 text-center text-gray-500 dark:text-gray-400">
                                         <div className="flex flex-col items-center gap-2">
                                             <span className="text-2xl">📁</span>
-                                            <span>No projects found</span>
+                                            <span>No projects found for this team</span>
                                         </div>
                                     </td>
                                 </tr>

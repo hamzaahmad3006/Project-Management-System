@@ -1,13 +1,9 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import api from '../../api/axios';
-import { Task } from '../../types';
+import { Task, TaskState } from '../../types';
+import { AxiosError } from 'axios';
 
-interface TaskState {
-    tasks: Task[];
-    currentTask: Task | null;
-    loading: boolean;
-    error: string | null;
-}
+
 
 const initialState: TaskState = {
     tasks: [],
@@ -23,8 +19,9 @@ export const createTask = createAsyncThunk(
         try {
             const response = await api.post('/tasks', taskData);
             return response.data;
-        } catch (error: any) {
-            const message = error.response?.data?.error || error.response?.data?.message || 'Failed to create task';
+        } catch (error) {
+            const err = error as AxiosError<{ message: string }>;
+            const message = err.response?.data?.message || 'Failed to create task';
             return rejectWithValue(message);
         }
     }
@@ -36,8 +33,9 @@ export const fetchTasks = createAsyncThunk(
         try {
             const response = await api.get('/tasks', { params: filters });
             return response.data.tasks;
-        } catch (error: any) {
-            const message = error.response?.data?.error || error.response?.data?.message || 'Failed to fetch tasks';
+        } catch (error) {
+            const err = error as AxiosError<{ message: string }>;
+            const message = err.response?.data?.message || 'Failed to fetch tasks';
             return rejectWithValue(message);
         }
     }
@@ -49,8 +47,9 @@ export const fetchTaskById = createAsyncThunk(
         try {
             const response = await api.get(`/tasks/${id}`);
             return response.data.task;
-        } catch (error: any) {
-            const message = error.response?.data?.error || error.response?.data?.message || 'Failed to fetch task details';
+        } catch (error) {
+            const err = error as AxiosError<{ message: string }>;
+            const message = err.response?.data?.message || 'Failed to fetch task details';
             return rejectWithValue(message);
         }
     }
@@ -62,8 +61,9 @@ export const updateTask = createAsyncThunk(
         try {
             const response = await api.put(`/tasks/${id}`, data);
             return response.data.task;
-        } catch (error: any) {
-            return rejectWithValue(error.response?.data?.message || 'Failed to update task');
+        } catch (error) {
+            const err = error as AxiosError<{ message: string }>;
+            return rejectWithValue(err.response?.data?.message || 'Failed to update task');
         }
     }
 );
@@ -74,8 +74,9 @@ export const deleteTask = createAsyncThunk(
         try {
             await api.delete(`/tasks/${id}`);
             return id;
-        } catch (error: any) {
-            return rejectWithValue(error.response?.data?.message || 'Failed to delete task');
+        } catch (error) {
+            const err = error as AxiosError<{ message: string }>;
+            return rejectWithValue(err.response?.data?.message || 'Failed to delete task');
         }
     }
 );

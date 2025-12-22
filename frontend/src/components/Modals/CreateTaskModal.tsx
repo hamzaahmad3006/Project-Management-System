@@ -76,6 +76,23 @@ const CreateTaskModal: React.FC<CreateModalProps> = ({ isOpen, onClose }) => {
                             </select>
                             <FaLayerGroup className="absolute left-2.5 top-3.5 text-gray-400 dark:text-gray-500" size={14} />
                         </div>
+                        {projectId && projects.find(p => p.id === projectId) && (
+                            <div className="flex justify-between items-center mt-1 px-1">
+                                <span className="text-[10px] text-gray-500">Project Budget:
+                                    <span className="font-semibold ml-1 text-gray-700 dark:text-gray-300">
+                                        ${projects.find(p => p.id === projectId)?.budget?.toLocaleString()}
+                                    </span>
+                                </span>
+                                <span className="text-[10px] text-gray-500">Remaining:
+                                    <span className={`font-semibold ml-1 ${(projects.find(p => p.id === projectId)!.budget - projects.find(p => p.id === projectId)!.spent) < 0
+                                            ? 'text-red-500'
+                                            : 'text-emerald-500'
+                                        }`}>
+                                        ${(projects.find(p => p.id === projectId)!.budget - projects.find(p => p.id === projectId)!.spent).toLocaleString()}
+                                    </span>
+                                </span>
+                            </div>
+                        )}
                     </div>
 
                     {/* Description */}

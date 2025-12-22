@@ -1,12 +1,7 @@
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
+import { AxiosError } from 'axios';
 import api from '../../api/axios';
-import { Comment } from '../../types';
-
-interface CommentState {
-    comments: Comment[];
-    loading: boolean;
-    error: string | null;
-}
+import { Comment, CommentState } from '../../types';
 
 const initialState: CommentState = {
     comments: [],
@@ -18,10 +13,11 @@ export const fetchComments = createAsyncThunk(
     'comments/fetchComments',
     async (taskId: string, { rejectWithValue }) => {
         try {
-            const response = await api.get(`/comments/task/${taskId}`);
+            const response = await api.get<{ comments: Comment[] }>(`/comments/task/${taskId}`);
             return response.data.comments;
-        } catch (error: any) {
-            return rejectWithValue(error.response?.data?.message || 'Failed to fetch comments');
+        } catch (err: unknown) {
+            const error = err as AxiosError<{ message: string }>;
+            return rejectWithValue(error.response?.data?.message || error.message || 'Failed to fetch comments');
         }
     }
 );
@@ -30,10 +26,11 @@ export const addComment = createAsyncThunk(
     'comments/addComment',
     async ({ taskId, content }: { taskId: string; content: string }, { rejectWithValue }) => {
         try {
-            const response = await api.post(`/comments/task/${taskId}`, { content });
+            const response = await api.post<Comment>(`/comments/task/${taskId}`, { content });
             return response.data;
-        } catch (error: any) {
-            return rejectWithValue(error.response?.data?.message || 'Failed to add comment');
+        } catch (err: unknown) {
+            const error = err as AxiosError<{ message: string }>;
+            return rejectWithValue(error.response?.data?.message || error.message || 'Failed to add comment');
         }
     }
 );
@@ -44,8 +41,9 @@ export const deleteComment = createAsyncThunk(
         try {
             await api.delete(`/comments/${commentId}`);
             return commentId;
-        } catch (error: any) {
-            return rejectWithValue(error.response?.data?.message || 'Failed to delete comment');
+        } catch (err: unknown) {
+            const error = err as AxiosError<{ message: string }>;
+            return rejectWithValue(error.response?.data?.message || error.message || 'Failed to delete comment');
         }
     }
 );
@@ -56,14 +54,16 @@ const commentSlice = createSlice({
     reducers: {
         clearComments: (state) => {
             state.comments = [];
+            state.error = null;
         }
     },
     extraReducers: (builder) => {
         builder
             .addCase(fetchComments.pending, (state) => {
                 state.loading = true;
+                state.error = null;
             })
-            .addCase(fetchComments.fulfilled, (state, action) => {
+            .addCase(fetchComments.fulfilled, (state, action: PayloadAction<Comment[]>) => {
                 state.loading = false;
                 state.comments = action.payload;
             })
@@ -71,10 +71,10 @@ const commentSlice = createSlice({
                 state.loading = false;
                 state.error = action.payload as string;
             })
-            .addCase(addComment.fulfilled, (state, action) => {
+            .addCase(addComment.fulfilled, (state, action: PayloadAction<Comment>) => {
                 state.comments.unshift(action.payload); // Add new comment to top
             })
-            .addCase(deleteComment.fulfilled, (state, action) => {
+            .addCase(deleteComment.fulfilled, (state, action: PayloadAction<string>) => {
                 state.comments = state.comments.filter(c => c.id !== action.payload);
             });
     },

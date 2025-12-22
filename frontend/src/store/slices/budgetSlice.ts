@@ -1,16 +1,7 @@
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
+import { AxiosError } from 'axios';
 import api from '../../api/axios';
-
-interface BudgetState {
-    overview: {
-        totalBudget: number;
-        totalSpent: number;
-        remaining: number;
-    } | null;
-    projects: any[];
-    loading: boolean;
-    error: string | null;
-}
+import { BudgetState, BudgetOverview, BudgetProject, UpdateBudgetData } from '../../types';
 
 const initialState: BudgetState = {
     overview: null,
@@ -23,22 +14,24 @@ export const fetchBudgetOverview = createAsyncThunk(
     'budget/fetchOverview',
     async (_, { rejectWithValue }) => {
         try {
-            const response = await api.get('/budget/overview');
+            const response = await api.get<{ overview: BudgetOverview; projects: BudgetProject[] }>('/budget/overview');
             return response.data;
-        } catch (error: any) {
-            return rejectWithValue(error.response?.data?.message || 'Failed to fetch budget');
+        } catch (err: unknown) {
+            const error = err as AxiosError<{ message: string }>;
+            return rejectWithValue(error.response?.data?.message || error.message || 'Failed to fetch budget');
         }
     }
 );
 
 export const updateProjectBudget = createAsyncThunk(
     'budget/updateProjectBudget',
-    async ({ projectId, data }: { projectId: string; data: any }, { rejectWithValue }) => {
+    async ({ projectId, data }: { projectId: string; data: UpdateBudgetData }, { rejectWithValue }) => {
         try {
-            const response = await api.put(`/budget/${projectId}`, data);
+            const response = await api.put<{ project: BudgetProject }>(`/budget/${projectId}`, data);
             return response.data.project;
-        } catch (error: any) {
-            return rejectWithValue(error.response?.data?.message || 'Failed to update budget');
+        } catch (err: unknown) {
+            const error = err as AxiosError<{ message: string }>;
+            return rejectWithValue(error.response?.data?.message || error.message || 'Failed to update budget');
         }
     }
 );
@@ -52,6 +45,7 @@ const budgetSlice = createSlice({
             // Fetch Overview
             .addCase(fetchBudgetOverview.pending, (state) => {
                 state.loading = true;
+                state.error = null;
             })
             .addCase(fetchBudgetOverview.fulfilled, (state, action) => {
                 state.loading = false;
@@ -63,7 +57,7 @@ const budgetSlice = createSlice({
                 state.error = action.payload as string;
             })
             // Update Project Budget
-            .addCase(updateProjectBudget.fulfilled, (state, action) => {
+            .addCase(updateProjectBudget.fulfilled, (state, action: PayloadAction<BudgetProject>) => {
                 const index = state.projects.findIndex(p => p.id === action.payload.id);
                 if (index !== -1) {
                     state.projects[index] = { ...state.projects[index], ...action.payload };

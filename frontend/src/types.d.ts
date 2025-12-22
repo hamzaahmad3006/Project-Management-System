@@ -52,6 +52,39 @@ export interface User {
     teamMemberships?: { team: { name: string } }[];
 }
 
+export interface AuthState {
+    user: User | null;
+    token: string | null;
+    isAuthenticated: boolean;
+    loading: boolean;
+    error: string | null;
+    allUsers: User[];
+}
+
+export interface LoginCredentials {
+    email: string;
+    password: string;
+}
+
+export interface RegisterData {
+    name: string;
+    email: string;
+    password?: string;
+    role?: "MEMBER" | "MANAGER";
+}
+
+export interface GoogleAuthData {
+    email?: string | null;
+    name?: string | null;
+    photoURL?: string | null;
+}
+
+export interface AuthResponse {
+    user: User;
+    token: string;
+    message?: string;
+}
+
 //===== Project.tsx Interface ======
 export type TaskStatus = 'TODO' | 'IN_PROGRESS' | 'COMPLETED' | 'CANCELED';
 export type TaskPriority = 'LOW' | 'MEDIUM' | 'HIGH';
@@ -60,7 +93,7 @@ export interface Task {
     id: string;
     name: string;
     description?: string;
-    project?: any;
+    project?: { id: string; name: string };
     projectId?: string;
     budget?: number;
     assignedToId?: string;
@@ -115,4 +148,140 @@ export interface NotificationPopoverProps {
     isOpen: boolean;
     onClose: () => void;
     leftOffset?: number;
+}
+
+//===== Budget.tsx Interface ======
+export interface BudgetOverview {
+    totalBudget: number;
+    totalSpent: number;
+    remaining: number;
+}
+
+export interface BudgetProject {
+    id: string;
+    name: string;
+    budget: number;
+    spent: number;
+    status: string;
+}
+
+export interface BudgetState {
+    overview: BudgetOverview | null;
+    projects: BudgetProject[];
+    loading: boolean;
+    error: string | null;
+}
+
+export interface UpdateBudgetData {
+    budget?: number;
+    spent?: number;
+}
+
+//===== Calendar.tsx Interface ======
+export interface CalendarEvent {
+    id: string;
+    title: string;
+    description?: string;
+    type: 'MEETING' | 'DEADLINE' | 'EVENT';
+    startTime: string;
+    endTime: string;
+    projectId?: string;
+    attendees: User[];
+}
+
+export interface CalendarState {
+    events: CalendarEvent[];
+    loading: boolean;
+    error: string | null;
+}
+
+//===== Comment.tsx Interface ======
+export interface CommentState {
+    comments: Comment[];
+    loading: boolean;
+    error: string | null;
+}
+
+//===== Notification.tsx Interface ======
+export interface Notification {
+    id: string;
+    userId: string;
+    type: string;
+    title: string;
+    message: string;
+    data: Record<string, any> | null;
+    isRead: boolean;
+    createdAt: string;
+}
+
+export interface NotificationState {
+    notifications: Notification[];
+    loading: boolean;
+    error: string | null;
+}
+
+//===== Project.tsx Interface ======
+export interface Project {
+    id: string;
+    name: string;
+    description?: string;
+    status: string;
+    progress: number;
+    startDate: string;
+    endDate: string;
+    budget: number;
+    spent: number;
+    manager: { id: string; name: string };
+    priority?: string;
+    teamId?: string;
+    tasks?: { status: string }[];
+    team?: {
+        id: string;
+        name: string;
+        members: {
+            user: {
+                id: string;
+                name: string;
+                avatar?: string;
+            }
+        }[];
+    };
+    _count?: { tasks: number };
+}
+
+export interface ProjectState {
+    projects: Project[];
+    currentProject: Project | null;
+    selectedProjectId: string;
+    loading: boolean;
+    error: string | null;
+}
+
+export interface CreateProjectData {
+    name: string;
+    description?: string;
+    startDate: string;
+    endDate: string;
+    budget?: number;
+    priority?: string;
+    teamId?: string;
+    members?: string[];
+}
+
+export interface UpdateProjectData {
+    name?: string;
+    description?: string;
+    status?: string;
+    startDate?: string;
+    endDate?: string;
+    budget?: number;
+    priority?: string;
+}
+
+//===== TaskSlice.ts Interface ======
+export interface TaskState {
+    tasks: Task[];
+    currentTask: Task | null;
+    loading: boolean;
+    error: string | null;
 }
