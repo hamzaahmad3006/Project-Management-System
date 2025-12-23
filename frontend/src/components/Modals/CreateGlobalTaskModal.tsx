@@ -4,6 +4,7 @@ import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import { createTask } from '../../store/slices/taskSlice';
 import { fetchProjects } from '../../store/slices/projectSlice';
 import { CreateModalProps, TaskPriority, TaskStatus } from '../../types';
+import { Loader } from 'lucide-react';
 
 const CreateGlobalTaskModal: React.FC<CreateModalProps> = ({ isOpen, onClose }) => {
     const dispatch = useAppDispatch();
@@ -19,6 +20,8 @@ const CreateGlobalTaskModal: React.FC<CreateModalProps> = ({ isOpen, onClose }) 
     const [projectId, setProjectId] = useState('');
     const [sectionId, setSectionId] = useState('');
     const [files, setFiles] = useState<File[]>([]);
+    const [labels, setLabels] = useState<string[]>([]);
+    const [loading, setLoading] = useState(false);
 
     useEffect(() => {
         if (isOpen) {
@@ -48,7 +51,6 @@ const CreateGlobalTaskModal: React.FC<CreateModalProps> = ({ isOpen, onClose }) 
         }
 
         try {
-            // Dispatch action and unwrap to catch errors
             await dispatch(createTask({
                 name,
                 description,
@@ -57,7 +59,7 @@ const CreateGlobalTaskModal: React.FC<CreateModalProps> = ({ isOpen, onClose }) 
                 dueDate: dueDate || undefined,
                 projectId,
                 assigneeId: assigneeId || undefined,
-                // sectionId will be handled by the backend (choosing default section)
+                label: labels
             })).unwrap();
 
             window.toastify("Task created successfully", "success");
@@ -78,6 +80,7 @@ const CreateGlobalTaskModal: React.FC<CreateModalProps> = ({ isOpen, onClose }) 
         setProjectId('');
         setSectionId('');
         setFiles([]);
+        setLabels([]);
     };
 
     return (
@@ -216,6 +219,30 @@ const CreateGlobalTaskModal: React.FC<CreateModalProps> = ({ isOpen, onClose }) 
                             </div>
                         </div>
 
+                        {/* Labels */}
+                        <div className="space-y-2 pt-2">
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Labels</label>
+                            <div className="flex flex-wrap gap-2">
+                                {['Design', 'Development', 'Marketing', 'Bug', 'Feature', 'Urgent'].map(tag => (
+                                    <button
+                                        key={tag}
+                                        type="button"
+                                        onClick={() => {
+                                            setLabels(prev =>
+                                                prev.includes(tag) ? prev.filter(t => t !== tag) : [...prev, tag]
+                                            );
+                                        }}
+                                        className={`px-3 py-1.5 text-xs rounded-full border transition-all ${labels.includes(tag)
+                                            ? 'bg-blue-100 text-blue-700 border-blue-300 dark:bg-blue-900/40 dark:text-blue-200 dark:border-blue-700 font-semibold'
+                                            : 'bg-gray-50 text-gray-600 border-gray-200 dark:bg-gray-800/50 dark:text-gray-400 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'
+                                            }`}
+                                    >
+                                        {tag}
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+
                         {/* Attachments */}
                         <div className="space-y-2 pt-2 border-t border-gray-100 dark:border-gray-800 border-dashed">
                             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Attachments</label>
@@ -259,7 +286,7 @@ const CreateGlobalTaskModal: React.FC<CreateModalProps> = ({ isOpen, onClose }) 
                         onClick={() => document.getElementById('create-task-form')?.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }))}
                         className="px-6 py-2 text-sm font-bold text-white bg-blue-600 hover:bg-blue-700 rounded-md shadow-sm transition-all transform active:scale-95"
                     >
-                        Create Task
+                        {loading ? <Loader size={15} color="inherit" /> : "Create Task"}
                     </button>
                 </div>
             </div>

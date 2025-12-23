@@ -4,7 +4,7 @@ import { fetchTeamMembersById } from '../../../store/slices/teamSlice';
 import { fetchAllUsers } from '../../../store/slices/authSlice';
 import { AppDispatch, RootState } from '../../../store/store';
 import Loader from "components/Loaders/Loader";
-import { useParams } from "react-router-dom";
+import { useParams, useOutletContext } from "react-router-dom";
 
 export default function MembersTab() {
     const { teamId: teamIdFromUrl } = useParams();
@@ -13,8 +13,11 @@ export default function MembersTab() {
     const { selectedProjectId, projects } = useSelector((state: RootState) => state.projects);
     const { allUsers, loading: authLoading } = useSelector((state: RootState) => state.auth);
 
+    const { teamId: contextTeamId } = useOutletContext<{ teamId?: string }>();
+
     // Determine target team ID
     const teamId = (() => {
+        if (contextTeamId) return contextTeamId;
         if (teamIdFromUrl) return teamIdFromUrl;
         if (selectedProjectId !== 'all') {
             const project = projects.find(p => p.id === selectedProjectId);

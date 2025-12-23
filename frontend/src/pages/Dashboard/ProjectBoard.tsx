@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import {
     FaStar, FaEllipsisH, FaSearch, FaFilter, FaSort, FaList,
     FaTh, FaCalendarAlt, FaStream, FaPlus, FaChevronDown, FaChevronRight, FaChevronLeft,
-    FaCheckCircle, FaRegCircle, FaRegComment, FaPaperclip, FaUserCircle
+    FaCheckCircle, FaRegCheckCircle, FaRegComment, FaPaperclip, FaUserCircle
 } from 'react-icons/fa';
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
 import CreateProjectModal from '../../components/Modals/CreateProjectModal';
@@ -34,7 +34,8 @@ const ProjectBoard: React.FC = () => {
         calendarDays,
         handlePrevMonth,
         handleNextMonth,
-        handleGoToToday
+        handleGoToToday,
+        currentProject
     } = useProjectBoard();
 
     const currentYear = currentDate.getFullYear();
@@ -48,7 +49,7 @@ const ProjectBoard: React.FC = () => {
                 <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-4 gap-4">
                     <div className="flex items-center gap-3 w-full md:w-auto justify-between md:justify-start">
                         <div className="flex items-center gap-3">
-                            <h1 className="text-xl md:text-2xl font-bold text-gray-800 dark:text-gray-100">Project Board [2023]</h1>
+                            <h1 className="text-xl md:text-2xl font-bold text-gray-800 dark:text-gray-100">{currentProject?.name || 'Project Board'}</h1>
                             <FaStar className="text-yellow-400 cursor-pointer" />
                             <FaEllipsisH className="text-gray-400 dark:text-gray-500 cursor-pointer" />
                         </div>
@@ -64,11 +65,27 @@ const ProjectBoard: React.FC = () => {
                     </div>
 
                     <div className="flex w-full md:w-auto items-center justify-between md:justify-end gap-3">
-                        {/* Avatars placeholder */}
+                        {/* Team Avatars */}
                         <div className="flex -space-x-2">
-                            <div className="w-8 h-8 rounded-full bg-gray-300 dark:bg-gray-700 border-2 border-white dark:border-gray-800"></div>
-                            <div className="w-8 h-8 rounded-full bg-blue-300 dark:bg-blue-700 border-2 border-white dark:border-gray-800"></div>
-                            <div className="w-8 h-8 rounded-full bg-indigo-300 dark:bg-indigo-700 border-2 border-white dark:border-gray-800 flex items-center justify-center text-xs font-medium text-white">4</div>
+                            {(currentProject?.team?.members || []).slice(0, 2).map((member) => (
+                                <img
+                                    key={member.user.id}
+                                    src={member.user.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(member.user.name)}&background=random`}
+                                    alt={member.user.name}
+                                    title={member.user.name}
+                                    className="w-8 h-8 rounded-full border-2 border-white dark:border-gray-800 object-cover"
+                                />
+                            ))}
+                            {(currentProject?.team?.members?.length || 0) > 2 && (
+                                <div className="w-8 h-8 rounded-full bg-gray-100 dark:bg-gray-800 border-2 border-white dark:border-gray-800 flex items-center justify-center text-xs font-medium text-gray-600 dark:text-gray-400">
+                                    +{(currentProject?.team?.members?.length || 0) - 2}
+                                </div>
+                            )}
+                            {(currentProject?.team?.members?.length || 0) === 0 && (
+                                <div className="w-8 h-8 rounded-full bg-gray-50 dark:bg-gray-800/50 border-2 border-white dark:border-gray-800 flex items-center justify-center">
+                                    <FaUserCircle className="text-gray-300 dark:text-gray-600" size={20} />
+                                </div>
+                            )}
                         </div>
 
                         <div className="flex gap-2">
@@ -333,105 +350,153 @@ const ProjectBoard: React.FC = () => {
                     </div>
                 ) : activeView === 'Table' ? (
                     // Table View Content
-                    <div className="min-w-[800px] overflow-x-auto">
-                        {/* Table Header */}
-                        <div className="grid grid-cols-12 gap-4 pb-2 border-b border-gray-200 dark:border-gray-800 text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
-                            <div className="col-span-6 pl-8">Name</div>
-                            <div className="col-span-2">Assignee</div>
-                            <div className="col-span-2">Due date</div>
-                            <div className="col-span-2">Label</div>
-                        </div>
+                    <div className="min-w-[900px] overflow-x-auto pb-20">
+
 
                         {/* Sections */}
                         {sections.map(section => (
-                            <div key={section.id} className="mt-6">
+                            <div key={section.id} className="group/section">
                                 {/* Section Header */}
-                                <div
-                                    className="flex items-center gap-2 mb-2 group cursor-pointer"
-                                    onClick={() => toggleSection(section.id)}
-                                >
-                                    {collapsedSections.includes(section.id) ? (
-                                        <FaChevronRight className="text-gray-400 dark:text-gray-500 group-hover:text-gray-600 dark:group-hover:text-gray-300 transition-colors" size={12} />
-                                    ) : (
-                                        <FaChevronDown className="text-gray-400 dark:text-gray-500 group-hover:text-gray-600 dark:group-hover:text-gray-300 transition-colors" size={12} />
-                                    )}
-                                    <div className={`w-2 h-2 rounded-full bg-${section.color}-500`}></div>
-                                    <h3 className="text-sm font-semibold text-gray-800 dark:text-gray-100">{section.title}</h3>
-                                    <span className="text-xs text-gray-500 dark:text-gray-400">{section.count}</span>
-                                    <FaEllipsisH className="text-gray-400 dark:text-gray-500 opacity-0 group-hover:opacity-100 ml-2 transition-opacity" size={12} />
-                                    <FaPlus className="text-gray-400 dark:text-gray-500 opacity-0 group-hover:opacity-100 ml-1 transition-opacity" size={12} />
+                                <div className="flex items-center gap-2 py-3 px-4 hover:bg-gray-50 dark:hover:bg-gray-800/30 transition-colors">
+                                    <button
+                                        onClick={() => toggleSection(section.id)}
+                                        className="p-1 rounded hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-400 transition-colors"
+                                    >
+                                        {collapsedSections.includes(section.id) ? (
+                                            <FaChevronRight size={10} />
+                                        ) : (
+                                            <FaChevronDown size={10} />
+                                        )}
+                                    </button>
+
+                                    <div className={`w-2 h-2 rounded-full ${section.id === 'postpone' ? 'bg-red-400' :
+                                        section.id === 'done' ? 'bg-green-400' :
+                                            section.id === 'inprogress' ? 'bg-blue-400' : 'bg-gray-400'
+                                        }`}></div>
+
+                                    <h3 className="text-sm font-medium text-gray-900 dark:text-gray-100">
+                                        {section.title}
+                                    </h3>
+                                    <span className="text-xs text-gray-400">{section.count}</span>
+
+                                    <div className="flex items-center gap-2 ml-2 opacity-0 group-hover/section:opacity-100 transition-opacity">
+                                        <button className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
+                                            <FaEllipsisH size={10} />
+                                        </button>
+                                        <button
+                                            onClick={() => handleAddTask("New Task", section.id)}
+                                            className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+                                        >
+                                            <FaPlus size={10} />
+                                        </button>
+                                    </div>
                                 </div>
 
                                 {/* Tasks */}
                                 {!collapsedSections.includes(section.id) && (
-                                    <div className="space-y-1">
+                                    <>
+                                        {/* Table Header inside Section */}
+                                        <div className="flex items-center border-b border-gray-200 dark:border-gray-800 bg-gray-50/50 dark:bg-[#15171f] text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1">
+                                            <div className="flex-1 min-w-[300px] pl-8 py-2 border-r border-gray-200 dark:border-gray-800">Name</div>
+                                            <div className="w-40 py-2 pl-4 border-r border-gray-200 dark:border-gray-800">Assignee</div>
+                                            <div className="w-32 py-2 pl-4 border-r border-gray-200 dark:border-gray-800">Due date</div>
+                                            <div className="w-40 py-2 pl-4 border-r border-gray-200 dark:border-gray-800">Label</div>
+                                            <div className="w-10 text-center py-2">+</div>
+                                        </div>
                                         {section.tasks.map(task => (
                                             <div
                                                 key={task.id}
                                                 onClick={() => setSelectedTask(task)}
-                                                className="grid grid-cols-12 gap-4 py-2 border-b border-gray-100 dark:border-gray-800/50 hover:bg-gray-50 dark:hover:bg-gray-800/30 items-center text-sm group cursor-pointer transition-colors"
+                                                className="flex items-center px-4 py-2 border-b border-gray-100 dark:border-gray-800/50 hover:bg-gray-50 dark:hover:bg-gray-800/20 group/row cursor-pointer text-sm"
                                             >
-                                                <div className="col-span-6 flex items-center gap-3 pl-2">
-                                                    <FaCheckCircle className="text-gray-300 dark:text-gray-600 hover:text-green-500 dark:hover:text-green-400 cursor-pointer transition-colors" />
-                                                    <span className="text-gray-900 dark:text-gray-100 font-medium truncate">{task.name}</span>
+                                                {/* Name Column */}
+                                                <div className="flex-1 min-w-[300px] flex items-center gap-3 pl-4 pr-4 py-2 border-r border-gray-100 dark:border-gray-800/50">
+                                                    <div className="text-gray-300 dark:text-gray-600 hover:text-blue-500 dark:hover:text-blue-400 transition-colors">
+                                                        <FaRegCheckCircle size={16} />
+                                                    </div>
+                                                    <span className="text-gray-700 dark:text-gray-200 truncate">{task.name}</span>
+
+                                                    {/* Icons inline with name */}
                                                     <div className="flex items-center gap-2 text-gray-400 dark:text-gray-500">
                                                         {task.comments && (
-                                                            <div className="flex items-center gap-1 text-[10px]">
+                                                            <div className="flex items-center gap-1 text-xs bg-gray-100 dark:bg-gray-800 px-1.5 py-0.5 rounded">
                                                                 <FaRegComment size={10} /> {task.comments}
                                                             </div>
                                                         )}
                                                         {task.attachments && (
-                                                            <div className="flex items-center gap-1 text-[10px]">
+                                                            <div className="flex items-center gap-1 text-xs">
                                                                 <FaPaperclip size={10} /> {task.attachments}
                                                             </div>
                                                         )}
-                                                        <FaStream className="opacity-0 group-hover:opacity-100 transition-opacity" size={10} />
                                                     </div>
                                                 </div>
-                                                <div className="col-span-2 flex items-center gap-2">
+
+                                                {/* Assignee Column */}
+                                                <div className="w-40 flex items-center text-sm py-2 pl-4 border-r border-gray-100 dark:border-gray-800/50">
                                                     {task.assignedTo ? (
-                                                        <>
-                                                            <img src={task.assignedTo.avatar || "https://ui-avatars.com/api/?name=" + task.assignedTo.name} alt={task.assignedTo.name} className="w-5 h-5 rounded-full border border-transparent dark:border-gray-700" />
-                                                            <span className="text-gray-600 dark:text-gray-400 text-xs">{task.assignedTo.name}</span>
-                                                        </>
+                                                        <div className="flex items-center gap-2">
+                                                            <img
+                                                                src={task.assignedTo.avatar || "https://ui-avatars.com/api/?name=" + task.assignedTo.name}
+                                                                alt={task.assignedTo.name}
+                                                                className="w-5 h-5 rounded-full object-cover"
+                                                            />
+                                                            <span className="text-gray-600 dark:text-gray-400 text-xs truncate max-w-[100px]">{task.assignedTo.name}</span>
+                                                        </div>
                                                     ) : (
-                                                        <FaUserCircle className="text-gray-300 dark:text-gray-600 opacity-0 group-hover:opacity-100 transition-opacity" size={20} />
+                                                        <span className="text-gray-300 dark:text-gray-600 text-xs">-</span>
                                                     )}
                                                 </div>
-                                                <div className="col-span-2 text-gray-600 dark:text-gray-400 text-xs">
-                                                    {task.dueDate || ''}
+
+                                                {/* Due Date Column */}
+                                                <div className="w-32 text-xs text-gray-500 dark:text-gray-400 py-2 pl-4 border-r border-gray-100 dark:border-gray-800/50">
+                                                    {task.dueDate ? new Date(task.dueDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '-'}
                                                 </div>
-                                                <div className="col-span-2 flex items-center gap-2">
-                                                    {task.label?.map((lbl, idx) => (
-                                                        <span
-                                                            key={idx}
-                                                            className={`px-2 py-0.5 rounded text-xs font-medium 
-                                                                    ${lbl === 'design' ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400' :
-                                                                    lbl === 'bug' ? 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400' :
-                                                                        lbl === 'mobile' ? 'bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-400' :
-                                                                            lbl === 'API' ? 'bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400' :
-                                                                                lbl === 'plan' ? 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-400' :
-                                                                                    'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-400'}`}
-                                                        >
-                                                            {lbl}
-                                                        </span>
-                                                    ))}
-                                                    <FaPlus className="text-gray-400 dark:text-gray-500 opacity-0 group-hover:opacity-100 cursor-pointer ml-auto transition-opacity" size={10} />
+
+                                                {/* Labels Column */}
+                                                <div className="w-40 flex flex-wrap gap-1.5 py-2 pl-4 border-r border-gray-100 dark:border-gray-800/50">
+                                                    {task.label?.map((lbl, idx) => {
+                                                        const colors: Record<string, string> = {
+                                                            design: 'bg-indigo-50 text-indigo-600 dark:bg-indigo-900/30 dark:text-indigo-300',
+                                                            bug: 'bg-rose-50 text-rose-600 dark:bg-rose-900/30 dark:text-rose-300',
+                                                            mobile: 'bg-orange-50 text-orange-600 dark:bg-orange-900/30 dark:text-orange-300',
+                                                            api: 'bg-emerald-50 text-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-300',
+                                                            plan: 'bg-yellow-50 text-yellow-600 dark:bg-yellow-900/30 dark:text-yellow-300'
+                                                        };
+                                                        const defaultColor = 'bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400';
+
+                                                        return (
+                                                            <span
+                                                                key={idx}
+                                                                className={`px-2 py-0.5 text-[11px] rounded ${colors[lbl.toLowerCase()] || defaultColor}`}
+                                                            >
+                                                                {lbl}
+                                                            </span>
+                                                        );
+                                                    })}
+                                                </div>
+
+                                                {/* Action Column */}
+                                                <div className="w-10 flex justify-center opacity-0 group-hover/row:opacity-100 transition-opacity py-2">
+                                                    <FaPlus className="text-gray-400 hover:text-gray-600 cursor-pointer" size={10} />
                                                 </div>
                                             </div>
                                         ))}
-                                        {/* Add Task Row */}
-                                        <div className="flex items-center gap-3 py-2 pl-2 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 cursor-pointer transition-colors">
+
+                                        {/* New Task Input Placeholder */}
+                                        <div
+                                            className="flex items-center gap-3 px-4 py-2 opacity-0 group-hover/section:opacity-100 hover:bg-gray-50 dark:hover:bg-gray-800/30 transition-all cursor-pointer text-gray-400 hover:text-gray-600"
+                                            onClick={() => handleAddTask("New Task", section.id)}
+                                        >
                                             <FaPlus size={12} />
-                                            <span className="text-sm">Add task</span>
+                                            <span className="text-sm">New</span>
                                         </div>
-                                    </div>
+                                    </>
                                 )}
                             </div>
                         ))}
                     </div>
                 ) : (
-                    // Hourly Timeline View (Daily Schedule)
+
                     <div className="flex flex-col h-full overflow-hidden bg-white dark:bg-[#12141c]">
                         {/* Timeline Header Section */}
                         <div className="flex items-center justify-between mb-6">

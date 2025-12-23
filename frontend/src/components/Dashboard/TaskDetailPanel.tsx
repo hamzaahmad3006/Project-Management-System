@@ -118,14 +118,31 @@ const TaskDetailPanel: React.FC<TaskDetailPanelProps> = ({ task: initialTask, on
 
                     {/* Tags */}
                     <div className="text-gray-500 dark:text-gray-400 pt-1">Tags</div>
-                    <div className="flex gap-2">
-                        {(task.label || ['design', 'web']).map((lbl: string, idx: number) => (
-                            <span key={idx} className={`px-2 py-0.5 rounded text-xs font-medium 
-                                ${lbl === 'design' ? 'bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-400 border border-orange-200 dark:border-orange-800' :
-                                    'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 border border-blue-200 dark:border-blue-800'}`}>
-                                {lbl}
-                            </span>
-                        ))}
+                    <div className="flex flex-wrap gap-2">
+                        {(task.label?.length ? task.label : []).map((lbl: string, idx: number) => {
+                            const colors: Record<string, string> = {
+                                design: 'bg-indigo-50 text-indigo-600 dark:bg-indigo-900/30 dark:text-indigo-300',
+                                bug: 'bg-rose-50 text-rose-600 dark:bg-rose-900/30 dark:text-rose-300',
+                                mobile: 'bg-orange-50 text-orange-600 dark:bg-orange-900/30 dark:text-orange-300',
+                                api: 'bg-emerald-50 text-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-300',
+                                plan: 'bg-yellow-50 text-yellow-600 dark:bg-yellow-900/30 dark:text-yellow-300',
+                                development: 'bg-blue-50 text-blue-600 dark:bg-blue-900/30 dark:text-blue-300',
+                                marketing: 'bg-purple-50 text-purple-600 dark:bg-purple-900/30 dark:text-purple-300',
+                                feature: 'bg-cyan-50 text-cyan-600 dark:bg-cyan-900/30 dark:text-cyan-300',
+                                urgent: 'bg-red-50 text-red-600 dark:bg-red-900/30 dark:text-red-300'
+                            };
+                            const defaultColor = 'bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400';
+
+                            return (
+                                <span key={idx} className={`px-2 py-0.5 rounded text-xs font-medium ${colors[lbl.toLowerCase()] || defaultColor}`}>
+                                    {lbl}
+                                </span>
+                            );
+                        })}
+
+                        {(!task.label || task.label.length === 0) && (
+                            <span className="text-xs text-gray-400 italic">No labels</span>
+                        )}
                     </div>
 
                     {/* Custom Field */}

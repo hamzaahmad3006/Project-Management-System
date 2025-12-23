@@ -8,12 +8,14 @@ interface DashboardState {
             completed: number;
             inProgress: number;
             canceled: number;
+            overdue: number;
         };
         projects: {
             active: number;
             totalBudget: number;
             totalSpent: number;
         };
+        chartData: any[];
     } | null;
     recentActivity: any[];
     loading: boolean;

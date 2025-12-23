@@ -168,6 +168,7 @@ export const useCreateTask = (onClose: () => void) => {
     const [budget, setBudget] = useState<number>(0);
     const [isLoading, setIsLoading] = useState(false);
     const [teamMembers, setTeamMembers] = useState<TeamMember[]>([]);
+    const [labels, setLabels] = useState<string[]>([]);
 
     useEffect(() => {
         dispatch(fetchProjects());
@@ -207,6 +208,7 @@ export const useCreateTask = (onClose: () => void) => {
         }
 
         setIsLoading(true);
+        console.log("Submitting Task with Labels:", labels); // DEBUG LOG
         try {
             await dispatch(createTask({
                 name,
@@ -217,6 +219,7 @@ export const useCreateTask = (onClose: () => void) => {
                 assigneeId: assigneeId || undefined,
                 projectId,
                 budget,
+                label: labels // Pass labels to the backend
             })).unwrap();
 
             onClose();
@@ -228,6 +231,7 @@ export const useCreateTask = (onClose: () => void) => {
             setPriority('MEDIUM');
             setStatus('TODO');
             setBudget(0);
+            setLabels([]);
         } catch (error) {
             const err = error as AxiosError<{ message: string }>;
             window.toastify(err.response?.data?.message || "Failed to create task", "error");
@@ -254,6 +258,8 @@ export const useCreateTask = (onClose: () => void) => {
         setProjectId,
         budget,
         setBudget,
+        labels,
+        setLabels,
         isLoading,
         teamMembers,
         handleSubmit

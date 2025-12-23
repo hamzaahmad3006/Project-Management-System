@@ -12,17 +12,16 @@ export default function Team() {
     const [isCreateTeamOpen, setIsCreateTeamOpen] = useState(false);
     const { allTeams } = useSelector((state: RootState) => state.team);
     const { selectedProjectId, projects } = useSelector((state: RootState) => state.projects);
+    const [manualTeamId, setManualTeamId] = useState<string | null>(null);
 
     useEffect(() => {
         dispatch(getTeams());
         dispatch(fetchProjects());
     }, [dispatch]);
 
-    // Priority:
-    // 1. teamId from URL (if any, though we reverted to /team)
-    // 2. teamId from selectedProjectId
-    // 3. Fallback to first team
+
     const team = (() => {
+        if (manualTeamId) return allTeams.find(t => t.id === manualTeamId);
         if (teamIdFromUrl) return allTeams.find(t => t.id === teamIdFromUrl);
         if (selectedProjectId !== 'all') {
             const project = projects.find(p => p.id === selectedProjectId);
@@ -40,10 +39,24 @@ export default function Team() {
                 {/* Header (team name) */}
                 <div className="flex items-center justify-between mb-6">
                     <div>
-                        <h1 className="text-2xl font-semibold text-gray-900 dark:text-gray-100">
-                            Defcon / {team?.name || 'Loading...'}
-                        </h1>
-                        <div className="text-sm text-gray-500 dark:text-gray-400">Teamspace overview</div>
+                        <div className="flex items-center gap-3">
+                            <h1 className="text-2xl font-semibold text-gray-900 dark:text-gray-100  ">
+                                Defcon /
+                            </h1>
+                            <select
+                                value={team?.id || ""}
+                                onChange={(e) => setManualTeamId(e.target.value)}
+                                className="text-2xl font-semibold bg-transparent border-none text-gray-900 dark:text-gray-100 outline-none cursor-pointer focus:ring-0 p-0"
+                            >
+                                {!team && <option value="">Loading...</option>}
+                                {allTeams.map((t) => (
+                                    <option key={t.id} value={t.id} className="bg-white dark:bg-[#1a1c23] text-sm ">
+                                        {t.name}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
+
                     </div>
 
                     <div className="flex items-center gap-2">
@@ -108,9 +121,9 @@ export default function Team() {
 
                 {/* Outlet will render Projects / Dashboard / Members / Files */}
                 <div className="animate-in fade-in duration-500">
-                    <Outlet />
+                    <Outlet context={{ teamId: team?.id }} />
                 </div>
-            </main>
+            </main >
             <CreateTeamModal
                 isOpen={isCreateTeamOpen}
                 onClose={() => {

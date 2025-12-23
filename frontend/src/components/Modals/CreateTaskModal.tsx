@@ -25,6 +25,8 @@ const CreateTaskModal: React.FC<CreateModalProps> = ({ isOpen, onClose }) => {
         setBudget,
         isLoading,
         teamMembers,
+        labels,
+        setLabels,
         handleSubmit
     } = useCreateTask(onClose);
 
@@ -85,8 +87,8 @@ const CreateTaskModal: React.FC<CreateModalProps> = ({ isOpen, onClose }) => {
                                 </span>
                                 <span className="text-[10px] text-gray-500">Remaining:
                                     <span className={`font-semibold ml-1 ${(projects.find(p => p.id === projectId)!.budget - projects.find(p => p.id === projectId)!.spent) < 0
-                                            ? 'text-red-500'
-                                            : 'text-emerald-500'
+                                        ? 'text-red-500'
+                                        : 'text-emerald-500'
                                         }`}>
                                         ${(projects.find(p => p.id === projectId)!.budget - projects.find(p => p.id === projectId)!.spent).toLocaleString()}
                                     </span>
@@ -185,6 +187,30 @@ const CreateTaskModal: React.FC<CreateModalProps> = ({ isOpen, onClose }) => {
                                 placeholder="0"
                                 className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md focus:outline-none focus:border-blue-500 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 text-sm transition-shadow"
                             />
+                        </div>
+
+                        {/* Labels */}
+                        <div className="space-y-1.5 col-span-2 md:col-span-3">
+                            <label className="block text-xs uppercase tracking-wider font-semibold text-gray-500 dark:text-gray-400">Labels</label>
+                            <div className="flex flex-wrap gap-2 mb-2">
+                                {['Design', 'Development', 'Marketing', 'Bug', 'Feature', 'Urgent'].map(tag => (
+                                    <button
+                                        key={tag}
+                                        type="button"
+                                        onClick={() => {
+                                            setLabels(prev =>
+                                                prev.includes(tag) ? prev.filter(t => t !== tag) : [...prev, tag]
+                                            );
+                                        }}
+                                        className={`px-3 py-1 text-xs rounded-full border transition-all ${labels.includes(tag)
+                                            ? 'bg-blue-100 text-blue-700 border-blue-300 dark:bg-blue-900/40 dark:text-blue-200 dark:border-blue-700 font-semibold'
+                                            : 'bg-gray-50 text-gray-600 border-gray-200 dark:bg-gray-800/50 dark:text-gray-400 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'
+                                            }`}
+                                    >
+                                        {tag}
+                                    </button>
+                                ))}
+                            </div>
                         </div>
                     </div>
 

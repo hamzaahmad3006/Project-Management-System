@@ -17,12 +17,12 @@ function App() {
   const token = localStorage.getItem('token');
 
   useEffect(() => {
-    if (token && !user) { // agar token hai aur user null hai
+    if (token && !user) {
       dispatch(fetchProfile() as any);
     }
   }, [dispatch, token, user]);
 
-  if (loading) return <Loader />; // Loader tab tak dikhe jab tak profile fetch nahi hota
+  if (loading) return <Loader size={48} color="secondary" />;
 
   return (
     <>

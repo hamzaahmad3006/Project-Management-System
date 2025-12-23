@@ -1,3 +1,9 @@
+// Loader Props in Component Folder
+export interface LoaderProps {
+    size?: number;
+    color?: "primary" | "secondary" | "inherit";
+}
+
 // ===== All Modals Props ====== 
 export interface CreateModalProps {
     isOpen: boolean;

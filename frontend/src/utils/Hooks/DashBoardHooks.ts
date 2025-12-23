@@ -1,26 +1,40 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import { fetchTasks, createTask as createTaskAction, updateTask, updateTaskStatusOptimistic } from '../../store/slices/taskSlice';
+import { fetchProjects } from '../../store/slices/projectSlice';
 import { Task, Section, TaskStatus } from '../../types';
 
 export const useProjectBoard = () => {
     const dispatch = useAppDispatch();
     const { tasks, loading, error } = useAppSelector(state => state.tasks);
-    const { currentProject, selectedProjectId } = useAppSelector(state => state.projects);
+    const { projects, currentProject: stateCurrentProject, selectedProjectId } = useAppSelector(state => state.projects);
 
     const [activeView, setActiveView] = useState('Board');
     const [collapsedSections, setCollapsedSections] = useState<string[]>(['postpone', 'qa']);
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
     const [selectedTask, setSelectedTask] = useState<Task | null>(null);
 
+    // Derive the current project based on global selection
+    const currentProject = useMemo(() => {
+        if (selectedProjectId && selectedProjectId !== 'all') {
+            return projects.find(p => p.id === selectedProjectId) || stateCurrentProject;
+        }
+        return stateCurrentProject || (projects.length > 0 ? projects[0] : null);
+    }, [projects, selectedProjectId, stateCurrentProject]);
+
     useEffect(() => {
+        // Fetch projects if not already loaded
+        if (projects.length === 0) {
+            dispatch(fetchProjects());
+        }
+
         // Use global selectedProjectId if set, otherwise fallback to currentProject
         const projectIdToFetch = (selectedProjectId && selectedProjectId !== 'all')
             ? selectedProjectId
             : currentProject?.id;
 
         dispatch(fetchTasks(projectIdToFetch ? { projectId: projectIdToFetch } : {}));
-    }, [dispatch, currentProject?.id, selectedProjectId]);
+    }, [dispatch, currentProject?.id, selectedProjectId]); // Note: excluding projects.length to avoid loops, only fetch once if empty
 
     const handleAddTask = (taskName: string, sectionId: string) => {
         const activeProjectId = (selectedProjectId && selectedProjectId !== 'all')
@@ -221,6 +235,7 @@ export const useProjectBoard = () => {
         calendarDays,
         handlePrevMonth,
         handleNextMonth,
-        handleGoToToday
+        handleGoToToday,
+        currentProject
     };
 };

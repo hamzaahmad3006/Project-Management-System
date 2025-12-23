@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 import { useAppDispatch, useAppSelector } from "store/hooks";
 import { fetchProjects } from "../../../store/slices/projectSlice";
 import Loader from "components/Loaders/Loader";
-import { useParams } from "react-router-dom";
+import { useParams, useOutletContext } from "react-router-dom";
 
 export default function ProjectTab() {
     const { teamId: teamIdFromUrl } = useParams();
@@ -14,8 +14,14 @@ export default function ProjectTab() {
         dispatch(fetchProjects());
     }, [dispatch]);
 
-    // Determine target team ID
+    const { teamId: contextTeamId } = useOutletContext<{ teamId?: string }>();
+
+    // Priority:
+    // 1. teamId from context (manual switcher)
+    // 2. teamId from URL
+    // 3. teamId from selectedProjectId
     const teamId = (() => {
+        if (contextTeamId) return contextTeamId;
         if (teamIdFromUrl) return teamIdFromUrl;
         if (selectedProjectId !== 'all') {
             const project = projects.find(p => p.id === selectedProjectId);
