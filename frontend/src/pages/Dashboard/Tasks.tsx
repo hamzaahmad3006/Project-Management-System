@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import { fetchTasks, updateTask, updateTaskStatusOptimistic } from '../../store/slices/taskSlice';
 import CreateGlobalTaskModal from '../../components/Modals/CreateGlobalTaskModal';
@@ -6,7 +6,8 @@ import { DragDropContext, Droppable, Draggable, DropResult } from '@hello-pangea
 import { TaskStatus } from '../../types';
 import {
     FaSearch, FaPlus, FaFilter, FaSortAmountDown, FaThLarge, FaList,
-    FaEllipsisH, FaPaperclip, FaCheckSquare, FaCalendarAlt
+    FaEllipsisH, FaPaperclip, FaCheckSquare, FaCalendarAlt, FaFlag,
+    FaRegCommentDots, FaRegFileAlt
 } from 'react-icons/fa';
 
 
@@ -18,6 +19,15 @@ const Tasks: React.FC = () => {
     const [viewMode, setViewMode] = useState<'KANBAN' | 'LIST'>('KANBAN');
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
     const [searchTerm, setSearchTerm] = useState('');
+
+    const filteredTasks = useMemo(() => {
+        if (!searchTerm.trim()) return tasks;
+        const term = searchTerm.toLowerCase();
+        return tasks.filter(t =>
+            t.name.toLowerCase().includes(term) ||
+            (t.description && t.description.toLowerCase().includes(term))
+        );
+    }, [tasks, searchTerm]);
 
     useEffect(() => {
         const filters: any = {};
@@ -49,21 +59,27 @@ const Tasks: React.FC = () => {
     };
 
     const columns = [
-        { id: 'TODO', title: 'To-Do', color: 'bg-blue-500', items: tasks.filter(t => t.status === 'TODO' || !t.status) },
-        { id: 'IN_PROGRESS', title: 'In Progress', color: 'bg-orange-500', items: tasks.filter(t => t.status === 'IN_PROGRESS') },
-        { id: 'COMPLETED', title: 'Completed', color: 'bg-green-500', items: tasks.filter(t => t.status === 'COMPLETED') },
-        { id: 'CANCELED', title: 'Cancelled', color: 'bg-red-500', items: tasks.filter(t => t.status === 'CANCELED') },
+        { id: 'TODO', title: 'To-Do', color: 'bg-blue-500', items: filteredTasks.filter(t => t.status === 'TODO' || !t.status) },
+        { id: 'IN_PROGRESS', title: 'In Progress', color: 'bg-orange-500', items: filteredTasks.filter(t => t.status === 'IN_PROGRESS') },
+        { id: 'COMPLETED', title: 'Completed', color: 'bg-green-500', items: filteredTasks.filter(t => t.status === 'COMPLETED') },
+        { id: 'CANCELED', title: 'Cancelled', color: 'bg-red-500', items: filteredTasks.filter(t => t.status === 'CANCELED') },
     ];
 
-    return (
+    if (loading && tasks.length === 0) {
+        return (
+            <div className="flex-1 flex items-center justify-center bg-gray-50 dark:bg-[#0f1117]">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
+            </div>
+        );
+    }
 
+    return (
         <div className="h-full flex flex-col bg-white dark:bg-[#12141c] overflow-hidden">
             <header className="px-8 py-6 border-b border-gray-200 dark:border-gray-800 bg-white dark:bg-[#12141c]">
                 <div className="flex flex-col gap-6">
                     <h1 className="text-3xl font-extrabold text-gray-900 dark:text-gray-100 tracking-tight">Tasks</h1>
 
                     <div className="flex flex-wrap items-center justify-between gap-4">
-
                         <div className="flex bg-gray-100 dark:bg-gray-800 p-1 rounded-lg">
                             <button
                                 onClick={() => setViewMode('KANBAN')}
@@ -128,74 +144,93 @@ const Tasks: React.FC = () => {
                                                 <span className="text-xs font-semibold text-gray-400 dark:text-gray-500 bg-gray-200 dark:bg-gray-800 px-2 py-0.5 rounded-full">{col.items.length}</span>
                                             </div>
                                             <div className="flex gap-2 text-gray-400 dark:text-gray-600">
-                                                <button className="hover:text-gray-600 dark:hover:text-gray-400"><FaPlus size={12} /></button>
-                                                <button className="hover:text-gray-600 dark:hover:text-gray-400"><FaEllipsisH size={12} /></button>
+                                                <button className="hover:text-gray-500 dark:hover:text-gray-400"><FaPlus size={12} /></button>
+                                                <button className="hover:text-gray-500 dark:hover:text-gray-400"><FaEllipsisH size={12} /></button>
                                             </div>
                                         </div>
 
-                                        <div className="flex-1 overflow-y-auto pr-2 space-y-3 pb-8 no-scrollbar">
-                                            {col.items.map((task, idx) => (
-                                                <Draggable key={task.id} draggableId={task.id} index={idx}>
+                                        <div className="flex-1 overflow-y-auto space-y-1 pr-1 custom-scrollbar scroll-smooth">
+                                            {col.items.map((task, index) => (
+                                                <Draggable key={task.id} draggableId={task.id} index={index}>
                                                     {(provided, snapshot) => (
                                                         <div
                                                             ref={provided.innerRef}
                                                             {...provided.draggableProps}
                                                             {...provided.dragHandleProps}
-                                                            className={`bg-white dark:bg-[#1a1c23] p-4 rounded-xl border shadow-sm transition-all cursor-pointer group
-                                                                ${snapshot.isDragging ? 'shadow-2xl border-blue-500 scale-105 z-50 ring-2 ring-blue-500/20' : 'border-gray-200 dark:border-gray-800 hover:shadow-md'}`}
+                                                            className={`bg-white dark:bg-[#1a1c23] p-5 rounded-2xl border shadow-sm transition-all cursor-pointer group mb-3
+                                                                ${snapshot.isDragging ? 'shadow-2xl border-blue-500 scale-105 z-50 ring-2 ring-blue-500/20' : 'border-gray-100 dark:border-gray-800 hover:shadow-md'}`}
                                                         >
-                                                            {/* Card Top: Labels & Menu */}
-                                                            <div className="flex justify-between items-start mb-2">
-                                                                <div className="flex gap-1">
-                                                                    {/* Mock Tag */}
-                                                                    <span className="px-2 py-0.5 text-[10px] font-semibold text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20 rounded border border-blue-100 dark:border-blue-900/30">Design</span>
-                                                                </div>
-                                                                <button className="text-gray-300 dark:text-gray-600 hover:text-gray-500 dark:hover:text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity">
+                                                            {/* Card Top: Project Badge & Menu */}
+                                                            <div className="flex justify-between items-center mb-4">
+                                                                <span className="px-3 py-1 text-[11px] font-semibold text-blue-600 dark:text-blue-400 bg-blue-50/80 dark:bg-blue-900/40 rounded-md border border-blue-100/50 dark:border-blue-900/30">
+                                                                    {task.project?.name || 'Internal'}
+                                                                </span>
+                                                                <button className="text-gray-400 dark:text-gray-600 hover:text-gray-500 dark:hover:text-gray-400 transition-colors">
                                                                     <FaEllipsisH size={14} />
                                                                 </button>
                                                             </div>
 
-                                                            {/* Title */}
-                                                            <h4 className="text-sm font-bold text-gray-800 dark:text-gray-100 mb-1 leading-snug">{task.name}</h4>
-                                                            <p className="text-xs text-gray-500 dark:text-gray-400 line-clamp-2 mb-3">{task.description || "No description provided."}</p>
+                                                            {/* Middle Content Row: Text */}
+                                                            <div className="mb-4">
+                                                                <h4 className="text-lg font-bold text-gray-900 dark:text-gray-100 mb-1 leading-tight tracking-tight">
+                                                                    {task.name}
+                                                                </h4>
+                                                                <p className="text-sm text-gray-500 dark:text-gray-400 line-clamp-2 leading-normal">
+                                                                    {task.description || "No description provided."}
+                                                                </p>
+                                                            </div>
 
-
-                                                            {/* Footer Row */}
-                                                            <div className="flex items-center justify-between pt-3 border-t border-gray-50 dark:border-gray-800 mt-auto">
-                                                                <div className="flex items-center gap-3 text-gray-400 dark:text-gray-500">
-                                                                    <div className="flex items-center gap-1 text-xs" title="Due Date">
-                                                                        <FaCalendarAlt size={10} />
-                                                                        <span>{task.dueDate ? new Date(task.dueDate).toLocaleDateString(undefined, { month: 'short', day: 'numeric' }) : 'No Date'}</span>
-                                                                    </div>
-                                                                    {task.budget && task.budget > 0 ? (
-                                                                        <div className="flex items-center gap-1 text-[10px] font-bold text-green-600 dark:text-green-400 bg-green-50 dark:bg-green-900/20 px-1.5 py-0.5 rounded border border-green-100 dark:border-green-900/30">
-                                                                            ${task.budget.toLocaleString()}
-                                                                        </div>
-                                                                    ) : null}
-                                                                    <div className="flex items-center gap-1 text-xs">
-                                                                        <FaCheckSquare size={12} /> <span className="text-[10px]">2/7</span>
-                                                                    </div>
-                                                                    <div className="flex items-center gap-1 text-xs">
-                                                                        <FaPaperclip size={10} /> <span className="text-[10px]">3</span>
+                                                            {/* Assignee Info & Priority Row */}
+                                                            <div className="space-y-2 mb-5">
+                                                                <div className="flex items-center gap-3">
+                                                                    <div className="text-[11px] text-gray-400 dark:text-gray-500 uppercase tracking-wider font-semibold">Assignee:</div>
+                                                                    {/* Assignee Avatar (Aligned with Label) */}
+                                                                    <div className="flex-shrink-0">
+                                                                        {task.assignedTo ? (
+                                                                            <img
+                                                                                src={task.assignedTo.avatar || `https://ui-avatars.com/api/?name=${task.assignedTo.name}`}
+                                                                                alt={task.assignedTo.name}
+                                                                                className="w-7 h-7 rounded-full border-2 border-white dark:border-gray-800 shadow-sm object-cover"
+                                                                            />
+                                                                        ) : (
+                                                                            <div className="w-7 h-7 rounded-full bg-blue-50 dark:bg-blue-900/20 border-2 border-white dark:border-gray-800 flex items-center justify-center text-[10px] font-bold text-blue-600 dark:text-blue-400">?</div>
+                                                                        )}
                                                                     </div>
                                                                 </div>
+                                                                <div className="flex items-center justify-between">
+                                                                    {/* Date with Flag */}
+                                                                    <div className="flex items-center gap-2 text-gray-400 dark:text-gray-500 text-sm font-medium">
+                                                                        <FaFlag size={14} className="text-gray-600 dark:text-gray-400" />
+                                                                        <span>{task.dueDate ? new Date(task.dueDate).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' }) : 'No Deadline'}</span>
+                                                                    </div>
 
-                                                                {/* Right: Priority & Assignee */}
-                                                                <div className="flex items-center gap-2">
-                                                                    {/* Assignee Avatar */}
-                                                                    {task.assignedTo ? (
-                                                                        <img src={task.assignedTo.avatar || `https://ui-avatars.com/api/?name=${task.assignedTo.name}`} alt={task.assignedTo.name} className="w-6 h-6 rounded-full border-2 border-white dark:border-gray-700 shadow-sm" />
-                                                                    ) : (
-                                                                        <div className="w-6 h-6 rounded-full bg-gray-200 dark:bg-gray-800 border-2 border-white dark:border-gray-700 flex items-center justify-center text-[8px] font-bold text-gray-500 dark:text-gray-400">?</div>
-                                                                    )}
+                                                                    {/* Priority with Dot */}
+                                                                    <div className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold border uppercase tracking-wider
+                                                                        ${task.priority === 'HIGH' ? 'bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 border-red-100/50 dark:border-red-900/30' :
+                                                                            task.priority === 'LOW' ? 'bg-green-50 dark:bg-green-900/20 text-green-600 dark:text-green-400 border-green-100/50 dark:border-green-900/30' :
+                                                                                'bg-yellow-50 dark:bg-yellow-900/20 text-yellow-600 dark:text-yellow-400 border-yellow-100/50 dark:border-yellow-900/30'}`}>
+                                                                        <div className={`w-1.5 h-1.5 rounded-full ${task.priority === 'HIGH' ? 'bg-red-600' : task.priority === 'LOW' ? 'bg-green-600' : 'bg-yellow-600'}`} />
+                                                                        {task.priority || 'Medium'}
+                                                                    </div>
+                                                                </div>
+                                                            </div>
 
-                                                                    {/* Priority Badge */}
-                                                                    <span className={`flex items-center gap-1 text-[10px] font-semibold px-1.5 py-0.5 rounded border
-                                                                        ${task.priority === 'HIGH' ? 'bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 border-red-100 dark:border-red-900/30' :
-                                                                            task.priority === 'LOW' ? 'bg-green-50 dark:bg-green-900/20 text-green-600 dark:text-green-400 border-green-100 dark:border-green-900/30' :
-                                                                                'bg-yellow-50 dark:bg-yellow-900/20 text-yellow-600 dark:text-yellow-400 border-yellow-100 dark:border-yellow-900/30'}`}>
-                                                                        {task.priority || 'MED'}
-                                                                    </span>
+                                                            {/* Horizontal Separator */}
+                                                            <div className="h-px bg-gray-100 dark:bg-gray-800 -mx-5 mb-4" />
+
+                                                            {/* Meta Info Bottom Row */}
+                                                            <div className="flex items-center gap-5 text-gray-400 dark:text-gray-500">
+                                                                <div className="flex items-center gap-2 text-sm font-medium">
+                                                                    <FaRegFileAlt size={16} />
+                                                                    <span className="text-sm font-semibold">3/4</span>
+                                                                </div>
+                                                                <div className="flex items-center gap-2 text-sm font-medium">
+                                                                    <FaRegCommentDots size={16} />
+                                                                    <span className="text-sm font-semibold">{task.comments || 0}</span>
+                                                                </div>
+                                                                <div className="flex items-center gap-2 text-sm font-medium">
+                                                                    <FaPaperclip size={16} />
+                                                                    <span className="text-sm font-semibold">{task.attachments || 7}</span>
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -207,7 +242,7 @@ const Tasks: React.FC = () => {
                                             {/* Add Card Ghost Button */}
                                             <button
                                                 onClick={() => setIsCreateModalOpen(true)}
-                                                className="w-full py-2 border border-dashed border-gray-300 dark:border-gray-700 rounded-lg text-gray-400 dark:text-gray-500 text-sm hover:border-blue-400 dark:hover:border-blue-500 hover:text-blue-500 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/10 transition-all flex items-center justify-center gap-2"
+                                                className="w-full py-2 bg-transparent border border-dashed border-gray-300 dark:border-gray-700 rounded-lg text-gray-400 dark:text-gray-500 text-sm hover:border-blue-400 dark:hover:border-blue-500 hover:text-blue-500 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/10 transition-all flex items-center justify-center gap-2 mt-2"
                                             >
                                                 <FaPlus size={10} /> New Task
                                             </button>
