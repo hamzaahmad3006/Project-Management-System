@@ -5,8 +5,9 @@ import { fetchTeamStats } from "../../../store/slices/teamSlice";
 import { fetchKPIs, fetchRecentActivity } from "../../../store/slices/dashboardSlice";
 import { fetchProjects, setSelectedProjectId } from "../../../store/slices/projectSlice";
 import { AppDispatch, RootState } from "../../../store/store";
-import Loader from "components/Loaders/Loader";
+import { Loader } from "components/loader/Loader";
 import { Bar } from 'react-chartjs-2';
+import { useDashboardTabHook } from "./useTeam";
 import {
     Chart as ChartJS,
     CategoryScale,
@@ -27,120 +28,8 @@ ChartJS.register(
 );
 
 export default function DashboardPage() {
-    const { teamId: teamIdFromUrl } = useParams();
-    const dispatch = useDispatch<AppDispatch>();
-    const { allTeams, stats: teamStats, loading: teamLoading } = useSelector((state: RootState) => state.team);
-    const { selectedProjectId, projects } = useSelector((state: RootState) => state.projects);
-    const { kpis, recentActivity, loading: dashLoading } = useSelector((state: RootState) => state.dashboard);
-    const theme = useSelector((state: RootState) => state.theme.theme);
-    const isDark = theme === 'dark' || (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
-
-    const { teamId: contextTeamId } = useOutletContext<{ teamId?: string }>();
-
-    // Determine target team ID
-    const teamId = (() => {
-        if (contextTeamId) return contextTeamId;
-        if (teamIdFromUrl) return teamIdFromUrl;
-        if (selectedProjectId !== 'all') {
-            const project = projects.find(p => p.id === selectedProjectId);
-            if (project?.teamId) return project.teamId;
-            return null;
-        }
-        return null;
-    })();
-
-    useEffect(() => {
-        // Always fetch team-wide stats if we are in a team context for the sidebar/chart
-        if (teamId) {
-            dispatch(fetchTeamStats(teamId));
-        }
-
-        // Fetch project-specific data if selected, otherwise fallback to global/team overview
-        if (selectedProjectId && selectedProjectId !== 'all') {
-            dispatch(fetchKPIs(selectedProjectId));
-            dispatch(fetchRecentActivity(selectedProjectId));
-        } else if (!teamId) {
-            dispatch(fetchKPIs('all'));
-            dispatch(fetchRecentActivity('all'));
-        }
-    }, [dispatch, teamId, selectedProjectId]);
-
-    const loading = teamLoading || dashLoading;
-
-    // Map global/project KPIs to the UI structure
-    const mappedGlobalStats = useMemo(() => {
-        if (!kpis) return null;
-        return {
-            stats: [
-                { title: "Completed tasks", value: kpis.tasks.completed, meta: `${kpis.tasks.total > 0 ? ((kpis.tasks.completed / kpis.tasks.total) * 100).toFixed(2) : 0}%` },
-                { title: "Incompleted tasks", value: kpis.tasks.total - kpis.tasks.completed, meta: `${kpis.tasks.total > 0 ? (((kpis.tasks.total - kpis.tasks.completed) / kpis.tasks.total) * 100).toFixed(2) : 0}%` },
-                { title: "Overdue tasks", value: kpis.tasks.overdue || 0, meta: "Overdue" },
-                { title: "Total Income", value: `$${kpis.projects.totalBudget.toLocaleString()}`, meta: `${kpis.projects.totalBudget > 0 ? ((kpis.projects.totalSpent / kpis.projects.totalBudget) * 100).toFixed(2) : 0}% consumed` },
-            ],
-            overview: {
-                totalSpent: `$${kpis.projects.totalSpent.toLocaleString()}`,
-                chartData: kpis.chartData || []
-            },
-            topMembers: teamStats?.topMembers || [], // Use team rankings for context
-            topProjects: teamStats?.topProjects || [], // Use team rankings for context
-            recentActivities: recentActivity.map(a => ({
-                id: a.id,
-                name: a.name,
-                updatedAt: a.updatedAt,
-                status: a.status
-            }))
-        };
-    }, [kpis, recentActivity, teamStats]);
-
-    // Final display logic: Project KPIs take priority for cards, but Sidebar/Chart use Team context
-    const displayStats = useMemo(() => {
-        if (selectedProjectId && selectedProjectId !== 'all') return mappedGlobalStats;
-        if (teamId && teamStats) return teamStats;
-        return mappedGlobalStats;
-    }, [selectedProjectId, teamId, teamStats, mappedGlobalStats]);
-
-    const chartData = useMemo(() => {
-        if (!displayStats?.overview?.chartData) return null;
-        const labels = displayStats.overview.chartData.map((d: any) => d.label);
-        const values = displayStats.overview.chartData.map((d: any) => d.value);
-
-        return {
-            labels,
-            datasets: [{
-                data: values,
-                backgroundColor: values.map((_: any, i: number) =>
-                    i === values.length - 1 ? (isDark ? '#3b82f6' : '#0070f3') : (isDark ? '#2d333b' : '#e5e7eb')
-                ),
-                borderRadius: 4,
-                barThickness: 32,
-            }]
-        };
-    }, [displayStats, isDark]);
-
-    const chartOptions = {
-        responsive: true,
-        plugins: {
-            legend: { display: false },
-            tooltip: {
-                callbacks: {
-                    label: (context: any) => `$${context.raw.toLocaleString()}`
-                }
-            }
-        },
-        scales: {
-            y: { display: false, beginAtZero: true },
-            x: {
-                grid: { display: false },
-                ticks: { color: isDark ? '#4b5563' : '#9ca3af', font: { size: 10 } }
-            }
-        }
-    };
-
-    const hours = ["8:00", "9:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00", "17:00"];
-
-    const filteredTeamProjects = useMemo(() => {
-        return projects.filter(p => !teamId || p.teamId === teamId);
-    }, [projects, teamId]);
+    const { loading, displayStats, chartData, chartOptions, hours, filteredTeamProjects, setSelectedProjectId, selectedProjectId, dispatch
+    } = useDashboardTabHook()
 
     if (loading || !displayStats) {
         return <Loader />;
@@ -148,7 +37,6 @@ export default function DashboardPage() {
 
     return (
         <div className="space-y-6 animate-in fade-in duration-500 pb-10">
-            {/* Header with Project Selector */}
             <div className="flex items-center justify-between mb-2">
                 <div className="text-xl font-bold text-gray-900 dark:text-gray-100">Teamspace overview</div>
                 <select
@@ -163,7 +51,6 @@ export default function DashboardPage() {
                 </select>
             </div>
 
-            {/* KPI Row */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                 {displayStats.stats.map((s: any, i: number) => (
                     <div key={i} className="bg-white dark:bg-[#1a1c23] border border-gray-100 dark:border-gray-800 rounded-xl p-5 shadow-sm">
@@ -179,9 +66,7 @@ export default function DashboardPage() {
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                {/* Left Column: Chart & Timeline */}
                 <div className="lg:col-span-2 space-y-6">
-                    {/* Overview Chart */}
                     <div className="bg-white dark:bg-[#1a1c23] border border-gray-100 dark:border-gray-800 rounded-xl p-6 shadow-sm">
                         <div className="flex justify-between items-center mb-6">
                             <div>
@@ -201,7 +86,6 @@ export default function DashboardPage() {
                         </div>
                     </div>
 
-                    {/* Timeline */}
                     <div className="bg-white dark:bg-[#1a1c23] border border-gray-100 dark:border-gray-800 rounded-xl p-6 shadow-sm">
                         <div className="flex justify-between items-center mb-8">
                             <div className="text-sm font-bold text-gray-900 dark:text-gray-100">Timeline</div>
@@ -217,7 +101,6 @@ export default function DashboardPage() {
                                 </div>
 
                                 <div className="relative h-[180px] space-y-3">
-                                    {/* Mock Task Bars based on Recent Activity */}
                                     {displayStats.recentActivities.slice(0, 5).map((activity: any, idx: number) => {
                                         const colors = [
                                             'bg-orange-50 border-orange-100 text-orange-700',
@@ -251,9 +134,7 @@ export default function DashboardPage() {
                     </div>
                 </div>
 
-                {/* Right Column: Sidebars */}
                 <aside className="space-y-6">
-                    {/* Top Contributors */}
                     <div className="bg-white dark:bg-[#1a1c23] border border-gray-100 dark:border-gray-800 rounded-xl p-5 shadow-sm">
                         <div className="flex justify-between items-center mb-6">
                             <div className="text-sm font-bold text-gray-900 dark:text-gray-100">Top completed tasks</div>

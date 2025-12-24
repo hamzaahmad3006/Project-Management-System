@@ -6,7 +6,7 @@ import { useDispatch } from 'react-redux';
 import { fetchProfile } from './store/slices/authSlice';
 import { useSelector } from 'react-redux';
 import { RootState } from './store/store';
-import Loader from 'components/Loaders/Loader';
+import { Loader } from 'components/loader/Loader';
 import { useTheme } from './hooks/useTheme';
 
 
@@ -22,7 +22,7 @@ function App() {
     }
   }, [dispatch, token, user]);
 
-  if (loading) return <Loader size={48} color="secondary" />;
+  if (loading) return <Loader />;
 
   return (
     <>

@@ -1,11 +1,11 @@
 import React from "react";
 import { Navigate, Route, Routes } from "react-router-dom";
-import Auth from "./Auth";
+import Auth from "./auth";
 import PrivateRoute from "../components/PrivateRoute";
 import Dashboard from "./Dashboard/";
-import InvitationHandler from "./InvitationHandler";
+import InvitationHandler from "./Dashboard/invitationHandler/InvitationHandler";
 import { useSelector } from "react-redux";
-import { RootState } from "store/store";
+import { RootState } from "../store/store";
 
 export default function Index() {
     const { isAuthenticated, loading } = useSelector((state: RootState) => state.auth);

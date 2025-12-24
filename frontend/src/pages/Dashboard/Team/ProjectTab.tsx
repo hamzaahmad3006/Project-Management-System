@@ -1,61 +1,8 @@
-import React, { useEffect } from "react";
-import { useAppDispatch, useAppSelector } from "store/hooks";
-import { fetchProjects } from "../../../store/slices/projectSlice";
-import Loader from "components/Loaders/Loader";
-import { useParams, useOutletContext } from "react-router-dom";
+import { Loader } from "components/loader/Loader";
+import { useProjectTabHook } from "./useTeam";
 
 export default function ProjectTab() {
-    const { teamId: teamIdFromUrl } = useParams();
-    const dispatch = useAppDispatch();
-    const { projects, selectedProjectId, loading } = useAppSelector(state => state.projects);
-    const { allTeams } = useAppSelector(state => state.team);
-
-    useEffect(() => {
-        dispatch(fetchProjects());
-    }, [dispatch]);
-
-    const { teamId: contextTeamId } = useOutletContext<{ teamId?: string }>();
-
-    // Priority:
-    // 1. teamId from context (manual switcher)
-    // 2. teamId from URL
-    // 3. teamId from selectedProjectId
-    const teamId = (() => {
-        if (contextTeamId) return contextTeamId;
-        if (teamIdFromUrl) return teamIdFromUrl;
-        if (selectedProjectId !== 'all') {
-            const project = projects.find(p => p.id === selectedProjectId);
-            if (project?.teamId) return project.teamId;
-            return null;
-        }
-        return null; // Show all projects if 'all' is selected
-    })();
-
-    const filteredProjects = projects.filter(p => !teamId || p.teamId === teamId);
-
-    const getStatusColor = (status: string) => {
-        switch (status.toLowerCase()) {
-            case 'active': return 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 border border-green-200 dark:border-green-800/50';
-            case 'completed': return 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 border border-blue-200 dark:border-blue-800/50';
-            case 'on hold': return 'bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-400 border border-orange-200 dark:border-orange-800/50';
-            default: return 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-400 border border-gray-200 dark:border-gray-700';
-        }
-    };
-
-    const getPriorityColor = (priority?: string) => {
-        switch (priority?.toLowerCase()) {
-            case 'high': return 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 border border-red-200 dark:border-red-800/50';
-            case 'medium': return 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-400 border border-yellow-200 dark:border-yellow-800/50';
-            case 'low': return 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 border border-green-200 dark:border-green-800/50';
-            default: return 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-400 border border-gray-200 dark:border-gray-700';
-        }
-    };
-
-    const calculateProgress = (tasks?: { status: string }[]) => {
-        if (!tasks || tasks.length === 0) return 0;
-        const completed = tasks.filter(t => t.status === 'COMPLETED').length;
-        return Math.round((completed / tasks.length) * 100);
-    };
+    const { loading, filteredProjects, calculateProgress, getStatusColor, getPriorityColor } = useProjectTabHook();
 
     if (loading) return <Loader />;
 

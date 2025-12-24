@@ -15,10 +15,3 @@ body {
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
   line-height: 1.5;
 }
-
-
-
-
-
-/*===Auth Pages Css*/
-@import "./styles/Auth/auth.css";
