@@ -4,6 +4,7 @@ import { AxiosError } from 'axios';
 import { RootState, AppDispatch } from '../../../store/store';
 import { fetchNotifications, markNotificationAsRead, acceptTeamInvitation, declineTeamInvitation } from '../../../store/slices/notificationSlice';
 import { Notification } from '../../../types';
+import { toast } from 'react-toastify';
 
 export const useNotificationHook = (isOpen: boolean, onClose: () => void) => {
     const dispatch = useDispatch<AppDispatch>();
@@ -19,10 +20,10 @@ export const useNotificationHook = (isOpen: boolean, onClose: () => void) => {
         try {
             await dispatch(acceptTeamInvitation(token)).unwrap();
             await dispatch(markNotificationAsRead(notificationId));
-            window.toastify("Invitation accepted successfully!", "success");
+            toast.success("Invitation accepted successfully!");
         } catch (err: unknown) {
             const error = err as AxiosError<{ message: string }>;
-            window.toastify(error.response?.data?.message || "Failed to accept invitation", "error");
+            toast.error(error.response?.data?.message || "Failed to accept invitation");
         }
     };
 
@@ -30,10 +31,10 @@ export const useNotificationHook = (isOpen: boolean, onClose: () => void) => {
         try {
             await dispatch(declineTeamInvitation(token)).unwrap();
             await dispatch(markNotificationAsRead(notificationId));
-            window.toastify("Invitation declined.", "success");
+            toast.success("Invitation declined.");
         } catch (err: unknown) {
             const error = err as AxiosError<{ message: string }>;
-            window.toastify(error.response?.data?.message || "Failed to decline invitation", "error");
+            toast.error(error.response?.data?.message || "Failed to decline invitation");
         }
     };
 

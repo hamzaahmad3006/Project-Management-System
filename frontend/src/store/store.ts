@@ -11,6 +11,8 @@ import notificationReducer from './slices/notificationSlice';
 import themeReducer from './slices/themeSlice';
 import commentReducer from './slices/commentSlice';
 
+import { socketMiddleware } from './middleware/socketMiddleware';
+
 export const store = configureStore({
     reducer: {
         auth: authReducer,
@@ -25,6 +27,8 @@ export const store = configureStore({
         theme: themeReducer,
         comments: commentReducer,
     },
+    middleware: (getDefaultMiddleware) =>
+        getDefaultMiddleware().concat(socketMiddleware),
 });
 
 export type RootState = ReturnType<typeof store.getState>;

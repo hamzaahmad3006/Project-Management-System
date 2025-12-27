@@ -67,6 +67,10 @@ const notificationSlice = createSlice({
     reducers: {
         clearError: (state) => {
             state.error = null;
+        },
+        addNotification: (state, action: PayloadAction<Notification>) => {
+            // Add new notification to the beginning of the list
+            state.notifications.unshift(action.payload);
         }
     },
     extraReducers: (builder) => {
@@ -92,5 +96,5 @@ const notificationSlice = createSlice({
     },
 });
 
-export const { clearError } = notificationSlice.actions;
+export const { clearError, addNotification } = notificationSlice.actions;
 export default notificationSlice.reducer;
