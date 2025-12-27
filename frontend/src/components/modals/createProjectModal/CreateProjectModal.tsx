@@ -1,9 +1,13 @@
 import React from 'react';
 import { useCreateProject } from './useCreateProject';
 import TemplateGalleryModal from '../templateGalleryModal/TemplateGalleryModal';
-import { FaTimes, FaMagic, FaChevronDown } from 'react-icons/fa';
+import { FaTimes, FaMagic, FaChevronDown, FaProjectDiagram } from 'react-icons/fa';
 import { CreateModalProps } from '../../../types';
 import { ButtonLoader } from 'components/loader/Loader';
+import InputForm from 'components/ui/inputFields/InputForm';
+import SelectField from 'components/ui/inputFields/SelectedForm';
+import TextAreaForm from 'components/ui/inputFields/TextAreaForm';
+import ButtonForm from 'components/ui/buttons/ButtonForm';
 
 
 const CreateProjectModal: React.FC<CreateModalProps> = ({ isOpen, onClose }) => {
@@ -42,14 +46,15 @@ const CreateProjectModal: React.FC<CreateModalProps> = ({ isOpen, onClose }) => 
                 <div className="p-6 space-y-5">
                     {/* Project Name */}
                     <div className="space-y-1.5">
-                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Project name</label>
-                        <input
-                            type="text"
+                        <InputForm
+                            label="Project name"
+                            name="projectName"
                             placeholder="e.g. Website Redesign"
-                            className="w-full px-3 py-2 border border-blue-400 dark:border-blue-500/50 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 transition-shadow"
-                            autoFocus
                             value={name}
                             onChange={(e) => setName(e.target.value)}
+                            className="text-gray-800 dark:text-gray-100 bg-white dark:bg-gray-800 focus:ring-1 focus:ring-blue-500 border-blue-400 dark:border-blue-500/50"
+                            labelClassName="text-gray-700 dark:text-gray-300"
+
                         />
                     </div>
 
@@ -74,74 +79,87 @@ const CreateProjectModal: React.FC<CreateModalProps> = ({ isOpen, onClose }) => 
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
 
                         <div className="space-y-1.5">
-                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Select a team</label>
-                            <div className="relative">
-                                <select
-                                    value={teamId}
-                                    onChange={(e) => setTeamId(e.target.value)}
-                                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md appearance-none focus:outline-none focus:border-blue-500 bg-white dark:bg-gray-800 text-sm text-gray-700 dark:text-gray-200"
-                                >
-                                    <option value="">No Team</option>
-                                    {allTeams?.map((team) => (
-                                        <option key={team.id} value={team.id}>
-                                            {team.name}
-                                        </option>
-                                    ))}
-                                </select>
-                                <FaChevronDown size={12} className="absolute right-3 top-3 text-gray-400 dark:text-gray-500 pointer-events-none" />
-                            </div>
+                            <SelectField
+                                label="Select a team"
+                                name="team"
+                                value={teamId}
+                                onChange={(e) => setTeamId(e.target.value)}
+                                options={[
+                                    { label: "No Team", value: "" },
+                                    ...(allTeams || []).map(team => ({ label: team.name, value: team.id }))
+                                ]}
+                                placeholder="Select Team"
+                                icon={<FaChevronDown size={12} />}
+                                className="border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200"
+                                labelClassName="text-gray-700 dark:text-gray-300"
+                            />
                         </div>
 
 
                         <div className="space-y-1.5">
-                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Privacy</label>
-                            <div className="relative">
-                                <select className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md appearance-none focus:outline-none focus:border-blue-500 bg-white dark:bg-gray-800 text-sm text-gray-700 dark:text-gray-200">
-                                    <option>Shared with team</option>
-                                    <option>Private to me</option>
-                                    <option>Public</option>
-                                </select>
-                                <FaChevronDown size={12} className="absolute right-3 top-3 text-gray-400 dark:text-gray-500 pointer-events-none" />
-                            </div>
+                            <SelectField
+                                label="Privacy"
+                                name="privacy"
+                                value="Shared with team"
+                                options={[
+                                    { label: "Shared with team", value: "Shared with team" },
+                                    { label: "Private to me", value: "Private to me" },
+                                    { label: "Public", value: "Public" }
+                                ]}
+                                placeholder="Select Privacy"
+                                icon={<FaChevronDown size={12} />}
+                                className="border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200"
+                                labelClassName="text-gray-700 dark:text-gray-300"
+                            // Note: Logic for setting privacy wasn't in original code, value hardcoded to option 1 visual
+                            />
                         </div>
 
 
                         <div className="space-y-1.5">
-                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Budget ($)</label>
-                            <input
+                            <InputForm
+                                label="Budget ($)"
+                                name="budget"
                                 type="number"
                                 placeholder="0"
-                                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md focus:outline-none focus:border-blue-500 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 text-sm transition-shadow"
                                 value={budget}
                                 onChange={(e) => setBudget(parseFloat(e.target.value) || 0)}
+                                className="border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100"
+                                labelClassName="text-gray-700 dark:text-gray-300"
                             />
                         </div>
                     </div>
 
 
                     <div className="space-y-1.5">
-                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Description</label>
-                        <textarea
+                        <TextAreaForm
+                            label="Description"
+                            name="description"
                             rows={3}
                             placeholder="Please share your main reason..."
-                            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md focus:outline-none focus:border-blue-500 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 text-sm resize-none"
                             value={description}
                             onChange={(e) => setDescription(e.target.value)}
-                        ></textarea>
+                            className="border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100"
+                            labelClassName="text-gray-700 dark:text-gray-300"
+                        />
                     </div>
 
 
                     <div className="flex items-center gap-3 pt-2">
-                        <button
+                        <ButtonForm
                             onClick={handleCreate}
                             disabled={isLoading || !name.trim()}
-                            className="px-5 py-2 bg-blue-500 text-white text-sm font-medium rounded hover:bg-blue-600 transition-colors shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
-                        >
-                            {isLoading ? <ButtonLoader /> : 'Create project'}
-                        </button>
-                        <button onClick={onClose} className="px-5 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-200 text-sm font-medium rounded hover:bg-gray-50 dark:hover:bg-gray-750 transition-colors">
-                            Cancel
-                        </button>
+                            label={isLoading ? <ButtonLoader /> : 'Create project'}
+                            variant="primary"
+                            size="md"
+                            className="px-5 py-2"
+                        />
+                        <ButtonForm
+                            onClick={onClose}
+                            label="Cancel"
+                            variant="secondary"
+                            size="md"
+                            className="px-5 py-2"
+                        />
                     </div>
                 </div>
 

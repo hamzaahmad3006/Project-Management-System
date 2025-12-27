@@ -3,6 +3,10 @@ import { FaTimes, FaEnvelope, FaChevronDown, FaSpinner } from 'react-icons/fa';
 import { CreateModalProps } from '../../../types';
 import { useInviteTeammates } from './useInviteTeammates';
 import { ButtonLoader } from '../../../components/loader/Loader';
+import InputForm from 'components/ui/inputFields/InputForm';
+import SelectField from 'components/ui/inputFields/SelectedForm';
+import TextAreaForm from 'components/ui/inputFields/TextAreaForm';
+import ButtonForm from 'components/ui/buttons/ButtonForm';
 
 const InviteTeammatesModal: React.FC<CreateModalProps> = ({ isOpen, onClose }) => {
     const {
@@ -36,93 +40,94 @@ const InviteTeammatesModal: React.FC<CreateModalProps> = ({ isOpen, onClose }) =
                 <div className="p-6 space-y-5">
                     {/* Email Input */}
                     <div className="space-y-1.5">
-                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Email addresses</label>
-                        <div className="relative">
-                            <input
-                                type="text"
-                                value={emailInput}
-                                onChange={(e) => setEmailInput(e.target.value)}
-                                placeholder="name@company.com, name2@company.com"
-                                className="w-full pl-9 pr-3 py-2 border border-blue-400 dark:border-blue-500/50 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 transition-shadow"
-                                autoFocus
-                                disabled={loading}
-                            />
-                            <FaEnvelope size={14} className="absolute left-3 top-3 text-gray-400 dark:text-gray-500" />
-                        </div>
-                        <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Separate multiple emails with commas.</p>
+                        <InputForm
+                            label="Email addresses"
+                            name="emails"
+                            type="text"
+                            value={emailInput}
+                            onChange={(e) => setEmailInput(e.target.value)}
+                            placeholder="name@company.com, name2@company.com"
+                            icon={<FaEnvelope size={14} />}
+                            className="w-full pl-9 pr-3 py-2 border border-blue-400 dark:border-blue-500/50 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 transition-shadow"
+                            labelClassName="text-gray-700 dark:text-gray-300"
+
+                        />
+                        <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                            Separate multiple emails with commas.
+                        </p>
+
                     </div>
 
                     {/* Team & Role Row */}
                     <div className="grid grid-cols-2 gap-4">
                         {/* Team */}
                         <div className="space-y-1.5">
-                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Add to team</label>
-                            <div className="relative">
-                                <select
-                                    value={selectedTeam}
-                                    onChange={(e) => setSelectedTeam(e.target.value)}
-                                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md appearance-none focus:outline-none focus:border-blue-500 bg-white dark:bg-gray-800 text-sm text-gray-700 dark:text-gray-200"
-                                    disabled={loading}
-                                >
-                                    {teams.length === 0 ? (
-                                        <option value="">No teams found</option>
-                                    ) : (
-                                        teams.map(t => (
-                                            <option key={t.id} value={t.name}>{t.name}</option>
-                                        ))
-                                    )}
-                                </select>
-                                <FaChevronDown size={12} className="absolute right-3 top-3 text-gray-400 dark:text-gray-500 pointer-events-none" />
-                            </div>
+                            <SelectField
+                                label="Add to team"
+                                name="team"
+                                value={selectedTeam}
+                                onChange={(e) => setSelectedTeam(e.target.value)}
+                                options={teams.map(team => ({ label: team.name, value: team.name }))}
+                                placeholder="Select team"
+                                icon={<FaChevronDown size={12} />}
+                                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md appearance-none focus:outline-none focus:border-blue-500 bg-white dark:bg-gray-800 text-sm text-gray-700 dark:text-gray-200"
+                                labelClassName="block text-sm font-medium text-gray-700 dark:text-gray-300"
+                            />
                         </div>
 
                         {/* Role */}
                         <div className="space-y-1.5">
-                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Role</label>
-                            <div className="relative">
-                                <select
-                                    value={selectedRole}
-                                    onChange={(e) => setSelectedRole(e.target.value)}
-                                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md appearance-none focus:outline-none focus:border-blue-500 bg-white dark:bg-gray-800 text-sm text-gray-700 dark:text-gray-200"
-                                    disabled={loading}
-                                >
-                                    <option value="MEMBER">Member</option>
-                                    <option value="MANAGER">Manager</option>
-                                </select>
-                                <FaChevronDown size={12} className="absolute right-3 top-3 text-gray-400 dark:text-gray-500 pointer-events-none" />
-                            </div>
+                            <SelectField
+                                label="Role"
+                                name="role"
+                                value={selectedRole}
+                                onChange={(e) => setSelectedRole(e.target.value)}
+                                options={[
+                                    { label: "Manager", value: "MANAGER" },
+                                    { label: "Member", value: "MEMBER" },
+                                ]}
+                                placeholder="Select role"
+                                icon={<FaChevronDown size={12} />}
+                                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md appearance-none focus:outline-none focus:border-blue-500 bg-white dark:bg-gray-800 text-sm text-gray-700 dark:text-gray-200"
+                                labelClassName="block text-sm font-medium text-gray-700 dark:text-gray-300"
+                            />
                         </div>
                     </div>
 
                     {/* Message */}
                     <div className="space-y-1.5">
-                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Personal message (optional)</label>
-                        <textarea
-                            rows={3}
+                        <TextAreaForm
+                            label="Personal message (optional)"
+                            name="personalMessage"
                             value={personalMessage}
                             onChange={(e) => setPersonalMessage(e.target.value)}
                             placeholder="Join us to collaborate on..."
-                            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md focus:outline-none focus:border-blue-500 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 text-sm resize-none"
+                            rows={3}
                             disabled={loading}
-                        ></textarea>
+                            labelClassName="block text-sm font-medium text-gray-700 dark:text-gray-300"
+                            className="border border-gray-300 dark:border-gray-700 rounded-md appearance-none focus:outline-none focus:border-blue-500 bg-white dark:bg-gray-800 text-sm text-gray-700 dark:text-gray-200"
+                        />
                     </div>
 
                     {/* Buttons */}
                     <div className="flex items-center gap-3 pt-2">
-                        <button
+                        <ButtonForm
+                            label={loading ? <ButtonLoader /> : "Send Invites"}
                             onClick={handleSend}
                             disabled={loading}
-                            className="px-5 py-2 bg-blue-500 text-white text-sm font-medium rounded hover:bg-blue-600 transition-colors shadow-sm flex items-center gap-2"
-                        >
-                            {loading ? <ButtonLoader /> : 'Send Invites'}
-                        </button>
-                        <button
+                            size="md"
+                            variant="primary"
+                            className="flex items-center gap-2 px-5 py-2 shadow-sm"
+                        />
+                        <ButtonForm
+                            label="Cancel"
                             onClick={onClose}
                             disabled={loading}
-                            className="px-5 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-200 text-sm font-medium rounded hover:bg-gray-50 dark:hover:bg-gray-750 transition-colors"
-                        >
-                            Cancel
-                        </button>
+                            size="md"
+                            variant="secondary"
+                            className="px-5 py-2"
+                        />
+
                     </div>
                 </div>
 
@@ -133,7 +138,7 @@ const InviteTeammatesModal: React.FC<CreateModalProps> = ({ isOpen, onClose }) =
                     </p>
                 </div>
             </div>
-        </div>
+        </div >
     );
 };
 

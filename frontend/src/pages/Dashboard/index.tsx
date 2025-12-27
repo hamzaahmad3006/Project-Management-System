@@ -4,12 +4,13 @@ import Tasks from './tasks/Tasks'
 import Projects from './Projects'
 import Calendar from './Calendar'
 import Reports from './Reports'
-import Team from 'pages/Dashboard/team/Team'
+import Team from 'pages/dashboard/team/Team'
 import ProjectBoard from './projectBoard/ProjectBoard'
 import Sidebar from 'components/layout/Sidebar'
-import DashboardTab from 'pages/Dashboard/team/DashboardTab'
-import ProjectTab from 'pages/Dashboard/team/ProjectTab'
-import MembersTab from 'pages/Dashboard/team/MembersTab'
+import DashboardTab from 'pages/dashboard/team/DashboardTab'
+import ProjectTab from 'pages/dashboard/team/ProjectTab'
+import MembersTab from 'pages/dashboard/team/MembersTab'
+import FilesTab from 'pages/dashboard/team/FilesTab'
 
 export default function Dashboard() {
     return (
@@ -30,6 +31,7 @@ export default function Dashboard() {
                         <Route index element={<ProjectTab />} />
                         <Route path="dashboard" element={<DashboardTab />} />
                         <Route path="members" element={<MembersTab />} />
+                        <Route path="files" element={<FilesTab />} />
                     </Route>
 
                     <Route path="board" element={< ProjectBoard />} />

@@ -2,6 +2,9 @@ import React from 'react';
 import { FaUser } from 'react-icons/fa';
 import { ButtonLoader, Loader } from '../../loader/Loader';
 import { UserProfile } from '../../../types';
+import InputForm from 'components/ui/inputFields/InputForm';
+import FileInputForm from 'components/ui/inputFields/FileInputForm';
+import ButtonForm from 'components/ui/buttons/ButtonForm';
 
 interface ProfileSettingsProps {
     profile: UserProfile;
@@ -29,55 +32,52 @@ const ProfileSettings: React.FC<ProfileSettingsProps> = ({
                 </div>
 
                 <div className="flex gap-3">
-                    <label className="px-3 py-2 cursor-pointer border border-gray-300 dark:border-gray-700 rounded-md text-sm text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700">
-                        Upload
-                        <input
-                            type="file"
-                            accept="image/*"
-                            onChange={onImageSelect}
-                            className="hidden"
-                        />
-                    </label>
+                    <FileInputForm
+                        label="Upload"
+                        accept="image/*"
+                        onChange={onImageSelect}
+                        labelClassName="px-3 py-1.5 text-sm"
+                        className="rounded-md"
+                        disabled={loading}
+                    />
 
-                    <button
-                        className="px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md text-sm text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700"
-                        onClick={onCancel} // In the original it was just resetting local preview
-                    >
-                        Remove photo
-                    </button>
+                    <ButtonForm
+                        label="Remove photo"
+                        onClick={onCancel}
+                        disabled={loading}
+                        variant="secondary"
+                        size="sm"
+                    />
                 </div>
             </div>
 
-            {/* Form Fields */}
             <div className="space-y-4">
                 <div>
-                    <label className="text-sm text-gray-500 dark:text-gray-400 mb-1 block">Full name</label>
-                    <input
-                        type="text"
+                    <InputForm
+                        label="Full name"
                         name="name"
                         value={profile.name}
                         onChange={handleChange}
-                        className="w-full px-3 py-2 border dark:border-gray-700 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
+                        className="px-3 py-2 "
                     />
                 </div>
                 <div>
-                    <label className="text-sm text-gray-500 dark:text-gray-400 mb-1 block">Job title</label>
-                    <input
-                        type="text"
+                    <InputForm
+                        label="Job title"
                         name="role"
                         value={profile.role}
                         onChange={handleChange}
-                        className="w-full px-3 py-2 border dark:border-gray-700 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
+                        className="px-3 py-2 "
                     />
                 </div>
                 <div>
-                    <label className="text-sm text-gray-500 dark:text-gray-400 mb-1 block">Email</label>
-                    <input
-                        type="email"
+                    <InputForm
+                        label="Email"
                         name="email"
-                        disabled
+                        disabled={true}
+                        onChange={handleChange}
                         value={profile.email}
-                        className="w-full px-3 py-2 border dark:border-gray-700 rounded-md bg-gray-50 dark:bg-gray-900 text-gray-500 dark:text-gray-400 cursor-not-allowed"
+                        className="px-3 py-2 cursor-not-allowed"
                     />
                 </div>
             </div>
@@ -85,19 +85,21 @@ const ProfileSettings: React.FC<ProfileSettingsProps> = ({
             {/* Action Buttons */}
             <div className="border-t dark:border-gray-800 pt-4 flex items-center gap-3">
 
-                <button
-                    className="px-5 py-2.5 bg-blue-600 text-white rounded-md text-sm hover:bg-blue-700"
+                <ButtonForm
+                    label={loading ? <ButtonLoader /> : 'Save'}
                     onClick={handleSave}
-                >
-                    {loading ? <ButtonLoader /> : 'Save'}
-                </button>
+                    disabled={loading}
+                    variant="primary"
+                    size="md"
+                />
 
-                <button
-                    className="px-5 py-2.5 bg-white dark:bg-gray-800 border dark:border-gray-700 rounded-md text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                <ButtonForm
+                    label="Cancel"
                     onClick={onCancel}
-                >
-                    Cancel
-                </button>
+                    disabled={loading}
+                    variant="secondary"
+                    size="md"
+                />
             </div>
         </div>
     );

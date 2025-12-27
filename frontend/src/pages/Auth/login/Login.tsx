@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { MdCelebration } from 'react-icons/md';
 import { useLoginHook } from './useLogin';
-
-
-
+import InputForm from 'components/ui/inputFields/InputForm';
+import ButtonForm from 'components/ui/buttons/ButtonForm';
+import SocialAuthButton from 'components/ui/buttons/SocialAuthButton';
 
 const Login: React.FC = () => {
     const { email, setEmail, password, setPassword, handleSubmit, handleSigninWithGoogle, navigate } = useLoginHook();
@@ -51,56 +51,69 @@ const Login: React.FC = () => {
 
 
                     {/* Email */}
-                    <label className="text-sm font-medium text-[#2F2F2F] dark:text-gray-300">Email Address *</label>
-                    <input
-                        type="email"
-                        placeholder="name@company.com"
-                        className="w-full mt-1 mb-4 px-4 py-2 border dark:border-gray-700 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-300 dark:focus:ring-blue-800 outline-none transition-all"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                    />
+                    <div className="mb-4">
+                        <InputForm
+                            label="Email Address"
+                            name="email"
+                            type="email"
+                            placeholder="name@company.com"
+                            className="w-full mt-1 px-4 py-2 border dark:border-gray-700 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-300 dark:focus:ring-blue-800 outline-none transition-all"
+                            labelClassName="text-sm font-medium text-[#2F2F2F] dark:text-gray-300"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                            required
+                        />
+                    </div>
 
 
                     {/* Password */}
-                    <div className="flex justify-between items-center">
-                        <label className="text-sm font-medium text-[#2F2F2F] dark:text-gray-300">Password *</label>
-                        <button className="text-sm text-[#8E94BB] dark:text-gray-500 hover:text-blue-600 dark:hover:text-blue-400 transition">Forgot password?</button>
+                    <div className="mb-4">
+                        <div className="flex justify-between items-center mb-1">
+                            <label className="text-sm font-medium text-[#2F2F2F] dark:text-gray-300">Password <span className='text-red-500'>*</span></label>
+                            <button className="text-sm text-[#8E94BB] dark:text-gray-500 hover:text-blue-600 dark:hover:text-blue-400 transition">Forgot password?</button>
+                        </div>
+                        <InputForm
+                            name="password"
+                            type="password"
+                            placeholder="Password"
+                            className="w-full px-4 py-2 border dark:border-gray-700 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-300 dark:focus:ring-blue-800 outline-none transition-all"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                        />
                     </div>
-                    <input
-                        type="password"
-                        placeholder="Password"
-                        className="w-full mt-1 mb-4 px-4 py-2 border dark:border-gray-700 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-300 dark:focus:ring-blue-800 outline-none transition-all"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                    />
 
 
-                    <button
-                        className="w-full bg-[#6696F5] dark:bg-blue-600 text-white py-2 rounded-md font-semibold hover:bg-blue-600 dark:hover:bg-blue-700 transition-all shadow-sm"
+                    <ButtonForm
+                        label="Log in"
                         onClick={handleSubmit}
-                    >
-                        Log in
-                    </button>
+                        className="w-full bg-[#6696F5] dark:bg-blue-600 text-white py-2 rounded-md font-semibold hover:bg-blue-600 dark:hover:bg-blue-700 transition-all shadow-sm"
+                    />
 
 
                     {/* Google & Microsoft */}
                     <div className="flex items-center justify-center gap-4 mt-4">
-                        <button
-                            className="flex items-center gap-2 border dark:border-gray-700 px-4 py-2 text-[#F57D2C] rounded-md bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 transition-all"
+                        <SocialAuthButton
+                            label="Google"
+                            iconSrc="/assets/google.png"
                             onClick={handleSigninWithGoogle}
-                        >
-                            <span className="text-lg "><img src="/assets/google.png" alt="Google" className='w-4 h-4' /></span> Google
-                        </button>
-                        <button className="flex items-center gap-2 border dark:border-gray-700 px-4 py-2 text-[#F57D2C] rounded-md bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 transition-all">
-                            <span className="text-lg "><img src="/assets/microsoft.png" alt="Microsoft" className='w-4 h-4' /></span> Microsoft
-                        </button>
+                            className="w-auto mb-0 border dark:border-gray-700 px-4 py-2 text-[#F57D2C] dark:text-[#F57D2C]"
+                        />
+                        <SocialAuthButton
+                            label="Microsoft"
+                            iconSrc="/assets/microsoft.png"
+                            onClick={() => { }}
+                            className="w-auto mb-0 border dark:border-gray-700 px-4 py-2 text-[#F57D2C] dark:text-[#F57D2C]"
+                        />
                     </div>
 
 
                     {/* SSO Section */}
-                    <button className="w-full inline-flex border-solid justify-center text-sm text-[#2F2F2F] dark:text-gray-300 !border !border-[#E2E2E2] dark:border-gray-700 appearance-none outline-none mt-4 py-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 transition-all bg-white dark:bg-gray-800">
-                        Sign in with your identity provider (SSO/SAML)
-                    </button>
+                    <ButtonForm
+                        label="Sign in with your identity provider (SSO/SAML)"
+                        variant='secondary'
+
+                        className="text-sm text-[#2F2F2F] appearance-none outline-none mt-4 py-2 "
+                    />
 
 
                     <div className="flex items-center my-4">

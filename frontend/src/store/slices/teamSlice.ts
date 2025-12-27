@@ -44,6 +44,19 @@ interface RecentActivity {
     status: string;
 }
 
+export interface TeamFile {
+    id: string;
+    name: string;
+    type: 'pdf' | 'image' | 'ppt';
+    size: string;
+    date: string;
+    author: {
+        name: string;
+        avatar: string;
+    };
+    url: string;
+}
+
 interface TeamStats {
     stats: TeamStat[];
     overview: {
@@ -59,6 +72,7 @@ export interface TeamState {
     members: TeamMember[];
     allTeams: Team[];
     stats: TeamStats | null;
+    files: TeamFile[];
     loading: boolean;
     error: string | null;
 }
@@ -67,6 +81,7 @@ const initialState: TeamState = {
     members: [],
     allTeams: [],
     stats: null,
+    files: [],
     loading: false,
     error: null,
 };
@@ -116,6 +131,18 @@ export const fetchTeamStats = createAsyncThunk(
             return response.data;
         } catch (error: any) {
             return rejectWithValue(error.response?.data?.message || 'Failed to fetch team stats');
+        }
+    }
+);
+
+export const fetchTeamFiles = createAsyncThunk(
+    'team/fetchFiles',
+    async (teamId: string, { rejectWithValue }) => {
+        try {
+            const response = await api.get(`/teams/${teamId}/files`);
+            return response.data.files;
+        } catch (error: any) {
+            return rejectWithValue(error.response?.data?.message || 'Failed to fetch team files');
         }
     }
 );
@@ -173,6 +200,19 @@ const teamSlice = createSlice({
                 state.members = action.payload;
             })
             .addCase(fetchTeamMembersById.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload as string;
+            })
+
+            // fetch files
+            .addCase(fetchTeamFiles.pending, (state) => {
+                state.loading = true;
+            })
+            .addCase(fetchTeamFiles.fulfilled, (state, action) => {
+                state.loading = false;
+                state.files = action.payload;
+            })
+            .addCase(fetchTeamFiles.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.payload as string;
             })

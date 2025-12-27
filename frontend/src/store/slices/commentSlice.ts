@@ -24,9 +24,9 @@ export const fetchComments = createAsyncThunk(
 
 export const addComment = createAsyncThunk(
     'comments/addComment',
-    async ({ taskId, content }: { taskId: string; content: string }, { rejectWithValue }) => {
+    async ({ taskId, content, attachments }: { taskId: string; content: string; attachments?: string[] }, { rejectWithValue }) => {
         try {
-            const response = await api.post<Comment>(`/comments/task/${taskId}`, { content });
+            const response = await api.post<Comment>(`/comments/task/${taskId}`, { content, attachments });
             return response.data;
         } catch (err: unknown) {
             const error = err as AxiosError<{ message: string }>;

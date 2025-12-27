@@ -3,6 +3,9 @@ import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '../../../store/store';
 import { setTheme, ThemeType } from '../../../store/slices/themeSlice';
 import { toast } from 'react-toastify';
+import SelectField from 'components/ui/inputFields/SelectedForm';
+import { FaChevronDown } from 'react-icons/fa';
+import ButtonForm from 'components/ui/buttons/ButtonForm';
 
 const GeneralSettings = () => {
     const dispatch = useDispatch();
@@ -16,81 +19,117 @@ const GeneralSettings = () => {
 
     return (
         <div className="w-full max-w-xl bg-white dark:bg-[#1a1c23] rounded-lg p-2 ">
-            {/* FORM FIELDS */}
-            <div className="space-y-3">
 
-                {/* THEME */}
+            <div className="space-y-3">
                 <div>
-                    <label className="text-sm text-gray-500 dark:text-gray-400 mb-1 block">Theme</label>
-                    <select
+                    <SelectField
+                        label="Theme"
+                        name="theme"
+                        icon={<FaChevronDown size={12} />}
                         value={localTheme}
                         onChange={(e) => setLocalTheme(e.target.value as ThemeType)}
-                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
-                    >
-                        <option value="light">Light</option>
-                        <option value="dark">Dark</option>
-                        <option value="system">System</option>
-                    </select>
+                        options={[
+                            { label: "Light", value: "light" },
+                            { label: "Dark", value: "dark" },
+                            { label: "System", value: "system" },
+                        ]}
+                        placeholder=""
+                        className="px-3 py-2 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
+                        labelClassName="text-sm text-gray-500 dark:text-gray-400 mb-1 block"
+                    />
+
                 </div>
 
-                {/* LANGUAGE */}
+
                 <div>
-                    <label className="text-sm text-gray-500 dark:text-gray-400 mb-1 block">Language</label>
-                    <select className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500">
-                        <option>English</option>
-                        <option>Urdu</option>
-                        <option>Arabic</option>
-                    </select>
+                    <SelectField
+                        label="Language"
+                        name="language"
+                        value={localTheme}
+                        onChange={(e) => setLocalTheme(e.target.value as ThemeType)}
+                        options={[
+                            { label: "English", value: "english" },
+                            { label: "Urdu", value: "urdu" },
+                            { label: "Arabic", value: "arabic" },
+                        ]}
+                        placeholder=""
+                        className="px-3 py-2 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
+                        labelClassName="text-sm text-gray-500 dark:text-gray-400 mb-1 block"
+                    />
                 </div>
 
-                {/* TIME ZONE */}
                 <div>
-                    <label className="text-sm text-gray-500 dark:text-gray-400 mb-1 block">Time zone</label>
-                    <select className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500">
-                        <option>Islamabad</option>
-                        <option>Karachi</option>
-                        <option>Lahore</option>
-                        <option>Dubai</option>
-                    </select>
+                    <SelectField
+                        label="Time zone"
+                        name="timezone"
+                        value={localTheme}
+                        onChange={(e) => setLocalTheme(e.target.value as ThemeType)}
+                        options={[
+                            { label: "Islamabad", value: "islamabad" },
+                            { label: "Karachi", value: "karachi" },
+                            { label: "Lahore", value: "lahore" },
+                            { label: "Dubai", value: "dubai" },
+                        ]}
+                        placeholder=""
+                        className="px-3 py-2 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
+                        labelClassName="text-sm text-gray-500 dark:text-gray-400 mb-1 block"
+                    />
                 </div>
 
-                {/* TIME FORMAT */}
                 <div>
-                    <label className="text-sm text-gray-500 dark:text-gray-400 mb-1 block">Time format</label>
-                    <select className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500">
-                        <option>13:00</option>
-                        <option>01:00 PM</option>
-                    </select>
+                    <SelectField
+                        label="Time format"
+                        name="timeformat"
+                        value={localTheme}
+                        onChange={(e) => setLocalTheme(e.target.value as ThemeType)}
+                        options={[
+                            { label: "13:00", value: "13:00" },
+                            { label: "01:00 PM", value: "01:00 PM" },
+                        ]}
+                        placeholder=""
+                        className="px-3 py-2 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
+                        labelClassName="text-sm text-gray-500 dark:text-gray-400 mb-1 block"
+                    />
                 </div>
 
-                {/* DATE FORMAT */}
                 <div>
-                    <label className="text-sm text-gray-500 dark:text-gray-400 mb-1 block">Date Format</label>
-                    <select className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500">
-                        <option>DD-MM-YYYY</option>
-                        <option>MM-DD-YYYY</option>
-                        <option>YYYY-MM-DD</option>
-                    </select>
+                    <SelectField
+                        label="Date format"
+                        name="dateformat"
+                        value={localTheme}
+                        onChange={(e) => setLocalTheme(e.target.value as ThemeType)}
+                        options={[
+                            { label: "DD-MM-YYYY", value: "dd-mm-yyyy" },
+                            { label: "MM-DD-YYYY", value: "mm-dd-yyyy" },
+                            { label: "YYYY-MM-DD", value: "yyyy-mm-dd" },
+                        ]}
+                        placeholder=""
+                        className="px-3 py-2 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
+                        labelClassName="text-sm text-gray-500 dark:text-gray-400 mb-1 block"
+                    />
                 </div>
 
             </div>
 
-            {/* ACTION BUTTONS */}
+
             <div className="border-t dark:border-gray-800 pt-4 flex items-center gap-3">
 
-                <button
+                <ButtonForm
+                    label="Save"
                     onClick={handleSave}
-                    className="px-5 py-2.5 bg-blue-600 text-white rounded-md text-sm hover:bg-blue-700"
-                >
-                    Save
-                </button>
+                    variant='primary'
+                    size='md'
+                    className="px-5 py-2.5 "
+                />
 
-                <button
+
+                <ButtonForm
+                    label="Cancel"
                     onClick={() => setLocalTheme(currentTheme)}
-                    className="px-5 py-2.5 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-700 rounded-md text-sm hover:bg-gray-100 dark:hover:bg-gray-700"
-                >
-                    Cancel
-                </button>
+                    variant='secondary'
+                    size='md'
+                    className="px-5 py-2.5 "
+                />
 
             </div>
         </div>

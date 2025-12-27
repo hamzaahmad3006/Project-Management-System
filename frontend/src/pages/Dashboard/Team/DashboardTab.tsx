@@ -17,6 +17,7 @@ import {
     Tooltip,
     Legend
 } from 'chart.js';
+import SelectField from "components/ui/inputFields/SelectedForm";
 
 ChartJS.register(
     CategoryScale,
@@ -39,7 +40,19 @@ export default function DashboardPage() {
         <div className="space-y-6 animate-in fade-in duration-500 pb-10">
             <div className="flex items-center justify-between mb-2">
                 <div className="text-xl font-bold text-gray-900 dark:text-gray-100">Teamspace overview</div>
-                <select
+                <SelectField
+                    label="Projects"
+                    name='projects'
+                    options={[
+                        { label: "All Projects", value: "all" },
+                        ...filteredTeamProjects.map((project) => ({ value: project.id, label: project.name }))
+                    ]}
+                    value={selectedProjectId}
+                    onChange={(e) => dispatch(setSelectedProjectId(e.target.value))}
+                    containerClassName="w-auto"
+                    placeholder=""
+                />
+                {/* <select
                     value={selectedProjectId}
                     onChange={(e) => dispatch(setSelectedProjectId(e.target.value))}
                     className="px-4 py-2 bg-white dark:bg-[#1a1c23] border border-gray-200 dark:border-gray-800 rounded-lg text-sm text-gray-700 dark:text-gray-300 outline-none shadow-sm cursor-pointer"
@@ -48,7 +61,7 @@ export default function DashboardPage() {
                     {filteredTeamProjects.map(p => (
                         <option key={p.id} value={p.id}>{p.name}</option>
                     ))}
-                </select>
+                </select> */}
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">

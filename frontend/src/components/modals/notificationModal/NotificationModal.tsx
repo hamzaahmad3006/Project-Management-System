@@ -17,15 +17,12 @@ const NotificationPopover: React.FC<NotificationPopoverProps> = ({ isOpen, onClo
 
     return (
         <>
-            {/* Backdrop for closing */}
             <div className="fixed inset-0 z-40 bg-transparent" onClick={onClose}></div>
 
-            {/* Popover Content */}
             <div
                 className="fixed top-4 bottom-4 w-[450px] bg-white dark:bg-[#1a1c23] rounded-2xl shadow-2xl z-50 overflow-hidden flex flex-col font-sans animate-in slide-in-from-left-4 duration-200 border border-gray-100 dark:border-gray-800"
                 style={{ left: `${leftOffset + 16}px` }}
             >
-                {/* Header */}
                 <div className="p-5 flex items-center justify-between border-b border-gray-100 dark:border-gray-800 bg-white dark:bg-[#1a1c23] sticky top-0 z-10">
                     <h3 className="text-xl font-bold text-gray-800 dark:text-gray-100 tracking-tight">Notifications</h3>
                     <button

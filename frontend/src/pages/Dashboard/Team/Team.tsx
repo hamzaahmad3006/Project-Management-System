@@ -1,8 +1,6 @@
 import CreateTeamModal from "components/modals/createTeamModal/CreateTeamModal";
 import { useTeamHook } from "./useTeam";
 import { NavLink, Outlet, useParams } from "react-router-dom";
-
-
 export default function Team() {
     const { team, isCreateTeamOpen, setIsCreateTeamOpen, manualTeamId, setManualTeamId, allTeams } = useTeamHook();
 

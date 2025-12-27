@@ -1,9 +1,13 @@
 import React from 'react';
-import { FaTimes, FaUser, FaRegFlag, FaCalendarAlt, FaLayerGroup, FaPaperclip } from 'react-icons/fa';
+import { FaTimes, FaUser, FaRegFlag, FaCalendarAlt, FaLayerGroup } from 'react-icons/fa';
 import { CreateModalProps } from '../../../types';
-import { Loader } from 'lucide-react';
 import { useCreateTaskHook } from './useCreateTaskHook';
 import { ButtonLoader } from 'components/loader/Loader';
+import SelectField from 'components/ui/inputFields/SelectedForm';
+import InputForm from 'components/ui/inputFields/InputForm';
+import TextAreaForm from 'components/ui/inputFields/TextAreaForm';
+import FileInputForm from 'components/ui/inputFields/FileInputForm';
+import ButtonForm from 'components/ui/buttons/ButtonForm';
 
 const CreateGlobalTaskModal: React.FC<CreateModalProps> = ({ isOpen, onClose }) => {
     const {
@@ -52,119 +56,125 @@ const CreateGlobalTaskModal: React.FC<CreateModalProps> = ({ isOpen, onClose }) 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 bg-blue-50/50 dark:bg-blue-900/10 p-4 rounded-lg border border-blue-100 dark:border-blue-900/30">
                             {/* Project Selector */}
                             <div className="space-y-1.5">
-                                <label className="text-xs uppercase tracking-wider font-bold text-blue-800 dark:text-blue-300 flex items-center gap-2">
-                                    <FaLayerGroup /> Project
-                                </label>
-                                <select
+                                <SelectField
+                                    label="Project"
+                                    name="project"
                                     value={projectId}
                                     onChange={(e) => {
                                         setProjectId(e.target.value);
                                         setAssigneeId(''); // Reset assignee when project changes
                                     }}
-                                    className="w-full px-3 py-2 border border-blue-200 dark:border-blue-800/50 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500/20 bg-white dark:bg-gray-800 text-sm text-gray-800 dark:text-gray-100"
+                                    options={[
+                                        { label: "Select a Project...", value: "" },
+                                        ...projects.map(p => ({ label: p.name, value: p.id }))
+                                    ]}
+                                    icon={<FaLayerGroup size={12} />}
                                     required
-                                >
-                                    <option value="" className="dark:bg-gray-800">Select a Project...</option>
-                                    {projects.map(p => (
-                                        <option key={p.id} value={p.id} className="dark:bg-gray-800">{p.name}</option>
-                                    ))}
-                                </select>
+                                    className="border-blue-200 dark:border-blue-800/50 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100"
+                                    labelClassName="text-xs uppercase tracking-wider font-bold text-blue-800 dark:text-blue-300 flex items-center gap-2"
+                                />
                             </div>
 
                             {/* Assignee Selector (Filtered by Project Team) */}
                             <div className="space-y-1.5">
-                                <label className="text-xs uppercase tracking-wider font-bold text-blue-800 dark:text-blue-300 flex items-center gap-2">
-                                    <FaUser /> Assignee
-                                </label>
-                                <select
+                                <SelectField
+                                    label="Assignee"
+                                    name="assignee"
                                     value={assigneeId}
                                     onChange={(e) => setAssigneeId(e.target.value)}
-                                    className="w-full px-3 py-2 border border-blue-200 dark:border-blue-800/50 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500/20 bg-white dark:bg-gray-800 text-sm text-gray-800 dark:text-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
                                     disabled={!projectId}
-                                >
-                                    <option value="" className="dark:bg-gray-800">
-                                        {!projectId ? 'Select a project first...' : 'Unassigned'}
-                                    </option>
-                                    {projectId && projects.find(p => p.id === projectId)?.team?.members?.map((m: { user: { id: string, name: string } }) => (
-                                        <option key={m.user.id} value={m.user.id} className="dark:bg-gray-800">
-                                            {m.user.name}
-                                        </option>
-                                    ))}
-                                </select>
+                                    options={[
+                                        { label: !projectId ? 'Select a project first...' : 'Unassigned', value: "" },
+                                        ...(projectId ? (projects.find(p => p.id === projectId)?.team?.members || []).map((m: { user: { id: string, name: string } }) => ({
+                                            label: m.user.name,
+                                            value: m.user.id
+                                        })) : [])
+                                    ]}
+                                    icon={<FaUser size={12} />}
+                                    className="border-blue-200 dark:border-blue-800/50 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100"
+                                    labelClassName="text-xs uppercase tracking-wider font-bold text-blue-800 dark:text-blue-300 flex items-center gap-2"
+                                />
                             </div>
                         </div>
 
                         {/* Task Name */}
                         <div className="space-y-1.5">
-                            <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300">Task Name <span className="text-red-500">*</span></label>
-                            <input
-                                type="text"
+                            <InputForm
+                                label="Task Name"
+                                name="taskName"
                                 value={name}
                                 onChange={(e) => setName(e.target.value)}
                                 placeholder="What needs to be done?"
-                                className="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 transition-all text-sm font-medium placeholder-gray-400 dark:placeholder-gray-500"
                                 required
+                                className="border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-medium placeholder-gray-400 dark:placeholder-gray-500"
+                                labelClassName="block text-sm font-semibold text-gray-700 dark:text-gray-300"
                             />
                         </div>
 
                         {/* Description */}
                         <div className="space-y-1.5">
-                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Description</label>
-                            <textarea
+                            <TextAreaForm
+                                label="Description"
+                                name="description"
                                 value={description}
                                 onChange={(e) => setDescription(e.target.value)}
                                 rows={4}
                                 placeholder="Add more details..."
-                                className="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 transition-all resize-none text-sm placeholder-gray-400 dark:placeholder-gray-500"
-                            ></textarea>
+                                className="border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500"
+                                labelClassName="block text-sm font-medium text-gray-700 dark:text-gray-300"
+                            />
                         </div>
 
                         {/* Metadata Grid */}
                         <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                             {/* Status */}
                             <div className="space-y-1.5">
-                                <label className="block text-xs font-semibold text-blue-600 dark:text-blue-400">Board Status</label>
-                                <select
+                                <SelectField
+                                    label="Board Status"
+                                    name="status"
                                     value={status}
                                     onChange={(e) => setStatus(e.target.value as any)}
-                                    className="w-full px-2 py-2 border border-blue-100 dark:border-blue-900/30 rounded-md text-sm bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 focus:border-blue-500"
-                                >
-                                    <option value="TODO" className="dark:bg-gray-800">Backlog (To Do)</option>
-                                    <option value="IN_PROGRESS" className="dark:bg-gray-800">In Progress</option>
-                                    <option value="COMPLETED" className="dark:bg-gray-800">QA (Completed)</option>
-                                    <option value="CANCELED" className="dark:bg-gray-800">Postpone (Canceled)</option>
-                                </select>
+                                    options={[
+                                        { label: "Backlog (To Do)", value: "TODO" },
+                                        { label: "In Progress", value: "IN_PROGRESS" },
+                                        { label: "QA (Completed)", value: "COMPLETED" },
+                                        { label: "Postpone (Canceled)", value: "CANCELED" }
+                                    ]}
+                                    className="border-blue-100 dark:border-blue-900/30 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100"
+                                    labelClassName="block text-xs font-semibold text-blue-600 dark:text-blue-400"
+                                />
                             </div>
 
                             {/* Priority */}
                             <div className="space-y-1.5">
-                                <label className="block text-xs font-semibold text-gray-500 dark:text-gray-400">Priority</label>
-                                <div className="relative">
-                                    <select
-                                        value={priority}
-                                        onChange={(e) => setPriority(e.target.value as any)}
-                                        className="w-full pl-7 pr-2 py-2 border border-gray-300 dark:border-gray-700 rounded-md text-sm bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 appearance-none focus:border-blue-500"
-                                    >
-                                        <option value="LOW" className="dark:bg-gray-800">Low</option>
-                                        <option value="MEDIUM" className="dark:bg-gray-800">Medium</option>
-                                        <option value="HIGH" className="dark:bg-gray-800">High</option>
-                                    </select>
-                                    <FaRegFlag className={`absolute left-2.5 top-2.5 ${priority === 'HIGH' ? 'text-red-500' : priority === 'MEDIUM' ? 'text-yellow-500' : 'text-blue-500'}`} size={12} />
-                                </div>
+                                <SelectField
+                                    label="Priority"
+                                    name="priority"
+                                    value={priority}
+                                    onChange={(e) => setPriority(e.target.value as any)}
+                                    options={[
+                                        { label: "Low", value: "LOW" },
+                                        { label: "Medium", value: "MEDIUM" },
+                                        { label: "High", value: "HIGH" }
+                                    ]}
+                                    icon={<FaRegFlag size={12} className={`${priority === 'HIGH' ? 'text-red-500' : priority === 'MEDIUM' ? 'text-yellow-500' : 'text-blue-500'}`} />}
+                                    className="border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100"
+                                    labelClassName="block text-xs font-semibold text-gray-500 dark:text-gray-400"
+                                />
                             </div>
 
                             {/* Due Date */}
                             <div className="space-y-1.5">
-                                <label className="block text-xs font-semibold text-gray-500 dark:text-gray-400">Due Date</label>
-                                <div className="relative">
-                                    <input
-                                        type="date"
-                                        value={dueDate}
-                                        onChange={(e) => setDueDate(e.target.value)}
-                                        className="w-full pl-7 pr-2 py-2 border border-gray-300 dark:border-gray-700 rounded-md text-sm bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 focus:border-blue-500 [color-scheme:light] dark:[color-scheme:dark]"
-                                    />
-                                    <FaCalendarAlt className="absolute left-2.5 top-2.5 text-gray-400 dark:text-gray-500" size={12} />
-                                </div>
+                                <InputForm
+                                    label="Due Date"
+                                    name="dueDate"
+                                    type="date"
+                                    value={dueDate}
+                                    onChange={(e) => setDueDate(e.target.value)}
+                                    icon={<FaCalendarAlt size={12} />}
+                                    className="border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 [color-scheme:light] dark:[color-scheme:dark]"
+                                    labelClassName="block text-xs font-semibold text-gray-500 dark:text-gray-400"
+                                />
                             </div>
                         </div>
 
@@ -194,24 +204,20 @@ const CreateGlobalTaskModal: React.FC<CreateModalProps> = ({ isOpen, onClose }) 
 
                         {/* Attachments */}
                         <div className="space-y-2 pt-2 border-t border-gray-100 dark:border-gray-800 border-dashed">
-                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Attachments</label>
-                            <div className="flex items-center justify-center w-full">
-                                <label className="flex flex-col items-center justify-center w-full h-24 border-2 border-gray-300 dark:border-gray-700 border-dashed rounded-lg cursor-pointer bg-gray-50 dark:bg-gray-800/50 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
-                                    <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                                        <FaPaperclip className="w-5 h-5 mb-2 text-gray-400 dark:text-gray-500" />
-                                        <p className="text-xs text-gray-500 dark:text-gray-400"><span className="font-semibold">Click to upload</span> or drag and drop</p>
-                                        <p className="text-[10px] text-gray-400 dark:text-gray-600 uppercase tracking-tight">PDF, PNG, JPG (MAX. 10MB)</p>
-                                    </div>
-                                    <input type="file" className="hidden" multiple onChange={handleFileChange} />
-                                </label>
-                            </div>
+                            <FileInputForm
+                                label="Attachments"
+                                onChange={handleFileChange}
+                                className="h-24 flex flex-col items-center justify-center border-dashed"
+                                labelClassName="block text-sm font-medium text-gray-700 dark:text-gray-300"
+                            />
+                            {/* File List Rendering Logic remains handled by FileInputForm or parent if custom rendering needed. For now keeping original file list rendering below as FileInputForm is just the input */}
 
-                            {/* File List */}
+                            {/* File List - Kept manual logical for now as FileInputForm is simple wrapper */}
                             {files.length > 0 && (
                                 <ul className="space-y-1 mt-2">
                                     {files.map((file, idx) => (
                                         <li key={idx} className="flex items-center gap-2 text-xs text-gray-600 dark:text-gray-400 bg-gray-100 dark:bg-gray-800 px-3 py-1.5 rounded-md border border-gray-200 dark:border-gray-700">
-                                            <FaPaperclip size={10} className="text-gray-400" />
+                                            {/* <FaPaperclip size={10} className="text-gray-400" /> */}
                                             <span className="truncate max-w-[200px]">{file.name}</span>
                                             <span className="text-gray-400 dark:text-gray-600 ml-auto">{(file.size / 1024).toFixed(0)} KB</span>
                                         </li>
@@ -225,18 +231,20 @@ const CreateGlobalTaskModal: React.FC<CreateModalProps> = ({ isOpen, onClose }) 
 
                 {/* Footer Actions */}
                 <div className="px-6 py-4 bg-gray-50 dark:bg-gray-800/30 border-t border-gray-100 dark:border-gray-800 flex items-center justify-end gap-3">
-                    <button
+                    <ButtonForm
+                        label="Cancel"
                         onClick={onClose}
-                        className="px-5 py-2 text-sm font-medium text-gray-600 dark:text-gray-400 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-md hover:bg-gray-50 dark:hover:bg-gray-750 transition-colors"
-                    >
-                        Cancel
-                    </button>
-                    <button
+                        variant="secondary"
+                        size="md"
+                        className="px-5 py-2 font-medium"
+                    />
+                    <ButtonForm
+                        label={loading ? <ButtonLoader /> : "Create Task"}
                         onClick={() => document.getElementById('create-task-form')?.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }))}
-                        className="px-6 py-2 text-sm font-bold text-white bg-blue-600 hover:bg-blue-700 rounded-md shadow-sm transition-all transform active:scale-95"
-                    >
-                        {loading ? <ButtonLoader /> : "Create Task"}
-                    </button>
+                        variant="primary"
+                        size="md"
+                        className="px-6 py-2 font-bold shadow-sm"
+                    />
                 </div>
             </div>
         </div>

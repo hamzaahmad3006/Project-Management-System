@@ -3,6 +3,8 @@ import { FaTimes, FaUsers, FaCheck, FaSpinner } from 'react-icons/fa';
 import { CreateModalProps } from '../../../types';
 import { useCreateTeam } from './useCreateTeam';
 import { ButtonLoader } from 'components/loader/Loader';
+import ButtonForm from 'components/ui/buttons/ButtonForm';
+import InputForm from 'components/ui/inputFields/InputForm';
 
 
 const CreateTeamModal: React.FC<CreateModalProps> = ({ isOpen, onClose }) => {
@@ -50,19 +52,17 @@ const CreateTeamModal: React.FC<CreateModalProps> = ({ isOpen, onClose }) => {
 
                     {/* Team Name */}
                     <div className="space-y-1.5">
-                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Team name</label>
-                        <div className="relative">
-                            <input
-                                type="text"
-                                placeholder="e.g. Frontend Team"
-                                className="w-full pl-9 pr-3 py-2 border border-blue-400 dark:border-blue-500/50 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 transition-shadow"
-                                autoFocus
-                                value={teamName}
-                                onChange={(e) => setTeamName(e.target.value)}
-                                disabled={loading || success}
-                            />
-                            <FaUsers size={14} className="absolute left-3 top-3 text-gray-400 dark:text-gray-500" />
-                        </div>
+                        <InputForm
+                            label="Team name"
+                            name='teamName'
+                            placeholder="e.g. Frontend Team"
+                            value={teamName}
+                            icon={<FaUsers size={14} />}
+                            onChange={(e) => setTeamName(e.target.value)}
+                            required
+                            disabled={loading || success}
+                        />
+
                     </div>
 
                     {/* Member Selection */}
@@ -114,22 +114,35 @@ const CreateTeamModal: React.FC<CreateModalProps> = ({ isOpen, onClose }) => {
                         </div>
                     </div>
 
-                    {/* Buttons */}
                     <div className="flex items-center gap-3 pt-2">
-                        <button
+                        <ButtonForm
+                            onClick={handleCreateTeam}
+                            disabled={loading || success || !teamName.trim() || selectedMembers.length === 0}
+                            label={loading ? <ButtonLoader /> : 'Create team'}
+                            variant="primary"
+                            size="md"
+                        />
+                        {/* <button
                             onClick={handleCreateTeam}
                             disabled={loading || success || !teamName.trim() || selectedMembers.length === 0}
                             className="flex-1 px-5 py-2.5 bg-blue-500 text-white text-sm font-bold rounded hover:bg-blue-600 transition-colors shadow-sm disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                         >
                             {loading ? <ButtonLoader /> : 'Create team'}
-                        </button>
-                        <button
+                        </button> */}
+                        <ButtonForm
+                            onClick={onClose}
+                            disabled={loading}
+                            label="Cancel"
+                            variant="secondary"
+                            size="md"
+                        />
+                        {/* <button
                             onClick={onClose}
                             disabled={loading}
                             className="px-5 py-2.5 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-200 text-sm font-medium rounded hover:bg-gray-50 dark:hover:bg-gray-750 transition-colors"
                         >
                             Cancel
-                        </button>
+                        </button> */}
                     </div>
                 </div>
 

@@ -4,6 +4,23 @@ export interface LoaderProps {
     color?: "primary" | "secondary" | "inherit";
 }
 
+//==== InputField Props Interface ====== 
+export interface InputFieldProps {
+    label?: string;
+    type?: string;
+    name: string;
+    id?: string;
+    value: string | number;
+    onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+    placeholder?: string;
+    error?: string;
+    required?: boolean;
+    disabled?: boolean;
+    className?: string;
+    icon?: React.ReactNode;
+    labelClassName?: string;
+}
+
 // ===== All Modals Props ====== 
 export interface CreateModalProps {
     isOpen: boolean;
@@ -104,7 +121,6 @@ export interface Task {
     budget?: number;
     assignedToId?: string;
     assigneeId?: string; // For creation payload
-    subtasks?: string;
     status: TaskStatus;
     priority: TaskPriority;
     dueDate?: string | null;
@@ -115,6 +131,7 @@ export interface Task {
     attachments?: number;
     createdAt?: string;
     comments_list?: Comment[];
+    subtasks?: Subtask[];
 }
 
 export interface Comment {
@@ -128,6 +145,19 @@ export interface Comment {
         name: string;
         avatar?: string;
     };
+    author: {
+        id: string;
+        name: string;
+        avatar?: string;
+    };
+    attachments?: string[];
+}
+
+export interface Subtask {
+    id: string;
+    title: string;
+    completed: boolean;
+    taskId: string;
 }
 
 export interface Section {

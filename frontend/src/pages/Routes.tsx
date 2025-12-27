@@ -2,8 +2,8 @@ import React from "react";
 import { Navigate, Route, Routes } from "react-router-dom";
 import Auth from "./auth";
 import PrivateRoute from "../components/PrivateRoute";
-import Dashboard from "./Dashboard/";
-import InvitationHandler from "./Dashboard/invitationHandler/InvitationHandler";
+import Dashboard from "./dashboard";
+import InvitationHandler from "./dashboard/invitationHandler/InvitationHandler";
 import { useSelector } from "react-redux";
 import { RootState } from "../store/store";
 

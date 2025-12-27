@@ -5,6 +5,7 @@ import { Doughnut, Bar } from 'react-chartjs-2';
 import { DashboardTask } from '../../../types';
 import { useHomeHook } from './useHome';
 import { Loader } from '../../../components/loader/Loader';
+import SelectField from 'components/ui/inputFields/SelectedForm';
 
 ChartJS.register(ArcElement, CategoryScale, LinearScale, PointElement, LineElement, BarElement, Filler, Tooltip, Legend);
 
@@ -34,19 +35,20 @@ const Dashboard: React.FC = () => {
         <div className="p-4 md:p-6 bg-[#FAFAFA] dark:bg-[#12141c] min-h-screen">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
                 <h1 className="text-2xl font-semibold text-gray-900 dark:text-gray-100">Dashboard</h1>
+
                 <div className="flex flex-wrap items-center gap-2 sm:gap-4">
-                    <select
+                    <SelectField
                         value={selectedProjectId}
                         onChange={(e) => handleProjectChange(e.target.value)}
-                        className="px-3 py-2 border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 rounded-lg text-sm outline-none focus:ring-2 focus:ring-blue-500/20 transition-all cursor-pointer min-w-[150px]"
-                    >
-                        <option value="all">All Projects</option>
-                        {projects.map((project) => (
-                            <option key={project.id} value={project.id}>
-                                {project.name}
-                            </option>
-                        ))}
-                    </select>
+                        options={[
+                            { label: "All Projects", value: "all" },
+                            ...projects.map((project) => ({ label: project.name, value: project.id }))
+                        ]}
+                        className="px-3 py-2 border border-blue-900/10 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 rounded-lg text-sm outline-none focus:ring-2 focus:ring-blue-500/20 transition-all cursor-pointer"
+                        containerClassName="w-auto min-w-[150px]"
+                        name="projectSelect"
+                        placeholder=''
+                    />
                     <button className="flex items-center gap-2 px-3 py-2 border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded-lg text-sm hover:bg-gray-50 dark:hover:bg-gray-700 flex-grow md:flex-grow-0 justify-center">
                         <FaFilter size={14} />
                         Filters

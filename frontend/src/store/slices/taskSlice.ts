@@ -1,6 +1,6 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import api from '../../api/axios';
-import { Task, TaskState } from '../../types';
+import { Task, TaskState, Subtask } from '../../types';
 import { AxiosError } from 'axios';
 
 
@@ -81,6 +81,34 @@ export const deleteTask = createAsyncThunk(
     }
 );
 
+// Add Subtask
+export const addSubtask = createAsyncThunk(
+    'tasks/addSubtask',
+    async ({ taskId, title }: { taskId: string; title: string }, { rejectWithValue }) => {
+        try {
+            const response = await api.post<Subtask>(`/tasks/${taskId}/subtasks`, { title });
+            return response.data;
+        } catch (err: unknown) {
+            const error = err as AxiosError<{ message: string }>;
+            return rejectWithValue(error.response?.data?.message || error.message || 'Failed to add subtask');
+        }
+    }
+);
+
+// Toggle Subtask
+export const toggleSubtask = createAsyncThunk(
+    'tasks/toggleSubtask',
+    async ({ subtaskId }: { subtaskId: string }, { rejectWithValue }) => {
+        try {
+            const response = await api.patch<Subtask>(`/tasks/subtasks/${subtaskId}`);
+            return response.data;
+        } catch (err: unknown) {
+            const error = err as AxiosError<{ message: string }>;
+            return rejectWithValue(error.response?.data?.message || error.message || 'Failed to toggle subtask');
+        }
+    }
+);
+
 const taskSlice = createSlice({
     name: 'tasks',
     initialState,
@@ -132,6 +160,34 @@ const taskSlice = createSlice({
             .addCase(fetchTaskById.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.payload as string;
+            })
+            // Add Subtask
+            .addCase(addSubtask.fulfilled, (state, action) => {
+                if (state.currentTask && state.currentTask.id === action.payload.taskId) {
+                    if (!state.currentTask.subtasks) state.currentTask.subtasks = [];
+                    state.currentTask.subtasks.push(action.payload);
+                }
+                const taskInList = state.tasks.find(t => t.id === action.payload.taskId);
+                if (taskInList) {
+                    if (!taskInList.subtasks) taskInList.subtasks = [];
+                    taskInList.subtasks.push(action.payload);
+                }
+            })
+            // Toggle Subtask
+            .addCase(toggleSubtask.fulfilled, (state, action) => {
+                if (state.currentTask) {
+                    const subtask = state.currentTask.subtasks?.find(s => s.id === action.payload.id);
+                    if (subtask) {
+                        subtask.completed = action.payload.completed;
+                    }
+                }
+                const taskInList = state.tasks.find(t => t.id === action.payload.taskId);
+                if (taskInList) {
+                    const subtask = taskInList.subtasks?.find(s => s.id === action.payload.id);
+                    if (subtask) {
+                        subtask.completed = action.payload.completed;
+                    }
+                }
             });
     },
 });

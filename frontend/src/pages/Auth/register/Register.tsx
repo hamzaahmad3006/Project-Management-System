@@ -1,5 +1,7 @@
 import React from 'react';
 import { useRegister } from './useRegister';
+import InputForm from 'components/ui/inputFields/InputForm';
+import SocialAuthButton from 'components/ui/buttons/SocialAuthButton';
 
 
 const Register: React.FC = () => {
@@ -19,31 +21,45 @@ const Register: React.FC = () => {
                 <h2 className="text-center text-2xl font-medium mb-8 text-[#25272D] dark:text-gray-100 uppercase tracking-tight">Sign up</h2>
 
                 {/* Google Button */}
-                <button className="w-full bg-white dark:bg-gray-800 border-solid !border-2 !border-[#E2E4E9] dark:border-gray-700 rounded-md py-2.5 px-4 flex items-center justify-center gap-3 text-sm font-medium text-[#25272D] dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 transition shadow-sm" onClick={handleSinginWithGoogle}>
-                    <img src="/assets/google.png" className="w-4 h-4" alt="Google" />
-                    Continue with Google
-                </button>
+                <SocialAuthButton
+                    label="Continue with Google"
+                    iconSrc="/assets/google.png"
+                    onClick={handleSinginWithGoogle}
+                />
+
 
                 {/* GitHub Button */}
-                <button className="w-full bg-white dark:bg-gray-800 border-solid !border-2 !border-[#E2E4E9] dark:border-gray-700 rounded-md py-2.5 px-4 flex items-center justify-center gap-3 text-sm font-medium text-[#25272D] dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 transition shadow-sm mt-5" onClick={handleSigninWithGithub}>
-                    <img src="/assets/github.png" className="w-4 h-4" alt="GitHub" />
-                    Continue with Github
-                </button>
+                <SocialAuthButton
+                    label="Continue with GitHub"
+                    iconSrc="/assets/github.png"
+                    onClick={handleSigninWithGithub}
+                />
 
                 {/* Figma Button */}
-                <button className="w-full bg-white dark:bg-gray-800 border-solid !border-2 !border-[#E2E4E9] dark:border-gray-700 rounded-md py-2.5 px-4 flex items-center justify-center gap-3 text-sm font-medium text-[#25272D] dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 transition shadow-sm mt-5" onClick={handleSinginWithFigma}>
-                    <img src="/assets/figma.png" className="w-4 h-4" alt="Figma" />
-                    Continue with Figma
-                </button>
+                <SocialAuthButton
+                    label="Continue with Figma"
+                    iconSrc="/assets/figma.png"
+                    onClick={handleSinginWithFigma}
+                />
 
                 {/* Email Section */}
                 <div className="mt-10">
-                    <label className="block text-xs text-[#8F929C] dark:text-gray-500 mb-2 uppercase tracking-wider font-bold">Email</label>
+                    <InputForm
+                        label="Email Address"
+                        name="email"
+                        type="email"
+                        placeholder="name@company.com"
+                        className="py-2.5 px-4 transition-all"
+                        value={""}
+                        onChange={() => { }}
+                        required
+                    />
+                    {/* <label className="block text-xs text-[#8F929C] dark:text-gray-500 mb-2 uppercase tracking-wider font-bold">Email</label>
                     <input
                         type="email"
                         placeholder="Enter your email address..."
                         className="w-full h-[36px] bg-white dark:bg-gray-800 border border-[#E2E4E9] dark:border-gray-700 py-2.5 px-4 text-sm font-medium text-[#25272D] dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-800 transition-all rounded-md"
-                    />
+                    /> */}
                     <p className="text-[11px] text-gray-400 dark:text-gray-500 mt-2.5 leading-relaxed">
                         Use an organization email to easily collaborate with teammates
                     </p>
