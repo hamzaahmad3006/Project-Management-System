@@ -1,8 +1,8 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useAppDispatch, useAppSelector } from '../../../store/hooks';
 import { fetchTasks, createTask as createTaskAction, updateTask, updateTaskStatusOptimistic } from '../../../store/slices/taskSlice';
-import { fetchProjects } from '../../../store/slices/projectSlice';
-import { Task, Section, TaskStatus } from '../../../types';
+import { fetchProjects, setSelectedProjectId } from '../../../store/slices/projectSlice';
+import { Task, Section, TaskStatus, Project } from '../../../types';
 
 export const useProjectBoard = () => {
     const dispatch = useAppDispatch();
@@ -16,7 +16,26 @@ export const useProjectBoard = () => {
 
     // Derive the current project based on global selection
     const currentProject = useMemo(() => {
-        if (selectedProjectId && selectedProjectId !== 'all') {
+        if (selectedProjectId === 'all') {
+            return {
+                id: 'all',
+                name: 'All Projects',
+                status: 'active',
+                description: 'All tasks across all your projects',
+                progress: 0,
+                budget: 0,
+                spent: 0,
+                endDate: new Date().toISOString(),
+                createdAt: new Date().toISOString(),
+                updatedAt: new Date().toISOString(),
+                teamId: '',
+                managerId: '',
+                startDate: new Date().toISOString(),
+                manager: { id: '', name: 'System' },
+                team: { id: '', name: 'All Teams', members: [] }
+            } as Project;
+        }
+        if (selectedProjectId) {
             return projects.find(p => p.id === selectedProjectId) || stateCurrentProject;
         }
         return stateCurrentProject || (projects.length > 0 ? projects[0] : null);
@@ -28,10 +47,10 @@ export const useProjectBoard = () => {
             dispatch(fetchProjects());
         }
 
-        // Use global selectedProjectId if set, otherwise fallback to currentProject
+        // Use global selectedProjectId if set
         const projectIdToFetch = (selectedProjectId && selectedProjectId !== 'all')
             ? selectedProjectId
-            : currentProject?.id;
+            : (selectedProjectId === 'all' ? undefined : currentProject?.id);
 
         dispatch(fetchTasks(projectIdToFetch ? { projectId: projectIdToFetch } : {}));
     }, [dispatch, currentProject?.id, selectedProjectId]); // Note: excluding projects.length to avoid loops, only fetch once if empty
@@ -215,6 +234,10 @@ export const useProjectBoard = () => {
         setCurrentDate(new Date());
     };
 
+    const handleProjectChange = (projectId: string) => {
+        dispatch(setSelectedProjectId(projectId));
+    };
+
     return {
         tasks,
         loading,
@@ -236,6 +259,9 @@ export const useProjectBoard = () => {
         handlePrevMonth,
         handleNextMonth,
         handleGoToToday,
-        currentProject
+        currentProject,
+        projects,
+        selectedProjectId,
+        handleProjectChange
     };
 };

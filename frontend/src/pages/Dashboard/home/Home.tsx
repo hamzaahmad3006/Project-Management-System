@@ -37,18 +37,18 @@ const Dashboard: React.FC = () => {
                 <h1 className="text-2xl font-semibold text-gray-900 dark:text-gray-100">Dashboard</h1>
 
                 <div className="flex flex-wrap items-center gap-2 sm:gap-4">
-                    <SelectField
+                    <select
                         value={selectedProjectId}
                         onChange={(e) => handleProjectChange(e.target.value)}
-                        options={[
-                            { label: "All Projects", value: "all" },
-                            ...projects.map((project) => ({ label: project.name, value: project.id }))
-                        ]}
-                        className="px-3 py-2 border border-blue-900/10 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 rounded-lg text-sm outline-none focus:ring-2 focus:ring-blue-500/20 transition-all cursor-pointer"
-                        containerClassName="w-auto min-w-[150px]"
-                        name="projectSelect"
-                        placeholder=''
-                    />
+                        className="px-3 py-2 border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 rounded-lg text-sm outline-none focus:ring-2 focus:ring-blue-500/20 transition-all cursor-pointer min-w-[150px]"
+                    >
+                        <option value="all">All Projects</option>
+                        {projects.map((project) => (
+                            <option key={project.id} value={project.id}>
+                                {project.name}
+                            </option>
+                        ))}
+                    </select>
                     <button className="flex items-center gap-2 px-3 py-2 border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded-lg text-sm hover:bg-gray-50 dark:hover:bg-gray-700 flex-grow md:flex-grow-0 justify-center">
                         <FaFilter size={14} />
                         Filters

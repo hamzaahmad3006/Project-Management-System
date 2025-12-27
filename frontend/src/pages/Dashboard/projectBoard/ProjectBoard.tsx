@@ -29,8 +29,13 @@ const ProjectBoard: React.FC = () => {
         handlePrevMonth,
         handleNextMonth,
         handleGoToToday,
-        currentProject
+        currentProject,
+        projects,
+        selectedProjectId,
+        handleProjectChange
     } = useProjectBoard();
+
+    const [isProjectSelectorOpen, setIsProjectSelectorOpen] = useState(false);
 
 
     const today = new Date();
@@ -42,9 +47,61 @@ const ProjectBoard: React.FC = () => {
                 <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-4 gap-4">
                     <div className="flex items-center gap-3 w-full md:w-auto justify-between md:justify-start">
                         <div className="flex items-center gap-3">
-                            <h1 className="text-xl md:text-2xl font-bold text-gray-800 dark:text-gray-100">{currentProject?.name || 'Project Board'}</h1>
+                            <h1 className="text-xl md:text-2xl font-bold text-gray-800 dark:text-gray-100">
+                                {currentProject?.name || 'Project Board'}
+                            </h1>
                             <FaStar className="text-yellow-400 cursor-pointer" />
-                            <FaEllipsisH className="text-gray-400 dark:text-gray-500 cursor-pointer" />
+                            <div className="relative">
+                                <FaEllipsisH
+                                    className="text-gray-400 dark:text-gray-500 cursor-pointer hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
+                                    onClick={() => setIsProjectSelectorOpen(!isProjectSelectorOpen)}
+                                />
+
+                                {isProjectSelectorOpen && (
+                                    <>
+                                        <div
+                                            className="fixed inset-0 z-10"
+                                            onClick={() => setIsProjectSelectorOpen(false)}
+                                        ></div>
+                                        <div className="absolute left-0 mt-2 w-56 rounded-md shadow-lg bg-white dark:bg-[#1a1c23] ring-1 ring-black ring-opacity-5 z-20 overflow-hidden border border-gray-100 dark:border-gray-800">
+                                            <div className="py-1" role="menu" aria-orientation="vertical">
+                                                <div className="px-4 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wider bg-gray-50 dark:bg-gray-800/50">
+                                                    Switch Project
+                                                </div>
+                                                <button
+                                                    onClick={() => {
+                                                        handleProjectChange('all');
+                                                        setIsProjectSelectorOpen(false);
+                                                    }}
+                                                    className={`w-full text-left px-4 py-2 text-sm flex items-center justify-between ${selectedProjectId === 'all'
+                                                        ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 font-medium'
+                                                        : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors'
+                                                        }`}
+                                                >
+                                                    All Projects
+                                                    {selectedProjectId === 'all' && <div className="w-1.5 h-1.5 rounded-full bg-blue-600"></div>}
+                                                </button>
+                                                {projects.map((project) => (
+                                                    <button
+                                                        key={project.id}
+                                                        onClick={() => {
+                                                            handleProjectChange(project.id);
+                                                            setIsProjectSelectorOpen(false);
+                                                        }}
+                                                        className={`w-full text-left px-4 py-2 text-sm flex items-center justify-between ${selectedProjectId === project.id
+                                                            ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 font-medium'
+                                                            : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors'
+                                                            }`}
+                                                    >
+                                                        <span className="truncate">{project.name}</span>
+                                                        {selectedProjectId === project.id && <div className="w-1.5 h-1.5 rounded-full bg-blue-600"></div>}
+                                                    </button>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    </>
+                                )}
+                            </div>
                         </div>
                         <span className="md:hidden px-2 py-0.5 text-xs font-medium text-green-700 dark:text-green-400 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center gap-1">
                             <span className="w-1.5 h-1.5 bg-green-500 rounded-full"></span>
