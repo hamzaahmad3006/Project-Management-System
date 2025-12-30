@@ -692,11 +692,6 @@ const ProjectBoard: React.FC = () => {
 
             {/* Create Modal */}
             <CreateProjectModal isOpen={isCreateModalOpen} onClose={() => setIsCreateModalOpen(false)} />
-
-            {/* Task Detail Panel */}
-            {selectedTask && (
-                <TaskDetailPanel task={selectedTask} onClose={() => setSelectedTask(null)} />
-            )}
         </div>
     );
 };

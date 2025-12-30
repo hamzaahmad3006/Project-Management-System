@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { AxiosError } from 'axios';
 import { RootState, AppDispatch } from '../../../store/store';
 import { fetchNotifications, markNotificationAsRead, acceptTeamInvitation, declineTeamInvitation } from '../../../store/slices/notificationSlice';
+import { fetchTaskById, setSelectedTask } from '../../../store/slices/taskSlice';
 import { Notification } from '../../../types';
 import { toast } from 'react-toastify';
 
@@ -46,11 +47,25 @@ export const useNotificationHook = (isOpen: boolean, onClose: () => void) => {
         });
     };
 
+    const handleNotificationClick = async (notif: Notification) => {
+        if (!notif.isRead) {
+            dispatch(markNotificationAsRead(notif.id));
+        }
+
+        if (notif.type === 'NEW_COMMENT' && notif.data?.taskId) {
+            // Set partial task immediately to trigger modal opening
+            dispatch(setSelectedTask({ id: notif.data.taskId } as any));
+            dispatch(fetchTaskById(notif.data.taskId) as any);
+            onClose();
+        }
+    };
+
     return {
         notifications,
         loading,
         handleAccept,
         handleDecline,
-        handleMarkAllAsRead
+        handleMarkAllAsRead,
+        handleNotificationClick
     };
 };

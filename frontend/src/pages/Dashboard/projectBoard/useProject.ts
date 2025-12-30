@@ -1,18 +1,21 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useAppDispatch, useAppSelector } from '../../../store/hooks';
-import { fetchTasks, createTask as createTaskAction, updateTask, updateTaskStatusOptimistic } from '../../../store/slices/taskSlice';
+import { fetchTasks, createTask as createTaskAction, updateTask, updateTaskStatusOptimistic, setSelectedTask as setSelectedTaskAction } from '../../../store/slices/taskSlice';
 import { fetchProjects, setSelectedProjectId } from '../../../store/slices/projectSlice';
 import { Task, Section, TaskStatus, Project } from '../../../types';
 
 export const useProjectBoard = () => {
     const dispatch = useAppDispatch();
-    const { tasks, loading, error } = useAppSelector(state => state.tasks);
+    const { tasks, loading, error, currentTask: selectedTask } = useAppSelector(state => state.tasks);
     const { projects, currentProject: stateCurrentProject, selectedProjectId } = useAppSelector(state => state.projects);
 
     const [activeView, setActiveView] = useState('Board');
     const [collapsedSections, setCollapsedSections] = useState<string[]>(['postpone', 'qa']);
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
-    const [selectedTask, setSelectedTask] = useState<Task | null>(null);
+
+    const setSelectedTask = (task: Task | null) => {
+        dispatch(setSelectedTaskAction(task));
+    };
 
     // Derive the current project based on global selection
     const currentProject = useMemo(() => {

@@ -113,6 +113,9 @@ const taskSlice = createSlice({
     name: 'tasks',
     initialState,
     reducers: {
+        setSelectedTask: (state, action: { payload: Partial<Task> | null }) => {
+            state.currentTask = action.payload as Task | null;
+        },
         clearCurrentTask: (state) => {
             state.currentTask = null;
         },
@@ -192,5 +195,5 @@ const taskSlice = createSlice({
     },
 });
 
-export const { clearCurrentTask, updateTaskStatusOptimistic } = taskSlice.actions;
+export const { clearCurrentTask, updateTaskStatusOptimistic, setSelectedTask } = taskSlice.actions;
 export default taskSlice.reducer;

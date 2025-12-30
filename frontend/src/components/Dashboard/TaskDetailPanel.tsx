@@ -37,7 +37,6 @@ const TaskDetailPanel: React.FC<TaskDetailPanelProps> = ({ task: initialTask, on
             dispatch(fetchComments(initialTask.id));
         }
         return () => {
-            dispatch(clearCurrentTask());
             dispatch(clearComments());
         };
     }, [initialTask?.id, dispatch]);
@@ -88,7 +87,7 @@ const TaskDetailPanel: React.FC<TaskDetailPanelProps> = ({ task: initialTask, on
     if (!task) return null;
 
     return (
-        <div className="fixed inset-y-0 right-0 w-[600px] bg-white dark:bg-[#1a1c23] shadow-2xl transform transition-transform duration-300 ease-in-out z-40 border-l border-gray-200 dark:border-gray-800 flex flex-col hover:overflow-y-auto">
+        <div className="fixed inset-y-0 right-0 w-[600px] bg-white dark:bg-[#1a1c23] shadow-2xl transform transition-transform duration-300 ease-in-out z-[100] border-l border-gray-200 dark:border-gray-800 flex flex-col hover:overflow-y-auto">
             {/* Header Toolbar */}
             <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 dark:border-gray-800">
                 <div className="flex items-center gap-4 text-gray-400 dark:text-gray-500">

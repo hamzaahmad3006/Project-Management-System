@@ -11,8 +11,14 @@ import DashboardTab from 'pages/dashboard/team/DashboardTab'
 import ProjectTab from 'pages/dashboard/team/ProjectTab'
 import MembersTab from 'pages/dashboard/team/MembersTab'
 import FilesTab from 'pages/dashboard/team/FilesTab'
+import TaskDetailPanel from 'components/dashboard/TaskDetailPanel'
+import { useAppDispatch, useAppSelector } from 'store/hooks'
+import { clearCurrentTask } from 'store/slices/taskSlice'
 
 export default function Dashboard() {
+    const dispatch = useAppDispatch();
+    const { currentTask } = useAppSelector(state => state.tasks);
+
     return (
         <div className="flex h-screen overflow-hidden">
             {/* Sidebar */}
@@ -37,6 +43,13 @@ export default function Dashboard() {
                     <Route path="board" element={< ProjectBoard />} />
                 </Routes>
             </div>
+
+            {currentTask && (
+                <TaskDetailPanel
+                    task={currentTask}
+                    onClose={() => dispatch(clearCurrentTask())}
+                />
+            )}
         </div>
     )
 }

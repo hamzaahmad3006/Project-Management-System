@@ -10,7 +10,8 @@ const NotificationPopover: React.FC<NotificationPopoverProps> = ({ isOpen, onClo
         loading,
         handleAccept,
         handleDecline,
-        handleMarkAllAsRead
+        handleMarkAllAsRead,
+        handleNotificationClick
     } = useNotificationHook(isOpen, onClose);
 
     if (!isOpen) return null;
@@ -47,15 +48,27 @@ const NotificationPopover: React.FC<NotificationPopoverProps> = ({ isOpen, onClo
                         </div>
                     ) : (
                         notifications.map((notif: Notification) => (
-                            <div key={notif.id} className="p-5 border-b border-gray-50 dark:border-gray-800/50 hover:bg-gray-50 dark:hover:bg-gray-800/30 transition-colors relative group">
-                                {/* Blue dot for unread */}
+                            <div
+                                key={notif.id}
+                                onClick={() => handleNotificationClick(notif)}
+                                className="p-5 border-b border-gray-50 dark:border-gray-800/50 hover:bg-gray-50 dark:hover:bg-gray-800/30 transition-colors relative group cursor-pointer"
+                            >
+
                                 {!notif.isRead && (
                                     <div className="absolute top-6 right-5 w-2 h-2 bg-blue-500 rounded-full shadow-[0_0_8px_rgba(59,130,246,0.5)]"></div>
                                 )}
 
                                 <div className="flex gap-4">
                                     <div className="w-10 h-10 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center flex-shrink-0 overflow-hidden border border-gray-200 dark:border-gray-700 shadow-sm">
-                                        <FaUserCircle className="text-gray-400 dark:text-gray-500 text-3xl" />
+                                        {(notif.data?.commenterAvatar || notif.data?.senderAvatar) ? (
+                                            <img
+                                                src={notif.data?.commenterAvatar || notif.data?.senderAvatar}
+                                                alt="User"
+                                                className="w-full h-full object-cover"
+                                            />
+                                        ) : (
+                                            <FaUserCircle className="text-gray-400 dark:text-gray-500 text-3xl" />
+                                        )}
                                     </div>
 
                                     <div className="flex-1 space-y-1.5">
