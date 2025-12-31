@@ -13,6 +13,7 @@ import { fetchTasks, createTask as createTaskAction, updateTask, updateTaskStatu
 import { fetchProjects, setSelectedProjectId } from '../../../store/slices/projectSlice';
 import { Task, Section, TaskStatus, Project } from '../../../types';
 import CreateEventModal from '../../../components/modals/createEventModal/CreateEventModal';
+import CreateGlobalTaskModal from '../../../components/modals/createTask/CreateGlobalTaskModal';
 
 
 const ProjectBoard: React.FC = () => {
@@ -49,9 +50,22 @@ const ProjectBoard: React.FC = () => {
     const { user } = useAppSelector(state => state.auth);
     const [isProjectSelectorOpen, setIsProjectSelectorOpen] = useState(false);
     const [isEventModalOpen, setIsEventModalOpen] = useState(false);
+    const [isTaskModalOpen, setIsTaskModalOpen] = useState(false);
+    const [initialTaskStatus, setInitialTaskStatus] = useState<TaskStatus | undefined>(undefined);
 
 
     const today = new Date();
+
+    const getLabelStyles = (label: string) => {
+        const l = label.toLowerCase();
+        if (l.includes('design')) return 'bg-emerald-50 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400';
+        if (l.includes('dev') || l.includes('code') || l.includes('frontend') || l.includes('backend')) return 'bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400';
+        if (l.includes('bug') || l.includes('fix') || l.includes('issue')) return 'bg-red-50 text-red-700 dark:bg-red-900/30 dark:text-red-400';
+        if (l.includes('feat') || l.includes('feature')) return 'bg-indigo-50 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-400';
+        if (l.includes('plan') || l.includes('marketing')) return 'bg-purple-50 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400';
+        if (l.includes('api')) return 'bg-orange-50 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400';
+        return 'bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400';
+    };
 
     return (
         <div className="flex flex-col h-full bg-white dark:bg-[#12141c]">
@@ -155,13 +169,18 @@ const ProjectBoard: React.FC = () => {
                             <button className="px-3 py-1.5 text-sm font-medium text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded hover:bg-gray-50 dark:hover:bg-gray-750 transition-colors">
                                 Share
                             </button>
-                            <button
-                                onClick={() => setIsCreateModalOpen(true)}
-                                className="px-3 py-1.5 text-sm font-medium text-white bg-blue-600 rounded hover:bg-blue-700 flex items-center gap-2"
-                            >
-                                Create
-                                <FaChevronDown size={10} />
-                            </button>
+                            {user?.role === 'MANAGER' && (
+                                <button
+                                    onClick={() => {
+                                        setInitialTaskStatus('TODO');
+                                        setIsTaskModalOpen(true);
+                                    }}
+                                    className="px-3 py-1.5 text-sm font-medium text-white bg-blue-600 rounded hover:bg-blue-700 flex items-center gap-2"
+                                >
+                                    Create Task
+                                    <FaPlus size={10} />
+                                </button>
+                            )}
                         </div>
                     </div>
                 </div>
@@ -182,9 +201,17 @@ const ProjectBoard: React.FC = () => {
                                 {view}
                             </button>
                         ))}
-                        <button className="flex items-center gap-2 pb-2 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300">
-                            <FaPlus size={12} /> Add
-                        </button>
+                        {user?.role === 'MANAGER' && (
+                            <button
+                                onClick={() => {
+                                    setInitialTaskStatus('TODO');
+                                    setIsTaskModalOpen(true);
+                                }}
+                                className="flex items-center gap-2 pb-2 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"
+                            >
+                                <FaPlus size={12} /> Add Task
+                            </button>
+                        )}
                     </div>
 
                     <div className="flex items-center gap-3 text-sm text-gray-600 dark:text-gray-400 min-w-max md:w-auto">
@@ -250,7 +277,22 @@ const ProjectBoard: React.FC = () => {
                                                         <h3 className="font-semibold text-gray-800 dark:text-gray-100">{section.title}</h3>
                                                         <span className="text-gray-400 dark:text-gray-500 text-sm">{section.count}</span>
                                                         <div className="ml-auto flex gap-2 text-gray-400 dark:text-gray-500">
-                                                            <FaPlus size={12} className="cursor-pointer hover:text-gray-600 dark:hover:text-gray-300" />
+                                                            {user?.role === 'MANAGER' && (
+                                                                <FaPlus
+                                                                    size={12}
+                                                                    className="cursor-pointer hover:text-gray-600 dark:hover:text-gray-300"
+                                                                    onClick={() => {
+                                                                        const statusMap: Record<string, TaskStatus> = {
+                                                                            'backlog': 'TODO',
+                                                                            'inprogress': 'IN_PROGRESS',
+                                                                            'qa': 'COMPLETED',
+                                                                            'postpone': 'CANCELED'
+                                                                        };
+                                                                        setInitialTaskStatus(statusMap[section.id] || 'TODO');
+                                                                        setIsTaskModalOpen(true);
+                                                                    }}
+                                                                />
+                                                            )}
                                                             <FaEllipsisH size={12} className="cursor-pointer hover:text-gray-600 dark:hover:text-gray-300" />
                                                         </div>
                                                     </div>
@@ -276,12 +318,7 @@ const ProjectBoard: React.FC = () => {
                                                                                 {task.label?.map((lbl, i) => (
                                                                                     <span
                                                                                         key={i}
-                                                                                        className={`px-1.5 py-0.5 text-[10px] font-medium rounded 
-                                                                                            ${lbl === 'design' ? 'bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400' :
-                                                                                                lbl === 'bug' ? 'bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400' :
-                                                                                                    lbl === 'API' ? 'bg-orange-50 dark:bg-orange-900/30 text-orange-600 dark:text-orange-400' :
-                                                                                                        lbl === 'plan' ? 'bg-yellow-50 dark:bg-yellow-900/30 text-yellow-600 dark:text-yellow-400' :
-                                                                                                            'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400'}`}
+                                                                                        className={`px-1.5 py-0.5 text-[10px] font-medium rounded ${getLabelStyles(lbl)}`}
                                                                                     >
                                                                                         {lbl}
                                                                                     </span>
@@ -313,7 +350,7 @@ const ProjectBoard: React.FC = () => {
                                                                                 )}
                                                                                 {task.dueDate && (
                                                                                     <div className="text-[10px] text-gray-400 dark:text-gray-500">
-                                                                                        {task.dueDate}
+                                                                                        {new Date(task.dueDate).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}
                                                                                     </div>
                                                                                 )}
                                                                             </div>
@@ -324,12 +361,23 @@ const ProjectBoard: React.FC = () => {
                                                         ))}
                                                         {provided.placeholder}
                                                         {/* Add Task Button */}
-                                                        <button
-                                                            onClick={() => handleAddTask("New Task", section.id)}
-                                                            className="flex items-center gap-2 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 text-sm py-1 w-full transition-colors"
-                                                        >
-                                                            <FaPlus size={12} /> Add task
-                                                        </button>
+                                                        {user?.role === 'MANAGER' && (
+                                                            <button
+                                                                onClick={() => {
+                                                                    const statusMap: Record<string, TaskStatus> = {
+                                                                        'backlog': 'TODO',
+                                                                        'inprogress': 'IN_PROGRESS',
+                                                                        'qa': 'COMPLETED',
+                                                                        'postpone': 'CANCELED'
+                                                                    };
+                                                                    setInitialTaskStatus(statusMap[section.id] || 'TODO');
+                                                                    setIsTaskModalOpen(true);
+                                                                }}
+                                                                className="flex items-center gap-2 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 text-sm py-1 w-full transition-colors"
+                                                            >
+                                                                <FaPlus size={12} /> Add task
+                                                            </button>
+                                                        )}
                                                     </div>
                                                 </>
                                             )}
@@ -340,9 +388,11 @@ const ProjectBoard: React.FC = () => {
                             ))}
 
                             {/* Add Section Button */}
-                            <button className="flex items-center gap-2 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 text-sm font-medium pt-1 whitespace-nowrap transition-colors">
-                                <FaPlus size={12} /> Add section
-                            </button>
+                            {user?.role === 'MANAGER' && (
+                                <button className="flex items-center gap-2 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 text-sm font-medium pt-1 whitespace-nowrap transition-colors">
+                                    <FaPlus size={12} /> Add section
+                                </button>
+                            )}
                         </div>
                     </DragDropContext>
                 ) : activeView === 'Calendar' ? (
@@ -448,7 +498,7 @@ const ProjectBoard: React.FC = () => {
                                     </button>
 
                                     <div className={`w-2 h-2 rounded-full ${section.id === 'postpone' ? 'bg-red-400' :
-                                        section.id === 'done' ? 'bg-green-400' :
+                                        section.id === 'qa' ? 'bg-green-400' :
                                             section.id === 'inprogress' ? 'bg-blue-400' : 'bg-gray-400'
                                         }`}></div>
 
@@ -461,12 +511,23 @@ const ProjectBoard: React.FC = () => {
                                         <button className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
                                             <FaEllipsisH size={10} />
                                         </button>
-                                        <button
-                                            onClick={() => handleAddTask("New Task", section.id)}
-                                            className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
-                                        >
-                                            <FaPlus size={10} />
-                                        </button>
+                                        {user?.role === 'MANAGER' && (
+                                            <button
+                                                onClick={() => {
+                                                    const statusMap: Record<string, TaskStatus> = {
+                                                        'backlog': 'TODO',
+                                                        'inprogress': 'IN_PROGRESS',
+                                                        'qa': 'COMPLETED',
+                                                        'postpone': 'CANCELED'
+                                                    };
+                                                    setInitialTaskStatus(statusMap[section.id] || 'TODO');
+                                                    setIsTaskModalOpen(true);
+                                                }}
+                                                className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+                                            >
+                                                <FaPlus size={10} />
+                                            </button>
+                                        )}
                                     </div>
                                 </div>
 
@@ -527,47 +588,63 @@ const ProjectBoard: React.FC = () => {
 
                                                 {/* Due Date Column */}
                                                 <div className="w-32 text-xs text-gray-500 dark:text-gray-400 py-2 pl-4 border-r border-gray-100 dark:border-gray-800/50">
-                                                    {task.dueDate ? new Date(task.dueDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '-'}
+                                                    {task.dueDate ? new Date(task.dueDate).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }) : '-'}
                                                 </div>
 
                                                 {/* Labels Column */}
                                                 <div className="w-40 flex flex-wrap gap-1.5 py-2 pl-4 border-r border-gray-100 dark:border-gray-800/50">
-                                                    {task.label?.map((lbl, idx) => {
-                                                        const colors: Record<string, string> = {
-                                                            design: 'bg-indigo-50 text-indigo-600 dark:bg-indigo-900/30 dark:text-indigo-300',
-                                                            bug: 'bg-rose-50 text-rose-600 dark:bg-rose-900/30 dark:text-rose-300',
-                                                            mobile: 'bg-orange-50 text-orange-600 dark:bg-orange-900/30 dark:text-orange-300',
-                                                            api: 'bg-emerald-50 text-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-300',
-                                                            plan: 'bg-yellow-50 text-yellow-600 dark:bg-yellow-900/30 dark:text-yellow-300'
-                                                        };
-                                                        const defaultColor = 'bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400';
-
-                                                        return (
-                                                            <span
-                                                                key={idx}
-                                                                className={`px-2 py-0.5 text-[11px] rounded ${colors[lbl.toLowerCase()] || defaultColor}`}
-                                                            >
-                                                                {lbl}
-                                                            </span>
-                                                        );
-                                                    })}
+                                                    {task.label?.map((lbl, idx) => (
+                                                        <span
+                                                            key={idx}
+                                                            className={`px-2 py-0.5 text-[11px] rounded ${getLabelStyles(lbl)}`}
+                                                        >
+                                                            {lbl}
+                                                        </span>
+                                                    ))}
                                                 </div>
 
                                                 {/* Action Column */}
                                                 <div className="w-10 flex justify-center opacity-0 group-hover/row:opacity-100 transition-opacity py-2">
-                                                    <FaPlus className="text-gray-400 hover:text-gray-600 cursor-pointer" size={10} />
+                                                    {user?.role === 'MANAGER' && (
+                                                        <FaPlus
+                                                            className="text-gray-400 hover:text-gray-600 cursor-pointer"
+                                                            size={10}
+                                                            onClick={(e) => {
+                                                                e.stopPropagation();
+                                                                const statusMap: Record<string, TaskStatus> = {
+                                                                    'backlog': 'TODO',
+                                                                    'inprogress': 'IN_PROGRESS',
+                                                                    'qa': 'COMPLETED',
+                                                                    'postpone': 'CANCELED'
+                                                                };
+                                                                setInitialTaskStatus(statusMap[section.id] || 'TODO');
+                                                                setIsTaskModalOpen(true);
+                                                            }}
+                                                        />
+                                                    )}
                                                 </div>
                                             </div>
                                         ))}
 
                                         {/* New Task Input Placeholder */}
-                                        <div
-                                            className="flex items-center gap-3 px-4 py-2 opacity-0 group-hover/section:opacity-100 hover:bg-gray-50 dark:hover:bg-gray-800/30 transition-all cursor-pointer text-gray-400 hover:text-gray-600"
-                                            onClick={() => handleAddTask("New Task", section.id)}
-                                        >
-                                            <FaPlus size={12} />
-                                            <span className="text-sm">New</span>
-                                        </div>
+                                        {user?.role === 'MANAGER' && (
+                                            <div
+                                                className="flex items-center gap-3 px-4 py-2 opacity-0 group-hover/section:opacity-100 hover:bg-gray-50 dark:hover:bg-gray-800/30 transition-all cursor-pointer text-gray-400 hover:text-gray-600"
+                                                onClick={() => {
+                                                    const statusMap: Record<string, TaskStatus> = {
+                                                        'backlog': 'TODO',
+                                                        'inprogress': 'IN_PROGRESS',
+                                                        'qa': 'COMPLETED',
+                                                        'postpone': 'CANCELED'
+                                                    };
+                                                    setInitialTaskStatus(statusMap[section.id] || 'TODO');
+                                                    setIsTaskModalOpen(true);
+                                                }}
+                                            >
+                                                <FaPlus size={12} />
+                                                <span className="text-sm">New</span>
+                                            </div>
+                                        )}
                                     </>
                                 )}
                             </div>
@@ -757,6 +834,12 @@ const ProjectBoard: React.FC = () => {
             {/* Modals */}
             <CreateProjectModal isOpen={isCreateModalOpen} onClose={() => setIsCreateModalOpen(false)} />
             <CreateEventModal isOpen={isEventModalOpen} onClose={() => setIsEventModalOpen(false)} />
+            <CreateGlobalTaskModal
+                isOpen={isTaskModalOpen}
+                onClose={() => setIsTaskModalOpen(false)}
+                initialStatus={initialTaskStatus}
+                initialProjectId={currentProject?.id}
+            />
         </div>
     );
 };

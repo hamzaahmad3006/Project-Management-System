@@ -1,8 +1,8 @@
-import React, { useEffect, useState, useMemo } from 'react';
-
+import React from 'react';
 import CreateGlobalTaskModal from '../../../components/modals/createTask/CreateGlobalTaskModal';
 import { useTasks } from './useTasks';
-import { TaskStatus } from '../../../types';
+import { useAppSelector } from 'store/hooks';
+import { RootState } from 'store/store';
 import {
     FaSearch, FaPlus, FaFilter, FaSortAmountDown, FaThLarge, FaList,
     FaEllipsisH, FaPaperclip, FaCheckSquare, FaCalendarAlt, FaFlag,
@@ -12,6 +12,7 @@ import {
 
 const Tasks: React.FC = () => {
     const { tasks, loading, viewMode, isCreateModalOpen, searchTerm, filteredTasks, columns, handleDragEnd, setViewMode, setIsCreateModalOpen, setSearchTerm, DragDropContext, Droppable, Draggable } = useTasks();
+    const { user } = useAppSelector((state: RootState) => state.auth);
 
     if (loading && tasks.length === 0) {
         return (
@@ -62,12 +63,14 @@ const Tasks: React.FC = () => {
                                 <FaSortAmountDown size={12} /> Sort By
                             </button>
 
-                            <button
-                                onClick={() => setIsCreateModalOpen(true)}
-                                className="flex items-center gap-2 px-4 py-2 text-sm font-semibold text-white bg-blue-600 rounded-lg hover:bg-blue-700 shadow-sm shadow-blue-200"
-                            >
-                                <FaPlus size={12} /> New Task
-                            </button>
+                            {user?.role === 'MANAGER' && (
+                                <button
+                                    onClick={() => setIsCreateModalOpen(true)}
+                                    className="flex items-center gap-2 px-4 py-2 text-sm font-semibold text-white bg-blue-600 rounded-lg hover:bg-blue-700 shadow-sm shadow-blue-200"
+                                >
+                                    <FaPlus size={12} /> New Task
+                                </button>
+                            )}
                         </div>
                     </div>
                 </div>
@@ -92,7 +95,14 @@ const Tasks: React.FC = () => {
                                                 <span className="text-xs font-semibold text-gray-400 dark:text-gray-500 bg-gray-200 dark:bg-gray-800 px-2 py-0.5 rounded-full">{col.items.length}</span>
                                             </div>
                                             <div className="flex gap-2 text-gray-400 dark:text-gray-600">
-                                                <button className="hover:text-gray-500 dark:hover:text-gray-400"><FaPlus size={12} /></button>
+                                                {user?.role === 'MANAGER' && (
+                                                    <button
+                                                        onClick={() => setIsCreateModalOpen(true)}
+                                                        className="hover:text-gray-500 dark:hover:text-gray-400"
+                                                    >
+                                                        <FaPlus size={12} />
+                                                    </button>
+                                                )}
                                                 <button className="hover:text-gray-500 dark:hover:text-gray-400"><FaEllipsisH size={12} /></button>
                                             </div>
                                         </div>
@@ -188,12 +198,14 @@ const Tasks: React.FC = () => {
                                             {provided.placeholder}
 
                                             {/* Add Card Ghost Button */}
-                                            <button
-                                                onClick={() => setIsCreateModalOpen(true)}
-                                                className="w-full py-2 bg-transparent border border-dashed border-gray-300 dark:border-gray-700 rounded-lg text-gray-400 dark:text-gray-500 text-sm hover:border-blue-400 dark:hover:border-blue-500 hover:text-blue-500 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/10 transition-all flex items-center justify-center gap-2 mt-2"
-                                            >
-                                                <FaPlus size={10} /> New Task
-                                            </button>
+                                            {user?.role === 'MANAGER' && (
+                                                <button
+                                                    onClick={() => setIsCreateModalOpen(true)}
+                                                    className="w-full py-2 bg-transparent border border-dashed border-gray-300 dark:border-gray-700 rounded-lg text-gray-400 dark:text-gray-500 text-sm hover:border-blue-400 dark:hover:border-blue-500 hover:text-blue-500 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/10 transition-all flex items-center justify-center gap-2 mt-2"
+                                                >
+                                                    <FaPlus size={10} /> New Task
+                                                </button>
+                                            )}
                                         </div>
                                     </div>
                                 )}

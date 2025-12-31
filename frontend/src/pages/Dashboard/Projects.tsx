@@ -7,6 +7,7 @@ import { FaPlus, FaCalendar, FaMoneyBillWave } from 'react-icons/fa';
 const Projects: React.FC = () => {
     const dispatch = useDispatch<AppDispatch>();
     const { projects, loading } = useSelector((state: RootState) => state.projects);
+    const { user } = useSelector((state: RootState) => state.auth);
 
     useEffect(() => {
         dispatch(fetchProjects());
@@ -16,9 +17,11 @@ const Projects: React.FC = () => {
         <div className="space-y-6 container mx-auto p-6">
             <div className="flex justify-between items-center">
                 <h1 className="text-2xl font-bold text-gray-800 dark:text-gray-100">Projects</h1>
-                <button className="bg-indigo-600 text-white px-4 py-2 rounded flex items-center gap-2 hover:bg-indigo-700">
-                    <FaPlus /> New Project
-                </button>
+                {user?.role === 'MANAGER' && (
+                    <button className="bg-indigo-600 text-white px-4 py-2 rounded flex items-center gap-2 hover:bg-indigo-700">
+                        <FaPlus /> New Project
+                    </button>
+                )}
             </div>
 
             {loading ? (

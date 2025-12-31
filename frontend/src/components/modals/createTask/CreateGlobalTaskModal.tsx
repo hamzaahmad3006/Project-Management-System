@@ -9,7 +9,7 @@ import TextAreaForm from 'components/ui/inputFields/TextAreaForm';
 import FileInputForm from 'components/ui/inputFields/FileInputForm';
 import ButtonForm from 'components/ui/buttons/ButtonForm';
 
-const CreateGlobalTaskModal: React.FC<CreateModalProps> = ({ isOpen, onClose }) => {
+const CreateGlobalTaskModal: React.FC<CreateModalProps> = ({ isOpen, onClose, initialStatus, initialProjectId }) => {
     const {
         projects,
         name,
@@ -32,7 +32,7 @@ const CreateGlobalTaskModal: React.FC<CreateModalProps> = ({ isOpen, onClose }) 
         loading,
         handleFileChange,
         handleSubmit
-    } = useCreateTaskHook(isOpen, onClose);
+    } = useCreateTaskHook(isOpen, onClose, initialStatus, initialProjectId);
 
     if (!isOpen) return null;
 

@@ -4,6 +4,10 @@ export interface LoaderProps {
     color?: "primary" | "secondary" | "inherit";
 }
 
+//==== Common Types ======
+export type TaskStatus = 'TODO' | 'IN_PROGRESS' | 'COMPLETED' | 'CANCELED';
+export type TaskPriority = 'LOW' | 'MEDIUM' | 'HIGH';
+
 //==== InputField Props Interface ====== 
 export interface InputFieldProps {
     label?: string;
@@ -25,6 +29,8 @@ export interface InputFieldProps {
 export interface CreateModalProps {
     isOpen: boolean;
     onClose: () => void;
+    initialStatus?: TaskStatus;
+    initialProjectId?: string;
 }
 
 //==== SearchModalProps Interface ====== 
@@ -109,8 +115,6 @@ export interface AuthResponse {
 }
 
 //===== Project.tsx Interface ======
-export type TaskStatus = 'TODO' | 'IN_PROGRESS' | 'COMPLETED' | 'CANCELED';
-export type TaskPriority = 'LOW' | 'MEDIUM' | 'HIGH';
 
 export interface Task {
     id: string;

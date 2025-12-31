@@ -5,7 +5,7 @@ import { useCreateTask } from './useCreateTask';
 import { ButtonLoader } from 'components/loader/Loader';
 
 
-const CreateTaskModal: React.FC<CreateModalProps> = ({ isOpen, onClose }) => {
+const CreateTaskModal: React.FC<CreateModalProps> = ({ isOpen, onClose, initialStatus }) => {
     const {
         projects,
         name,
@@ -29,7 +29,7 @@ const CreateTaskModal: React.FC<CreateModalProps> = ({ isOpen, onClose }) => {
         labels,
         setLabels,
         handleSubmit
-    } = useCreateTask(onClose);
+    } = useCreateTask(onClose, initialStatus);
 
     if (!isOpen) return null;
 

@@ -63,7 +63,7 @@ const Sidebar: React.FC = () => {
             <aside
                 className={`
                     fixed md:sticky top-0 h-screen bg-[#FAFAFA] dark:bg-[#1a1c23] border-r border-gray-200 dark:border-gray-800
-                    transition-all duration-300 z-40
+                    transition-all duration-300 z-40 flex flex-col
                     ${isOpen ? 'w-64' : 'w-20'}
                     ${isMobileOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}
                 `}
@@ -88,7 +88,7 @@ const Sidebar: React.FC = () => {
                 </div>
 
 
-                <nav className="p-3 space-y-1">
+                <nav className="flex-1 overflow-y-auto no-scrollbar p-3 space-y-1">
                     <div
                         onClick={() => setIsSearchOpen(true)}
                         className={`flex items-center gap-3 px-3 py-2 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-800 rounded cursor-pointer ${!isOpen && 'justify-center'}`}
@@ -139,12 +139,14 @@ const Sidebar: React.FC = () => {
                         <>
                             <div className="pt-4 pb-2 px-3 flex items-center justify-between group">
                                 <span className="text-xs font-semibold text-gray-500 uppercase">Teamspaces</span>
-                                <div
-                                    className="p-1 hover:bg-gray-200 rounded cursor-pointer"
-                                    onClick={() => setIsCreateTeamOpen(true)}
-                                >
-                                    <FaPlus size={10} className="text-gray-500" />
-                                </div>
+                                {isManager && (
+                                    <div
+                                        className="p-1 hover:bg-gray-200 rounded cursor-pointer"
+                                        onClick={() => setIsCreateTeamOpen(true)}
+                                    >
+                                        <FaPlus size={10} className="text-gray-500" />
+                                    </div>
+                                )}
                             </div>
 
                             {/* Mobile App Section */}
@@ -176,7 +178,7 @@ const Sidebar: React.FC = () => {
                                                 Team
                                             </div>
                                             {isTeamSubExpanded && (
-                                                <div className="ml-4 mt-1 space-y-1 border-l border-gray-100 dark:border-gray-800">
+                                                <div className="ml-4 mt-1 space-y-1 border-l border-gray-100 dark:border-gray-800 max-h-[200px] overflow-y-auto no-scrollbar">
                                                     {allTeams.map(team => (
                                                         <NavLink
                                                             key={team.id}
@@ -227,7 +229,7 @@ const Sidebar: React.FC = () => {
                                                 Projects
                                             </div>
                                             {isProjectSubExpanded && (
-                                                <div className="ml-4 mt-1 space-y-1 border-l border-gray-100 dark:border-gray-800">
+                                                <div className="ml-4 mt-1 space-y-1 border-l border-gray-100 dark:border-gray-800 max-h-[200px] overflow-y-auto no-scrollbar">
                                                     {projects.map(project => (
                                                         <NavLink
                                                             key={project.id}
@@ -256,7 +258,7 @@ const Sidebar: React.FC = () => {
                 </nav>
 
 
-                <div className="absolute bottom-0 w-full border-t border-gray-200 p-3 space-y-1">
+                <div className="mt-auto w-full border-t border-gray-200 dark:border-gray-800 p-3 space-y-1 bg-[#FAFAFA] dark:bg-[#1a1c23]">
                     {isOpen && isManager && (
                         <div
                             onClick={() => setIsInviteOpen(true)}

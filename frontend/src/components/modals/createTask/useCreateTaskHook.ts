@@ -4,18 +4,18 @@ import { createTask } from '../../../store/slices/taskSlice';
 import { fetchProjects } from '../../../store/slices/projectSlice';
 import { TaskPriority, TaskStatus } from '../../../types';
 
-export const useCreateTaskHook = (isOpen: boolean, onClose: () => void) => {
+export const useCreateTaskHook = (isOpen: boolean, onClose: () => void, initialStatus?: TaskStatus, initialProjectId?: string) => {
     const dispatch = useAppDispatch();
     const { projects } = useAppSelector((state) => state.projects);
 
     // Form State
     const [name, setName] = useState('');
     const [description, setDescription] = useState('');
-    const [status, setStatus] = useState<TaskStatus>('TODO');
+    const [status, setStatus] = useState<TaskStatus>(initialStatus || 'TODO');
     const [priority, setPriority] = useState<TaskPriority>('MEDIUM');
     const [dueDate, setDueDate] = useState('');
     const [assigneeId, setAssigneeId] = useState('');
-    const [projectId, setProjectId] = useState('');
+    const [projectId, setProjectId] = useState(initialProjectId || '');
     const [sectionId, setSectionId] = useState('');
     const [files, setFiles] = useState<File[]>([]);
     const [labels, setLabels] = useState<string[]>([]);
@@ -26,6 +26,18 @@ export const useCreateTaskHook = (isOpen: boolean, onClose: () => void) => {
             dispatch(fetchProjects());
         }
     }, [isOpen, dispatch]);
+
+    useEffect(() => {
+        if (initialStatus) {
+            setStatus(initialStatus);
+        }
+    }, [initialStatus]);
+
+    useEffect(() => {
+        if (initialProjectId) {
+            setProjectId(initialProjectId);
+        }
+    }, [initialProjectId]);
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files) {

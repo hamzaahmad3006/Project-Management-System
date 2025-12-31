@@ -5,14 +5,21 @@ import { createTask } from '../../../store/slices/taskSlice';
 import { fetchProjects } from '../../../store/slices/projectSlice';
 import { TeamMember, TaskStatus, TaskPriority } from "../../../types";
 
-export const useCreateTask = (onClose: () => void) => {
+export const useCreateTask = (onClose: () => void, initialStatus?: TaskStatus) => {
     const dispatch = useAppDispatch();
     const projects = useAppSelector(state => state.projects.projects);
     const currentUser = useAppSelector(state => state.auth.user);
 
     const [name, setName] = useState('');
     const [description, setDescription] = useState('');
-    const [status, setStatus] = useState<TaskStatus>('TODO');
+    const [status, setStatus] = useState<TaskStatus>(initialStatus || 'TODO');
+
+    // Update status if initialStatus changes (modal reopened with different column)
+    useEffect(() => {
+        if (initialStatus) {
+            setStatus(initialStatus);
+        }
+    }, [initialStatus]);
     const [priority, setPriority] = useState<TaskPriority>('MEDIUM');
     const [dueDate, setDueDate] = useState('');
     const [assigneeId, setAssigneeId] = useState('');

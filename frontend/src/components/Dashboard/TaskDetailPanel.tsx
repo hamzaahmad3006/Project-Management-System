@@ -162,15 +162,14 @@ const TaskDetailPanel: React.FC<TaskDetailPanelProps> = ({ task: initialTask, on
                     <div className="flex flex-wrap gap-2">
                         {(task.label?.length ? task.label : []).map((lbl: string, idx: number) => {
                             const colors: Record<string, string> = {
-                                design: 'bg-indigo-50 text-indigo-600 dark:bg-indigo-900/30 dark:text-indigo-300',
-                                bug: 'bg-rose-50 text-rose-600 dark:bg-rose-900/30 dark:text-rose-300',
-                                mobile: 'bg-orange-50 text-orange-600 dark:bg-orange-900/30 dark:text-orange-300',
-                                api: 'bg-emerald-50 text-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-300',
-                                plan: 'bg-yellow-50 text-yellow-600 dark:bg-yellow-900/30 dark:text-yellow-300',
-                                development: 'bg-blue-50 text-blue-600 dark:bg-blue-900/30 dark:text-blue-300',
-                                marketing: 'bg-purple-50 text-purple-600 dark:bg-purple-900/30 dark:text-purple-300',
-                                feature: 'bg-cyan-50 text-cyan-600 dark:bg-cyan-900/30 dark:text-cyan-300',
-                                urgent: 'bg-red-50 text-red-600 dark:bg-red-900/30 dark:text-red-300'
+                                design: 'bg-emerald-50 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400',
+                                development: 'bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400',
+                                bug: 'bg-red-50 text-red-700 dark:bg-red-900/30 dark:text-red-400',
+                                api: 'bg-orange-50 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400',
+                                plan: 'bg-purple-50 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400',
+                                marketing: 'bg-purple-50 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400',
+                                feature: 'bg-indigo-50 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-400',
+                                urgent: 'bg-rose-50 text-rose-700 dark:bg-rose-900/30 dark:text-rose-400'
                             };
                             const defaultColor = 'bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400';
 
