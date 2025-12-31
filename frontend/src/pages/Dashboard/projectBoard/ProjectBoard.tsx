@@ -2,12 +2,18 @@ import React, { useState } from 'react';
 import {
     FaStar, FaEllipsisH, FaSearch, FaFilter, FaSort, FaList,
     FaTh, FaCalendarAlt, FaStream, FaPlus, FaChevronDown, FaChevronRight, FaChevronLeft,
-    FaRegCheckCircle, FaRegComment, FaPaperclip, FaUserCircle
+    FaRegCheckCircle, FaRegComment, FaPaperclip, FaUserCircle, FaTimes, FaBell, FaThLarge, FaUserPlus, FaLayerGroup
 } from 'react-icons/fa';
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
 import CreateProjectModal from '../../../components/modals/createProjectModal/CreateProjectModal';
 import TaskDetailPanel from '../../../components/dashboard/TaskDetailPanel';
 import { useProjectBoard } from './useProject';
+import { useAppDispatch, useAppSelector } from '../../../store/hooks';
+import { fetchTasks, createTask as createTaskAction, updateTask, updateTaskStatusOptimistic, setSelectedTask as setSelectedTaskAction, clearCurrentTask } from '../../../store/slices/taskSlice';
+import { fetchProjects, setSelectedProjectId } from '../../../store/slices/projectSlice';
+import { Task, Section, TaskStatus, Project } from '../../../types';
+import CreateEventModal from '../../../components/modals/createEventModal/CreateEventModal';
+
 
 const ProjectBoard: React.FC = () => {
     const {
@@ -28,14 +34,21 @@ const ProjectBoard: React.FC = () => {
         calendarDays,
         handlePrevMonth,
         handleNextMonth,
+        handlePrevDay,
+        handleNextDay,
         handleGoToToday,
         currentProject,
         projects,
         selectedProjectId,
-        handleProjectChange
+        handleProjectChange,
+        meetings,
+        searchQuery,
+        setSearchQuery
     } = useProjectBoard();
 
+    const { user } = useAppSelector(state => state.auth);
     const [isProjectSelectorOpen, setIsProjectSelectorOpen] = useState(false);
+    const [isEventModalOpen, setIsEventModalOpen] = useState(false);
 
 
     const today = new Date();
@@ -175,8 +188,23 @@ const ProjectBoard: React.FC = () => {
                     </div>
 
                     <div className="flex items-center gap-3 text-sm text-gray-600 dark:text-gray-400 min-w-max md:w-auto">
-                        <div className="flex items-center gap-2 hover:text-gray-900 dark:hover:text-gray-200 cursor-pointer transition-colors">
-                            <FaSearch size={14} /> <span className="hidden sm:inline">Search</span>
+                        <div className="relative group">
+                            <FaSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-blue-500 transition-colors" size={14} />
+                            <input
+                                type="text"
+                                placeholder="Search tasks or events..."
+                                value={searchQuery}
+                                onChange={(e) => setSearchQuery(e.target.value)}
+                                className="pl-9 pr-8 py-1.5 w-40 sm:w-64 bg-gray-100 dark:bg-gray-800 border-transparent focus:bg-white dark:focus:bg-gray-750 focus:border-blue-500/50 border rounded-full text-xs text-gray-800 dark:text-gray-200 placeholder-gray-500 focus:outline-none focus:ring-4 focus:ring-blue-500/10 transition-all"
+                            />
+                            {searchQuery && (
+                                <button
+                                    onClick={() => setSearchQuery('')}
+                                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors"
+                                >
+                                    <FaTimes size={12} />
+                                </button>
+                            )}
                         </div>
                         <div className="flex items-center gap-2 hover:text-gray-900 dark:hover:text-gray-200 cursor-pointer transition-colors">
                             <FaFilter size={14} /> <span className="hidden sm:inline">Filter</span>
@@ -554,135 +582,171 @@ const ProjectBoard: React.FC = () => {
                                 <h2 className="text-xl font-bold text-gray-800 dark:text-gray-100">
                                     {currentDate.toLocaleDateString('en-GB', { day: 'numeric', month: 'long' })}
                                 </h2>
+                                {(() => {
+                                    const count = meetings.filter(m => {
+                                        const mDate = new Date(m.startTime);
+                                        return mDate.getFullYear() === currentDate.getFullYear() &&
+                                            mDate.getMonth() === currentDate.getMonth() &&
+                                            mDate.getDate() === currentDate.getDate();
+                                    }).length;
+                                    return count > 0 ? (
+                                        <span className="px-2 py-0.5 bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 text-[10px] font-bold rounded-full border border-blue-200 dark:border-blue-800/50">
+                                            {count} {count === 1 ? 'Meeting' : 'Meetings'}
+                                        </span>
+                                    ) : null;
+                                })()}
                                 <div className="flex items-center gap-1">
-                                    <button className="p-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300" onClick={handlePrevMonth}>
+                                    <button className="p-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300" onClick={handlePrevDay}>
                                         <FaChevronLeft size={12} />
                                     </button>
-                                    <button className="p-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300" onClick={handleNextMonth}>
+                                    <button className="p-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300" onClick={handleNextDay}>
                                         <FaChevronRight size={12} />
                                     </button>
                                 </div>
                             </div>
 
                             <div className="flex items-center gap-3">
-                                <div className="px-4 py-1.5 bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-lg text-sm font-medium text-gray-600 dark:text-gray-400 shadow-sm">
-                                    8:00 - 17:00
-                                </div>
                                 <button
                                     onClick={handleGoToToday}
                                     className="px-4 py-1.5 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg text-sm font-semibold text-gray-700 dark:text-gray-200 hover:shadow-md transition-all active:scale-95 shadow-sm"
                                 >
-                                    Now
+                                    Today
                                 </button>
+                                <div className="px-4 py-1.5 bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-lg text-sm font-medium text-gray-600 dark:text-gray-400 shadow-sm">
+                                    8:00 - 17:00
+                                </div>
+                                {user?.role === 'MANAGER' && (
+                                    <button
+                                        onClick={() => setIsEventModalOpen(true)}
+                                        className="flex items-center gap-2 px-4 py-1.5 bg-blue-600 hover:bg-blue-700 rounded-lg text-sm font-semibold text-white transition-all shadow-md active:scale-95"
+                                    >
+                                        <FaPlus size={10} />
+                                        Add Event
+                                    </button>
+                                )}
                             </div>
                         </div>
 
-                        {/* Hourly Timeline Grid */}
-                        <div className="flex-1 flex flex-col min-w-[1000px] bg-white dark:bg-[#12141c] rounded-2xl border border-gray-100 dark:border-gray-800/50 shadow-sm overflow-hidden">
-                            {/* Hours Label Bar */}
-                            <div className="flex bg-gray-50/50 dark:bg-gray-800/30 border-b border-gray-100 dark:border-gray-800/50">
-                                {Array.from({ length: 10 }).map((_, i) => {
-                                    const hour = 8 + i;
-                                    return (
-                                        <div key={hour} className="flex-1 py-3 text-center border-r border-gray-100 dark:border-gray-800/30">
-                                            <span className="text-[11px] font-bold text-gray-400 dark:text-gray-600 uppercase tracking-tighter">
-                                                {hour}:00
-                                            </span>
-                                        </div>
-                                    );
-                                })}
-                            </div>
-
-                            {/* Timeline Body Area */}
-                            <div className="relative flex-1 bg-white dark:bg-[#12141c]">
-                                {/* Horizontal Grid Lines (Hidden mostly, we use borders) */}
-                                <div className="absolute inset-0 flex">
-                                    {Array.from({ length: 10 }).map((_, i) => (
-                                        <div key={i} className="flex-1 border-r border-gray-50 dark:border-gray-800/20"></div>
-                                    ))}
+                        {/* Hourly Timeline Grid Wrapper - Clean & Responsive */}
+                        <div className="flex-1 mt-2">
+                            <div className="flex flex-col w-full bg-white dark:bg-[#12141c] rounded-2xl border border-gray-100 dark:border-gray-800/50 shadow-sm overflow-hidden">
+                                {/* Hours Label Bar */}
+                                <div className="flex bg-gray-50/50 dark:bg-gray-800/30 border-b border-gray-100 dark:border-gray-800/50">
+                                    {Array.from({ length: 10 }).map((_, i) => {
+                                        const hour = 8 + i;
+                                        return (
+                                            <div key={hour} className="flex-1 py-3 text-center">
+                                                <span className="text-[10px] font-bold text-gray-400 dark:text-gray-600 uppercase tracking-tighter">
+                                                    {hour}:00
+                                                </span>
+                                            </div>
+                                        );
+                                    })}
                                 </div>
 
-                                {/* Task Rows Area */}
-                                <div className="relative p-6 space-y-4">
-                                    {(() => {
-                                        // Logic to arrange tasks in rows without overlap
-                                        const timelineTasks = sections.flatMap(s => s.tasks).filter(t => t.dueDate || t.createdAt);
+                                {/* Timeline Body Area */}
+                                <div className="relative flex-1 bg-white dark:bg-[#12141c]">
+                                    {/* Horizontal Grid Lines - Removed for minimalism */}
+                                    <div className="absolute inset-0 flex opacity-0">
+                                        {Array.from({ length: 10 }).map((_, i) => (
+                                            <div key={i} className="flex-1"></div>
+                                        ))}
+                                    </div>
 
-                                        // Create mapped objects instead of mutating originals
-                                        const processedTasks = timelineTasks.map(task => {
-                                            const hashStr = (task.id + task.name).split('').reduce((a, b) => { a = ((a << 5) - a) + b.charCodeAt(0); return a & a }, 0);
-                                            const startHourOffset = Math.abs(hashStr % 7);
-                                            const duration = (Math.abs(hashStr % 3) + 1);
-
-                                            const taskStart = 8 + startHourOffset;
-                                            const taskEnd = taskStart + duration;
-
-                                            return {
-                                                task,
-                                                visual: { start: taskStart, end: taskEnd, duration }
+                                    {/* Task Rows Area */}
+                                    <div className="relative p-6 space-y-4">
+                                        {(() => {
+                                            // Robust date comparison helper
+                                            const isSameDay = (d1: Date, d2: Date) => {
+                                                return d1.getFullYear() === d2.getFullYear() &&
+                                                    d1.getMonth() === d2.getMonth() &&
+                                                    d1.getDate() === d2.getDate();
                                             };
-                                        });
 
-                                        const rows: any[][] = [];
+                                            // Filter meetings for the current selected date
+                                            const timelineMeetings = meetings.filter(m => {
+                                                const mDate = new Date(m.startTime);
+                                                return isSameDay(mDate, currentDate);
+                                            });
 
-                                        processedTasks.forEach(pt => {
-                                            // Find a row
-                                            let placed = false;
-                                            for (const row of rows) {
-                                                const hasOverlap = row.some(existing => {
-                                                    const e = existing.visual;
-                                                    const t = pt.visual;
-                                                    return !(t.end <= e.start || t.start >= e.end);
-                                                });
-                                                if (!hasOverlap) {
-                                                    row.push(pt);
-                                                    placed = true;
-                                                    break;
-                                                }
+                                            // LOGGING FOR DEBUGGING
+                                            console.log('--- Timeline Debug ---');
+                                            console.log('Selected Date:', currentDate.toDateString());
+                                            console.log('Total Meetings in Redux:', meetings.length);
+                                            console.log('Meetings for this day:', timelineMeetings.length);
+                                            if (meetings.length > 0 && timelineMeetings.length === 0) {
+                                                console.log('Sample Meetings in State:', meetings.map(m => ({
+                                                    title: m.title,
+                                                    start: new Date(m.startTime).toDateString()
+                                                })));
                                             }
-                                            if (!placed) rows.push([pt]);
-                                        });
 
-                                        return rows.map((row, rowIndex) => (
-                                            <div key={rowIndex} className="relative h-14 w-full">
-                                                {row.map(pt => {
-                                                    const { task, visual: v } = pt;
-                                                    const leftPercent = ((v.start - 8) / 10) * 100;
-                                                    const widthPercent = (v.duration / 10) * 100;
+                                            const processedMeetings = timelineMeetings.map(meeting => {
+                                                const start = new Date(meeting.startTime);
+                                                const end = new Date(meeting.endTime);
 
-                                                    // Determine colors based on task metadata
-                                                    const colorClasses = [
-                                                        'bg-amber-50 border-amber-500 text-amber-800',
-                                                        'bg-emerald-50 border-emerald-500 text-emerald-800',
-                                                        'bg-cyan-50 border-cyan-500 text-cyan-800',
-                                                        'bg-rose-50 border-rose-500 text-rose-800',
-                                                        'bg-slate-50 border-slate-500 text-slate-800'
-                                                    ];
-                                                    const colorIdx = Math.abs((task.id.length + task.name.length) % colorClasses.length);
-                                                    const colorStyle = colorClasses[colorIdx];
+                                                const startHour = start.getHours() + (start.getMinutes() / 60);
+                                                const endHour = end.getHours() + (end.getMinutes() / 60);
+                                                const duration = endHour - startHour;
 
-                                                    return (
-                                                        <div
-                                                            key={task.id}
-                                                            onClick={() => setSelectedTask(task)}
-                                                            className={`absolute top-0 h-10 px-4 flex flex-col justify-center rounded-xl border-l-[4px] shadow-sm hover:shadow-md transition-all cursor-pointer group ${colorStyle.split(' ')[0]} ${colorStyle.split(' ')[1]}`}
-                                                            style={{
-                                                                left: `${leftPercent}%`,
-                                                                width: `calc(${widthPercent}% - 8px)`,
-                                                            }}
-                                                        >
-                                                            <div className="font-bold text-[11px] truncate leading-tight dark:opacity-90">
-                                                                {task.name}
+                                                return {
+                                                    meeting,
+                                                    visual: { start: startHour, end: endHour, duration }
+                                                };
+                                            });
+
+                                            // Simple List Stacking Logic: Every meeting gets its own row
+                                            // This ensures they appear "neech" (below) regardless of time overlap
+                                            const sortedMeetings = processedMeetings.sort((a, b) => a.visual.start - b.visual.start);
+                                            const rows = sortedMeetings.map(pm => [pm]);
+
+                                            if (rows.length === 0) {
+                                                return (
+                                                    <div className="flex flex-col items-center justify-center h-64 text-gray-400">
+                                                        <FaCalendarAlt size={32} className="mb-2 opacity-20" />
+                                                        <p className="text-sm">No meetings scheduled for this day</p>
+                                                    </div>
+                                                );
+                                            }
+
+                                            return rows.map((row, rowIndex) => (
+                                                <div key={rowIndex} className="relative h-24 w-full">
+                                                    {row.map(pm => {
+                                                        const { meeting, visual: v } = pm;
+                                                        const leftPercent = ((v.start - 8) / 10) * 100;
+                                                        const widthPercent = (v.duration / 10) * 100;
+
+                                                        const typeColors: Record<string, string> = {
+                                                            'MEETING': 'bg-orange-50/70 border-orange-400 text-orange-900 dark:bg-orange-900/20 dark:text-orange-300 dark:border-orange-700',
+                                                            'DEADLINE': 'bg-rose-50/70 border-rose-400 text-rose-900 dark:bg-rose-900/20 dark:text-rose-300 dark:border-rose-700',
+                                                            'EVENT': 'bg-green-50/70 border-green-400 text-green-900 dark:bg-green-900/20 dark:text-green-300 dark:border-green-700'
+                                                        };
+                                                        const colorStyle = typeColors[meeting.type] || 'bg-blue-50/70 border-blue-400 text-blue-900 dark:bg-blue-900/20 dark:text-blue-300 dark:border-blue-700';
+
+                                                        return (
+                                                            <div
+                                                                key={meeting.id}
+                                                                className={`absolute top-0 h-16 px-5 flex flex-col justify-center rounded-2xl border-l-[8px] shadow-sm hover:shadow-lg transition-all cursor-pointer group ${colorStyle}`}
+                                                                style={{
+                                                                    left: `${Math.max(0, leftPercent)}%`,
+                                                                    width: `calc(${Math.max(8, Math.min(100 - leftPercent, widthPercent))}% - 12px)`,
+                                                                    display: v.start >= 18 || v.end <= 8 ? 'none' : 'flex',
+                                                                    minWidth: '140px'
+                                                                }}
+                                                            >
+                                                                <div className="font-bold text-[13px] truncate leading-tight dark:opacity-95 mb-1">
+                                                                    {meeting.title}
+                                                                </div>
+                                                                <div className="text-[11px] font-semibold opacity-60 tracking-tight">
+                                                                    {new Date(meeting.startTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false })} - {new Date(meeting.endTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false })}
+                                                                </div>
                                                             </div>
-                                                            <div className="text-[9px] font-medium opacity-60 tracking-tight">
-                                                                {v.start}:00 - {v.end}:00
-                                                            </div>
-                                                        </div>
-                                                    );
-                                                })}
-                                            </div>
-                                        ));
-                                    })()}
+                                                        );
+                                                    })}
+                                                </div>
+                                            ));
+                                        })()}
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -690,8 +754,9 @@ const ProjectBoard: React.FC = () => {
                 )}
             </div>
 
-            {/* Create Modal */}
+            {/* Modals */}
             <CreateProjectModal isOpen={isCreateModalOpen} onClose={() => setIsCreateModalOpen(false)} />
+            <CreateEventModal isOpen={isEventModalOpen} onClose={() => setIsEventModalOpen(false)} />
         </div>
     );
 };

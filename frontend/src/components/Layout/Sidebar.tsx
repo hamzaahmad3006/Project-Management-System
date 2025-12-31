@@ -11,7 +11,8 @@ import SearchModal from '../modals/searchModal/SearchModal';
 import NotificationPopover from '../modals/notificationModal/NotificationModal';
 import { FaSearch, FaBell, FaChevronRight, FaChevronDown, FaUserPlus, FaCog, FaBars, FaTimes, FaRegCheckCircle, FaRegFile, FaPlus, } from 'react-icons/fa';
 import { logout } from 'store/slices/authSlice';
-import { fetchProjects } from '../../store/slices/projectSlice';
+import { fetchProjects, setSelectedProjectId } from '../../store/slices/projectSlice';
+import { getTeams } from '../../store/slices/teamSlice';
 import { MdLogout } from 'react-icons/md';
 import { PanelLeft } from 'lucide-react';
 
@@ -20,11 +21,16 @@ const Sidebar: React.FC = () => {
     const navigate = useNavigate();
     const { user } = useSelector((state: RootState) => state.auth);
     const { notifications } = useSelector((state: RootState) => state.notifications);
-    const unreadCount = notifications.filter(n => !n.isRead).length;
-    const isManager = user?.role === 'MANAGER';
+    const { allTeams } = useSelector((state: RootState) => state.team);
+    const { projects, selectedProjectId } = useSelector((state: RootState) => state.projects);
     const [isOpen, setIsOpen] = useState(true);
     const [isMobileOpen, setIsMobileOpen] = useState(false);
-    const [expandedTeamspace, setExpandedTeamspace] = useState('mobile-app');
+    const unreadCount = notifications.filter(n => !n.isRead).length;
+    const isManager = user?.role === 'MANAGER';
+    const [isMobileDesignExpanded, setIsMobileDesignExpanded] = useState(true);
+    const [isTeamSubExpanded, setIsTeamSubExpanded] = useState(false);
+    const [isDiadoraExpanded, setIsDiadoraExpanded] = useState(true);
+    const [isProjectSubExpanded, setIsProjectSubExpanded] = useState(false);
     const [isCreateProjectOpen, setIsCreateProjectOpen] = useState(false);
     const [isInviteOpen, setIsInviteOpen] = useState(false);
     const [isCreateTeamOpen, setIsCreateTeamOpen] = useState(false);
@@ -35,6 +41,7 @@ const Sidebar: React.FC = () => {
     useEffect(() => {
         dispatch(fetchNotifications());
         dispatch(fetchProjects());
+        dispatch(getTeams());
     }, [dispatch]);
 
     useEffect(() => {
@@ -43,32 +50,6 @@ const Sidebar: React.FC = () => {
 
 
 
-    const teamspaces = [
-        {
-            id: 'mobile-app',
-            name: 'Mobile app: design',
-            items: [
-                { name: 'Intro', path: '/intro' },
-                { name: 'Team', path: '/team' },
-                { name: 'Process', path: '/process' },
-                { name: 'HR', path: '/hr' }
-            ]
-        },
-        {
-            id: 'diadora',
-            name: 'Diadora scoup',
-            items: [
-                { name: 'Ideas and details', path: '/ideas' },
-                { name: 'Project Board [2023]', path: '/board' },
-                { name: 'Design References', path: '/references' },
-                { name: 'QA and review', path: '/qa' }
-            ]
-        }
-    ];
-
-    const toggleTeamspace = (id: string) => {
-        setExpandedTeamspace(expandedTeamspace === id ? '' : id);
-    };
 
     return (
         <>
@@ -100,7 +81,8 @@ const Sidebar: React.FC = () => {
                         onClick={() => setIsOpen(!isOpen)}
                         className="flex items-center gap-3 px-3 py-2 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-800 rounded md:block"
                     >
-                        <PanelLeft size={20} />
+                        {/* <PanelLeft size={20} /> */}
+                        <img src="/assets/collapse.svg" alt="" className="w-4 h-4 text-gray-600 dark:text-gray-400" />
 
                     </button>
                 </div>
@@ -159,50 +141,116 @@ const Sidebar: React.FC = () => {
                                 <span className="text-xs font-semibold text-gray-500 uppercase">Teamspaces</span>
                                 <div
                                     className="p-1 hover:bg-gray-200 rounded cursor-pointer"
-                                    onClick={(e) => {
-                                        e.stopPropagation();
-                                        e.preventDefault();
-                                        setIsCreateTeamOpen(true);
-                                    }}
+                                    onClick={() => setIsCreateTeamOpen(true)}
                                 >
                                     <FaPlus size={10} className="text-gray-500" />
                                 </div>
                             </div>
 
-                            {teamspaces.map((teamspace) => (
-                                <div key={teamspace.id}>
-                                    <div
-                                        onClick={() => toggleTeamspace(teamspace.id)}
-                                        className="flex items-center gap-2 px-3 py-2 text-gray-700 hover:bg-gray-200 rounded cursor-pointer"
-                                    >
-                                        {expandedTeamspace === teamspace.id ? (
-                                            <FaChevronDown size={12} />
-                                        ) : (
-                                            <FaChevronRight size={12} />
-                                        )}
-                                        <span className="text-sm font-medium">{teamspace.name}</span>
-                                    </div>
-
-                                    {expandedTeamspace === teamspace.id && (
-                                        <div className="ml-6 mt-1 space-y-1">
-                                            {teamspace.items.map((item) => (
-                                                <NavLink
-                                                    key={item.path}
-                                                    to={item.path}
-                                                    className={({ isActive }) =>
-                                                        `block px-3 py-1.5 text-sm rounded transition-colors ${isActive
-                                                            ? 'bg-gray-200 text-gray-900'
-                                                            : 'text-gray-600 hover:bg-gray-200'
-                                                        }`
-                                                    }
-                                                >
-                                                    {item.name}
-                                                </NavLink>
-                                            ))}
-                                        </div>
-                                    )}
+                            {/* Mobile App Section */}
+                            <div>
+                                <div
+                                    onClick={() => {
+                                        const newStates = !isMobileDesignExpanded;
+                                        setIsMobileDesignExpanded(newStates);
+                                        if (newStates) setIsDiadoraExpanded(false);
+                                    }}
+                                    className="flex items-center gap-2 px-3 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-800 rounded cursor-pointer"
+                                >
+                                    {isMobileDesignExpanded ? <img src="/assets/chevronDown.svg" alt="" className="w-6 h-6" /> : <img src="/assets/collapseRight.svg" alt="" className="w-5 h-5" />}
+                                    <div className="w-5 h-5 bg-gray-100 dark:bg-gray-800 border dark:border-gray-700 flex items-center justify-center rounded text-[10px] font-bold">M</div>
+                                    <span className="text-sm font-medium">Mobile app: design</span>
                                 </div>
-                            ))}
+
+                                {isMobileDesignExpanded && (
+                                    <div className="ml-9 mt-1 space-y-1">
+                                        <div className="px-3 py-1.5 text-sm text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 rounded cursor-pointer">Intro</div>
+
+                                        {/* Nested Team Folder */}
+                                        <div>
+                                            <div
+                                                onClick={() => setIsTeamSubExpanded(!isTeamSubExpanded)}
+                                                className="flex items-center gap-2 px-3 py-1.5 text-sm text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 rounded cursor-pointer"
+                                            >
+                                                {isTeamSubExpanded ? <img src="/assets/chevronDown.svg" alt="" className="w-6 h-6" /> : <img src="/assets/collapseRight.svg" alt="" className="w-5 h-5" />}
+                                                Team
+                                            </div>
+                                            {isTeamSubExpanded && (
+                                                <div className="ml-4 mt-1 space-y-1 border-l border-gray-100 dark:border-gray-800">
+                                                    {allTeams.map(team => (
+                                                        <NavLink
+                                                            key={team.id}
+                                                            to={`/team/${team.id}`}
+                                                            className={({ isActive }) =>
+                                                                `block pl-4 py-1.5 text-xs rounded transition-colors ${isActive
+                                                                    ? 'text-blue-600 font-medium'
+                                                                    : 'text-gray-500 hover:text-gray-900 dark:hover:text-gray-200'
+                                                                }`
+                                                            }
+                                                        >
+                                                            {team.name}
+                                                        </NavLink>
+                                                    ))}
+                                                </div>
+                                            )}
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+
+                            {/* Diadora Section */}
+                            <div className="mt-2">
+                                <div
+                                    onClick={() => {
+                                        const newStates = !isDiadoraExpanded;
+                                        setIsDiadoraExpanded(newStates);
+                                        if (newStates) setIsMobileDesignExpanded(false);
+                                    }}
+                                    className="flex items-center gap-2 px-3 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-800 rounded cursor-pointer"
+                                >
+                                    {isDiadoraExpanded ? <img src="/assets/chevronDown.svg" alt="" className="w-6 h-6" /> : <img src="/assets/collapseRight.svg" alt="" className="w-5 h-5" />}
+                                    <div className="w-5 h-5 bg-gray-100 dark:bg-gray-800 border dark:border-gray-700 flex items-center justify-center rounded text-[10px] font-bold">D</div>
+                                    <span className="text-sm font-medium">Diadora scoup</span>
+                                </div>
+
+                                {isDiadoraExpanded && (
+                                    <div className="ml-9 mt-1 space-y-1">
+                                        <div className="px-3 py-1.5 text-sm text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 rounded cursor-pointer">Ideas and details</div>
+
+                                        {/* Nested Projects Folder */}
+                                        <div>
+                                            <div
+                                                onClick={() => setIsProjectSubExpanded(!isProjectSubExpanded)}
+                                                className="flex items-center gap-2 px-3 py-1.5 text-sm text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 rounded cursor-pointer"
+                                            >
+                                                {isProjectSubExpanded ? <img src="/assets/chevronDown.svg" alt="" className="w-6 h-6" /> : <img src="/assets/collapseRight.svg" alt="" className="w-5 h-5" />}
+                                                Projects
+                                            </div>
+                                            {isProjectSubExpanded && (
+                                                <div className="ml-4 mt-1 space-y-1 border-l border-gray-100 dark:border-gray-800">
+                                                    {projects.map(project => (
+                                                        <NavLink
+                                                            key={project.id}
+                                                            to="/board"
+                                                            onClick={() => dispatch(setSelectedProjectId(project.id))}
+                                                            className={({ isActive }) =>
+                                                                `block pl-4 py-1.5 text-xs rounded transition-colors ${selectedProjectId === project.id
+                                                                    ? 'text-blue-600 font-medium'
+                                                                    : 'text-gray-500 hover:text-gray-900 dark:hover:text-gray-200'
+                                                                }`
+                                                            }
+                                                        >
+                                                            {project.name}
+                                                        </NavLink>
+                                                    ))}
+                                                </div>
+                                            )}
+                                        </div>
+
+                                        <div className="px-3 py-1.5 text-sm text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 rounded cursor-pointer">Design References</div>
+                                    </div>
+                                )}
+                            </div>
                         </>
                     )}
                 </nav>

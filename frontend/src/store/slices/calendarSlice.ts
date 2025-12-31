@@ -22,6 +22,19 @@ export const fetchEvents = createAsyncThunk(
     }
 );
 
+export const createCalendarEvent = createAsyncThunk(
+    'calendar/createEvent',
+    async (eventData: any, { rejectWithValue }) => {
+        try {
+            const response = await api.post<{ event: CalendarEvent }>('/calendar', eventData);
+            return response.data.event;
+        } catch (err: unknown) {
+            const error = err as AxiosError<{ message: string }>;
+            return rejectWithValue(error.response?.data?.message || error.message || 'Failed to create event');
+        }
+    }
+);
+
 const calendarSlice = createSlice({
     name: 'calendar',
     initialState,
@@ -39,6 +52,9 @@ const calendarSlice = createSlice({
             .addCase(fetchEvents.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.payload as string;
+            })
+            .addCase(createCalendarEvent.fulfilled, (state, action) => {
+                state.events.push(action.payload);
             });
     },
 });

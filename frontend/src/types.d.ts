@@ -214,6 +214,8 @@ export interface UpdateBudgetData {
 }
 
 //===== Calendar.tsx Interface ======
+export type EventType = 'MEETING' | 'DEADLINE' | 'EVENT';
+
 export interface CalendarEvent {
     id: string;
     title: string;

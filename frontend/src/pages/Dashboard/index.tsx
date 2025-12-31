@@ -2,7 +2,6 @@ import { Route, Routes } from 'react-router-dom'
 import Home from './home/Home'
 import Tasks from './tasks/Tasks'
 import Projects from './Projects'
-import Calendar from './Calendar'
 import Reports from './Reports'
 import Team from 'pages/dashboard/team/Team'
 import ProjectBoard from './projectBoard/ProjectBoard'
@@ -30,10 +29,9 @@ export default function Dashboard() {
                     <Route index element={< Home />} />
                     <Route path="tasks" element={< Tasks />} />
                     <Route path="projects" element={< Projects />} />
-                    <Route path="calendar" element={< Calendar />} />
                     <Route path="reports" element={< Reports />} />
 
-                    <Route path="team" element={<Team />}>
+                    <Route path="team/:teamId?" element={<Team />}>
                         <Route index element={<ProjectTab />} />
                         <Route path="dashboard" element={<DashboardTab />} />
                         <Route path="members" element={<MembersTab />} />

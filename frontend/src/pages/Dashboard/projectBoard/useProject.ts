@@ -2,16 +2,19 @@ import { useState, useEffect, useMemo } from 'react';
 import { useAppDispatch, useAppSelector } from '../../../store/hooks';
 import { fetchTasks, createTask as createTaskAction, updateTask, updateTaskStatusOptimistic, setSelectedTask as setSelectedTaskAction } from '../../../store/slices/taskSlice';
 import { fetchProjects, setSelectedProjectId } from '../../../store/slices/projectSlice';
-import { Task, Section, TaskStatus, Project } from '../../../types';
+import { fetchEvents } from '../../../store/slices/calendarSlice';
+import { Task, Section, TaskStatus, Project, CalendarEvent } from '../../../types';
 
 export const useProjectBoard = () => {
     const dispatch = useAppDispatch();
-    const { tasks, loading, error, currentTask: selectedTask } = useAppSelector(state => state.tasks);
+    const { tasks, loading: tasksLoading, error, currentTask: selectedTask } = useAppSelector(state => state.tasks);
     const { projects, currentProject: stateCurrentProject, selectedProjectId } = useAppSelector(state => state.projects);
+    const { events: meetings, loading: calendarLoading } = useAppSelector(state => state.calendar);
 
     const [activeView, setActiveView] = useState('Board');
     const [collapsedSections, setCollapsedSections] = useState<string[]>(['postpone', 'qa']);
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+    const [searchQuery, setSearchQuery] = useState('');
 
     const setSelectedTask = (task: Task | null) => {
         dispatch(setSelectedTaskAction(task));
@@ -56,6 +59,9 @@ export const useProjectBoard = () => {
             : (selectedProjectId === 'all' ? undefined : currentProject?.id);
 
         dispatch(fetchTasks(projectIdToFetch ? { projectId: projectIdToFetch } : {}));
+
+        // Fetch calendar events (meetings)
+        dispatch(fetchEvents({}));
     }, [dispatch, currentProject?.id, selectedProjectId]); // Note: excluding projects.length to avoid loops, only fetch once if empty
 
     const handleAddTask = (taskName: string, sectionId: string) => {
@@ -121,11 +127,16 @@ export const useProjectBoard = () => {
 
     // Transform raw tasks into grouped sections for the UI
     const dynamicSections = useMemo((): Section[] => {
-        // Fallback to empty tasks if none exist
-        const backlogTasks = tasks.filter(t => t.status === 'TODO');
-        const inProgressTasks = tasks.filter(t => t.status === 'IN_PROGRESS');
-        const qaTasks = tasks.filter(t => t.status === 'COMPLETED'); // Mapping COMPLETED to QA for now as per user preference
-        const canceledTasks = tasks.filter(t => t.status === 'CANCELED');
+        // Filter tasks by search query
+        const filteredTasks = tasks.filter(t =>
+            t.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            (t.project?.name || '').toLowerCase().includes(searchQuery.toLowerCase())
+        );
+
+        const backlogTasks = filteredTasks.filter(t => t.status === 'TODO');
+        const inProgressTasks = filteredTasks.filter(t => t.status === 'IN_PROGRESS');
+        const qaTasks = filteredTasks.filter(t => t.status === 'COMPLETED');
+        const canceledTasks = filteredTasks.filter(t => t.status === 'CANCELED');
 
         return [
             {
@@ -157,13 +168,18 @@ export const useProjectBoard = () => {
                 tasks: qaTasks
             }
         ];
-    }, [tasks]);
+    }, [tasks, searchQuery]);
 
     const [currentDate, setCurrentDate] = useState(new Date());
 
     // Transform raw tasks into calendar events (Assign Date -> Green, Due Date -> Red)
     const calendarEvents = useMemo(() => {
-        return tasks.flatMap(t => {
+        const filteredTasks = tasks.filter(t =>
+            t.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            (t.project?.name || '').toLowerCase().includes(searchQuery.toLowerCase())
+        );
+
+        return filteredTasks.flatMap(t => {
             const events = [];
             const dueDate = t.dueDate ? new Date(t.dueDate) : null;
             const assignDate = t.createdAt ? new Date(t.createdAt) : null;
@@ -201,7 +217,7 @@ export const useProjectBoard = () => {
 
             return events;
         });
-    }, [tasks]);
+    }, [tasks, searchQuery]);
 
     // Helper to generate calendar grid
     const calendarDays = useMemo(() => {
@@ -233,6 +249,14 @@ export const useProjectBoard = () => {
         setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 1));
     };
 
+    const handlePrevDay = () => {
+        setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate() - 1));
+    };
+
+    const handleNextDay = () => {
+        setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate() + 1));
+    };
+
     const handleGoToToday = () => {
         setCurrentDate(new Date());
     };
@@ -243,7 +267,7 @@ export const useProjectBoard = () => {
 
     return {
         tasks,
-        loading,
+        loading: tasksLoading || calendarLoading,
         error,
         activeView,
         setActiveView,
@@ -261,10 +285,15 @@ export const useProjectBoard = () => {
         calendarDays,
         handlePrevMonth,
         handleNextMonth,
+        handlePrevDay,
+        handleNextDay,
         handleGoToToday,
         currentProject,
         projects,
         selectedProjectId,
-        handleProjectChange
+        handleProjectChange,
+        meetings: meetings.filter(m => m.title.toLowerCase().includes(searchQuery.toLowerCase())),
+        searchQuery,
+        setSearchQuery
     };
 };

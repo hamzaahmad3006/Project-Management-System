@@ -2,7 +2,7 @@ import CreateTeamModal from "components/modals/createTeamModal/CreateTeamModal";
 import { useTeamHook } from "./useTeam";
 import { NavLink, Outlet, useParams } from "react-router-dom";
 export default function Team() {
-    const { team, isCreateTeamOpen, setIsCreateTeamOpen, manualTeamId, setManualTeamId, allTeams } = useTeamHook();
+    const { team, isCreateTeamOpen, setIsCreateTeamOpen, allTeams } = useTeamHook();
 
     return (
         <div className="flex w-full h-screen bg-white dark:bg-[#12141c]">
@@ -12,21 +12,9 @@ export default function Team() {
                 <div className="flex items-center justify-between mb-6">
                     <div>
                         <div className="flex items-center gap-3">
-                            <h1 className="text-2xl font-semibold text-gray-900 dark:text-gray-100  ">
-                                Defcon /
+                            <h1 className="text-2xl font-semibold text-gray-900 dark:text-gray-100">
+                                {team?.name || 'Loading...'}
                             </h1>
-                            <select
-                                value={team?.id || ""}
-                                onChange={(e) => setManualTeamId(e.target.value)}
-                                className="text-2xl font-semibold bg-transparent border-none text-gray-900 dark:text-gray-100 outline-none cursor-pointer focus:ring-0 p-0"
-                            >
-                                {!team && <option value="">Loading...</option>}
-                                {allTeams.map((t) => (
-                                    <option key={t.id} value={t.id} className="bg-white dark:bg-[#1a1c23] text-sm ">
-                                        {t.name}
-                                    </option>
-                                ))}
-                            </select>
                         </div>
 
                     </div>

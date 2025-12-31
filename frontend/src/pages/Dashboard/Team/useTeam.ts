@@ -16,8 +16,6 @@ export const useTeamHook = () => {
     const [isCreateTeamOpen, setIsCreateTeamOpen] = useState(false);
     const { allTeams } = useSelector((state: RootState) => state.team);
     const { selectedProjectId, projects } = useSelector((state: RootState) => state.projects);
-    const [manualTeamId, setManualTeamId] = useState<string | null>(null);
-
     useEffect(() => {
         dispatch(getTeams());
         dispatch(fetchProjects());
@@ -25,7 +23,6 @@ export const useTeamHook = () => {
 
 
     const team = (() => {
-        if (manualTeamId) return allTeams.find(t => t.id === manualTeamId);
         if (teamIdFromUrl) return allTeams.find(t => t.id === teamIdFromUrl);
         if (selectedProjectId !== 'all') {
             const project = projects.find(p => p.id === selectedProjectId);
@@ -40,8 +37,6 @@ export const useTeamHook = () => {
         team,
         isCreateTeamOpen,
         setIsCreateTeamOpen,
-        manualTeamId,
-        setManualTeamId,
         allTeams
     }
 }
