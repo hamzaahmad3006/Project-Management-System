@@ -181,6 +181,8 @@ export interface DashboardTask {
     priority: string;
     dueDate?: string;
     budget?: number;
+    createdAt?: string;
+    subtasks?: Subtask[];
 }
 
 //===== Notification.tsx Popover Props Interface ======

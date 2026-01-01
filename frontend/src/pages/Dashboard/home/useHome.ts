@@ -39,29 +39,122 @@ export const useHomeHook = () => {
         }]
     }), [kpis, isDark]);
 
-    const budgetData = useMemo(() => ({
-        labels: ['Total Budget', 'Total Spent'],
-        datasets: [
-            {
-                label: 'Project Budget',
-                data: [kpis?.projects?.totalBudget || 0, kpis?.projects?.totalSpent || 0],
-                backgroundColor: [
-                    isDark ? '#3b82f6' : '#1E3A8A',
-                    kpis?.projects?.totalSpent && kpis.projects.totalSpent > kpis.projects.totalBudget ? '#ef4444' : '#10b981'
-                ],
-                borderRadius: 8,
-                barThickness: 40,
-            }
-        ]
-    }), [kpis, isDark]);
+    const budgetData: any = useMemo(() => {
+        const chartPoints = kpis?.chartData || [];
+        const labels = chartPoints.map((d: any) => d.label);
+        const rawSpendData = chartPoints.map((d: any) => d.value);
 
-    const budgetOptions = useMemo(() => ({
+        // Fallback for empty data
+        const displayLabels = labels.length > 0 ? labels : Array.from({ length: 30 }, (_, i) => (i + 1).toString().padStart(2, '0'));
+        const displaySpend = rawSpendData.length > 0 ? rawSpendData : new Array(30).fill(0);
+
+        // Cumulative spending
+        const initialSpend = kpis?.initialSpend || 0;
+        const cumulativeSpend = displaySpend.reduce((acc: number[], val: number, i: number) => {
+            acc.push((acc[i - 1] || initialSpend) + val);
+            return acc;
+        }, []);
+
+        // Budget line (Total budget or fallback)
+        const totalBudget = kpis?.projects?.totalBudget || 0;
+        const budgetDataLine = new Array(cumulativeSpend.length).fill(totalBudget);
+
+        return {
+            labels: displayLabels,
+            datasets: [
+                {
+                    label: 'Budget',
+                    data: budgetDataLine,
+                    borderColor: '#34d399',
+                    backgroundColor: (context: any) => {
+                        const chart = context.chart;
+                        const { ctx, chartArea } = chart;
+                        if (!chartArea) return 'rgba(52, 211, 153, 0.05)';
+                        const gradient = ctx.createLinearGradient(0, chartArea.bottom, 0, chartArea.top);
+                        gradient.addColorStop(0, 'rgba(52, 211, 153, 0.01)');
+                        gradient.addColorStop(1, 'rgba(52, 211, 153, 0.1)');
+                        return gradient;
+                    },
+                    fill: true,
+                    tension: 0.4,
+                    pointRadius: 0,
+                    pointHoverRadius: 6,
+                    pointHoverBackgroundColor: '#34d399',
+                    pointHoverBorderColor: '#fff',
+                    pointHoverBorderWidth: 2,
+                    borderWidth: 2,
+                },
+                {
+                    label: 'Expenses',
+                    data: cumulativeSpend,
+                    borderColor: '#0f4c75',
+                    backgroundColor: (context: any) => {
+                        const chart = context.chart;
+                        const { ctx, chartArea } = chart;
+                        if (!chartArea) return 'rgba(15, 76, 117, 0.2)';
+                        const gradient = ctx.createLinearGradient(0, chartArea.bottom, 0, chartArea.top);
+                        gradient.addColorStop(0, 'rgba(15, 76, 117, 0.05)');
+                        gradient.addColorStop(1, 'rgba(15, 76, 117, 0.4)');
+                        return gradient;
+                    },
+                    fill: true,
+                    tension: 0.4,
+                    pointRadius: 0,
+                    pointHoverRadius: 6,
+                    pointHoverBackgroundColor: '#0f4c75',
+                    pointHoverBorderColor: '#fff',
+                    pointHoverBorderWidth: 2,
+                    borderWidth: 3,
+                }
+            ]
+        };
+    }, [kpis, isDark]);
+
+    const budgetOptions: any = useMemo(() => ({
         responsive: true,
+        maintainAspectRatio: false,
+        interaction: {
+            intersect: false,
+            mode: 'index' as const,
+        },
         plugins: {
-            legend: { display: false },
+            legend: {
+                display: true,
+                position: 'bottom',
+                labels: {
+                    usePointStyle: true,
+                    pointStyle: 'circle',
+                    padding: 20,
+                    color: isDark ? '#9ca3af' : '#64748b',
+                    font: { size: 12 }
+                }
+            },
             tooltip: {
+                backgroundColor: isDark ? '#1e293b' : '#ffffff',
+                titleColor: isDark ? '#4b5563' : '#64748b',
+                bodyColor: isDark ? '#f1f5f9' : '#1e293b',
+                borderColor: isDark ? '#334155' : '#e2e8f0',
+                borderWidth: 1,
+                padding: 12,
+                boxPadding: 6,
+                usePointStyle: true,
                 callbacks: {
-                    label: (context: any) => `$${context.raw.toLocaleString()}`
+                    label: (context: any) => {
+                        let value = context.raw;
+                        let formatted = value;
+                        if (value >= 1000000) formatted = `${(value / 1000000).toFixed(1)}M`;
+                        else if (value >= 1000) formatted = `${(value / 1000).toFixed(0)}k`;
+                        return `${context.dataset.label}: ${formatted}`;
+                    },
+                    title: (items: any) => {
+                        if (!items || items.length === 0) return '';
+                        const index = items[0].dataIndex;
+                        const dataPoint = kpis?.chartData?.[index];
+                        const month = dataPoint?.month || new Date().toLocaleDateString('en-US', { month: 'short' });
+                        const day = items[0].label;
+                        const year = new Date().getFullYear();
+                        return `${month} ${day}, ${year}`;
+                    }
                 }
             }
         },
@@ -69,20 +162,28 @@ export const useHomeHook = () => {
             y: {
                 beginAtZero: true,
                 grid: {
-                    color: isDark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.05)',
+                    color: isDark ? 'rgba(255, 255, 255, 0.03)' : 'rgba(0, 0, 0, 0.03)',
                 },
                 ticks: {
-                    color: isDark ? '#9ca3af' : '#6b7280',
-                    callback: (value: any) => `$${value.toLocaleString()}`
+                    color: isDark ? '#4b5563' : '#94a3b8',
+                    font: { size: 10 },
+                    callback: (value: any) => {
+                        if (value >= 1000000) return `${value / 1000000}M`;
+                        if (value >= 1000) return `${value / 1000}k`;
+                        return value;
+                    }
                 }
             },
             x: {
                 grid: { display: false },
                 ticks: {
-                    color: isDark ? '#9ca3af' : '#6b7280',
+                    color: isDark ? '#4b5563' : '#94a3b8',
+                    font: { size: 10 },
+                    autoSkip: true,
+                    maxTicksLimit: 15
                 }
             }
-        }
+        },
     }), [isDark]);
 
     const getStatusBadge = (status: string) => {

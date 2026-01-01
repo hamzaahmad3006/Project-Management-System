@@ -17,7 +17,7 @@ export const useCreateTaskHook = (isOpen: boolean, onClose: () => void, initialS
     const [assigneeId, setAssigneeId] = useState('');
     const [projectId, setProjectId] = useState(initialProjectId || '');
     const [sectionId, setSectionId] = useState('');
-    const [files, setFiles] = useState<File[]>([]);
+    const [budget, setBudget] = useState('');
     const [labels, setLabels] = useState<string[]>([]);
     const [loading, setLoading] = useState(false);
 
@@ -39,12 +39,6 @@ export const useCreateTaskHook = (isOpen: boolean, onClose: () => void, initialS
         }
     }, [initialProjectId]);
 
-    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        if (e.target.files) {
-            setFiles(Array.from(e.target.files));
-        }
-    };
-
     const resetForm = () => {
         setName('');
         setDescription('');
@@ -54,7 +48,7 @@ export const useCreateTaskHook = (isOpen: boolean, onClose: () => void, initialS
         setAssigneeId('');
         setProjectId('');
         setSectionId('');
-        setFiles([]);
+        setBudget('');
         setLabels([]);
     };
 
@@ -81,7 +75,8 @@ export const useCreateTaskHook = (isOpen: boolean, onClose: () => void, initialS
                 dueDate: dueDate || undefined,
                 projectId,
                 assigneeId: assigneeId || undefined,
-                label: labels
+                label: labels,
+                budget: budget ? Number(budget) : undefined
             })).unwrap();
 
             window.toastify("Task created successfully", "success");
@@ -112,12 +107,11 @@ export const useCreateTaskHook = (isOpen: boolean, onClose: () => void, initialS
         setProjectId,
         sectionId,
         setSectionId,
-        files,
-        setFiles,
+        budget,
+        setBudget,
         labels,
         setLabels,
         loading,
-        handleFileChange,
         handleSubmit,
         resetForm
     };

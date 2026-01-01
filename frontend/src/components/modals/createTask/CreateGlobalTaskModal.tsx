@@ -1,12 +1,11 @@
 import React from 'react';
-import { FaTimes, FaUser, FaRegFlag, FaCalendarAlt, FaLayerGroup } from 'react-icons/fa';
+import { FaTimes, FaUser, FaRegFlag, FaCalendarAlt, FaLayerGroup, FaDollarSign } from 'react-icons/fa';
 import { CreateModalProps } from '../../../types';
 import { useCreateTaskHook } from './useCreateTaskHook';
 import { ButtonLoader } from 'components/loader/Loader';
 import SelectField from 'components/ui/inputFields/SelectedForm';
 import InputForm from 'components/ui/inputFields/InputForm';
 import TextAreaForm from 'components/ui/inputFields/TextAreaForm';
-import FileInputForm from 'components/ui/inputFields/FileInputForm';
 import ButtonForm from 'components/ui/buttons/ButtonForm';
 
 const CreateGlobalTaskModal: React.FC<CreateModalProps> = ({ isOpen, onClose, initialStatus, initialProjectId }) => {
@@ -26,11 +25,11 @@ const CreateGlobalTaskModal: React.FC<CreateModalProps> = ({ isOpen, onClose, in
         setAssigneeId,
         projectId,
         setProjectId,
-        files,
+        budget,
+        setBudget,
         labels,
         setLabels,
         loading,
-        handleFileChange,
         handleSubmit
     } = useCreateTaskHook(isOpen, onClose, initialStatus, initialProjectId);
 
@@ -176,6 +175,21 @@ const CreateGlobalTaskModal: React.FC<CreateModalProps> = ({ isOpen, onClose, in
                                     labelClassName="block text-xs font-semibold text-gray-500 dark:text-gray-400"
                                 />
                             </div>
+
+                            {/* Task Price (Budget) */}
+                            <div className="space-y-1.5">
+                                <InputForm
+                                    label="Task Price ($)"
+                                    name="budget"
+                                    type="number"
+                                    value={budget}
+                                    onChange={(e) => setBudget(e.target.value)}
+                                    placeholder="0.00"
+                                    icon={<FaDollarSign size={12} />}
+                                    className="border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100"
+                                    labelClassName="block text-xs font-semibold text-gray-500 dark:text-gray-400"
+                                />
+                            </div>
                         </div>
 
                         {/* Labels */}
@@ -201,31 +215,6 @@ const CreateGlobalTaskModal: React.FC<CreateModalProps> = ({ isOpen, onClose, in
                                 ))}
                             </div>
                         </div>
-
-                        {/* Attachments */}
-                        <div className="space-y-2 pt-2 border-t border-gray-100 dark:border-gray-800 border-dashed">
-                            <FileInputForm
-                                label="Attachments"
-                                onChange={handleFileChange}
-                                className="h-24 flex flex-col items-center justify-center border-dashed"
-                                labelClassName="block text-sm font-medium text-gray-700 dark:text-gray-300"
-                            />
-                            {/* File List Rendering Logic remains handled by FileInputForm or parent if custom rendering needed. For now keeping original file list rendering below as FileInputForm is just the input */}
-
-                            {/* File List - Kept manual logical for now as FileInputForm is simple wrapper */}
-                            {files.length > 0 && (
-                                <ul className="space-y-1 mt-2">
-                                    {files.map((file, idx) => (
-                                        <li key={idx} className="flex items-center gap-2 text-xs text-gray-600 dark:text-gray-400 bg-gray-100 dark:bg-gray-800 px-3 py-1.5 rounded-md border border-gray-200 dark:border-gray-700">
-                                            {/* <FaPaperclip size={10} className="text-gray-400" /> */}
-                                            <span className="truncate max-w-[200px]">{file.name}</span>
-                                            <span className="text-gray-400 dark:text-gray-600 ml-auto">{(file.size / 1024).toFixed(0)} KB</span>
-                                        </li>
-                                    ))}
-                                </ul>
-                            )}
-                        </div>
-
                     </form>
                 </div>
 

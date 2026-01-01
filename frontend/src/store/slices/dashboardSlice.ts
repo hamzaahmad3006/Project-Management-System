@@ -16,6 +16,7 @@ interface DashboardState {
             totalSpent: number;
         };
         chartData: any[];
+        initialSpend: number;
     } | null;
     recentActivity: any[];
     loading: boolean;
