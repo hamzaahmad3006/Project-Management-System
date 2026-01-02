@@ -46,6 +46,13 @@ const Dashboard: React.FC = () => {
         budgetData,
         budgetOptions,
         latestTasks,
+        filteredEvents,
+        scheduleTab,
+        setScheduleTab,
+        selectedDate,
+        setSelectedDate,
+        weekDates,
+        calendarLoading,
         getStatusBadge,
         getPriorityBadge,
         handleProjectChange
@@ -61,7 +68,7 @@ const Dashboard: React.FC = () => {
         <div className="p-4 md:p-6 bg-[#FBFBFC] dark:bg-[#12141c] min-h-screen">
             <div className="mb-6 space-y-4">
                 <div className="flex items-center justify-between">
-                    <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100 italic">Dashboard</h1>
+                    <h1 className="text-2xl font-bold text-[#50555D] dark:text-gray-100 ">Dashboard</h1>
                 </div>
 
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 dark:bg-[#1a1c23] p-3 rounded-xl shadow-sm">
@@ -93,12 +100,12 @@ const Dashboard: React.FC = () => {
                     {/* Right side: Calendar and Periods */}
                     <div className="flex flex-wrap items-center gap-3">
                         <div className="flex items-center gap-2 px-3 py-1.5 bg-gray-50 dark:bg-gray-800/50 text-gray-700 text-xs border border-gray-100 dark:border-gray-700/50">
-                            <FaCalendar size={12} className="text-blue-500" />
+                            <FaCalendar size={12} className="text-black" />
                             <span className="font-medium">{new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</span>
                         </div>
                         <div className="flex gap-1 bg-gray-100/50 dark:bg-gray-800/50 rounded-lg p-1 border border-gray-100 dark:border-gray-700/50">
                             {['D', 'W', 'M', 'BM', 'Y'].map((period) => (
-                                <button key={period} className={`px-3 py-1 text-xs font-bold rounded-md transition-all ${period === 'M' ? 'bg-white dark:bg-gray-700 text-blue-600 dark:text-blue-400 shadow-sm' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'}`}>
+                                <button key={period} className={`px-3 py-1 text-xs font-bold rounded-md transition-all ${period === 'M' ? 'bg-white dark:bg-gray-700 text-balck dark:text-blue-400 shadow-sm' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'}`}>
                                     {period}
                                 </button>
                             ))}
@@ -115,8 +122,8 @@ const Dashboard: React.FC = () => {
                     </div>
                     <div className="flex items-end justify-between">
                         <span className="text-[21px] font-medium text-[#575A61] dark:text-gray-100">{kpis?.tasks?.total || 0}</span>
-                        <div className="flex items-center gap-1 text-green-600 text-sm">
-                            <FaArrowUp size={12} />
+                        <div className="flex items-center gap-1 bg-green-100 text-green-600 text-sm">
+                            <FaArrowUp size={12} className='rotate-45' />
                             <span>+3 points since yesterday</span>
                         </div>
                     </div>
@@ -130,8 +137,8 @@ const Dashboard: React.FC = () => {
                         <span className="text-[21px] font-medium text-[#575A61] dark:text-gray-100">
                             {(kpis?.tasks?.total || 0) - (kpis?.tasks?.completed || 0) - (kpis?.tasks?.inProgress || 0) - (kpis?.tasks?.canceled || 0)}
                         </span>
-                        <div className="flex items-center gap-1 text-red-600 text-sm">
-                            <FaArrowDown size={12} />
+                        <div className="flex items-center gap-1 bg-red-100 text-red-600 text-sm">
+                            <FaArrowDown size={12} className='-rotate-45' />
                             <span>-5 points since yesterday</span>
                         </div>
                     </div>
@@ -143,8 +150,8 @@ const Dashboard: React.FC = () => {
                     </div>
                     <div className="flex items-end justify-between">
                         <span className="text-[21px] font-medium text-[#575A61] dark:text-gray-100">{kpis?.tasks?.inProgress || 0}</span>
-                        <div className="flex items-center gap-1 text-green-600 text-sm">
-                            <FaArrowUp size={12} />
+                        <div className="flex items-center gap-1 bg-green-100 text-green-600 text-sm">
+                            <FaArrowUp size={12} className='rotate-45' />
                             <span>+3 points since yesterday</span>
                         </div>
                     </div>
@@ -156,8 +163,8 @@ const Dashboard: React.FC = () => {
                     </div>
                     <div className="flex items-end justify-between">
                         <span className="text-[21px] font-medium text-[#575A61] dark:text-gray-100">{kpis?.tasks?.canceled || 0}</span>
-                        <div className="flex items-center gap-1 text-red-600 text-sm">
-                            <FaArrowDown size={12} />
+                        <div className="flex items-center gap-1 bg-red-100 text-red-600 text-sm">
+                            <FaArrowDown size={12} className='-rotate-45' />
                             <span>-3 points since yesterday</span>
                         </div>
                     </div>
@@ -169,7 +176,7 @@ const Dashboard: React.FC = () => {
                     <h3 className="text-[16px] font-normal mb-4 text-[#77797C] dark:text-gray-100">Completion</h3>
                     <div className="relative w-48 h-48 mx-auto">
                         <Doughnut data={completionData} options={{
-                            cutout: '75%',
+                            cutout: '90%',
                             plugins: { legend: { display: false } }
                         }} />
                         <div className="absolute inset-0 flex flex-col items-center justify-center">
@@ -195,34 +202,75 @@ const Dashboard: React.FC = () => {
                         {new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
                     </div>
                     <div className="grid grid-cols-7 gap-1 text-center text-xs mb-4">
-                        {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map((day) => (
-                            <div key={day} className="text-gray-500 dark:text-gray-400 font-medium">{day}</div>
-                        ))}
                         {[...Array(7)].map((_, i) => (
-                            <div key={i} className={`py-2 ${i === (new Date().getDay() || 7) - 1 ? 'bg-blue-600 text-white rounded-full' : 'text-gray-900 dark:text-gray-100'}`}>
-                                {new Date().getDate() - (new Date().getDay() || 7) + i + 1}
+                            <div key={i} className={`text-gray-500 dark:text-gray-400 font-medium`}>
+                                {weekDates[i].toLocaleDateString('en-US', { weekday: 'short' })}
                             </div>
                         ))}
+                        {weekDates.map((date, i) => {
+                            const isSelected = date.getDate() === selectedDate.getDate() &&
+                                date.getMonth() === selectedDate.getMonth() &&
+                                date.getFullYear() === selectedDate.getFullYear();
+                            return (
+                                <button
+                                    key={i}
+                                    onClick={() => setSelectedDate(date)}
+                                    className={`py-1 w-full flex items-center justify-center rounded-full transition-all ${isSelected
+                                        ? 'bg-[#0f4c75] text-white shadow-sm'
+                                        : 'text-gray-900 dark:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-800'
+                                        }`}
+                                >
+                                    {date.getDate()}
+                                </button>
+                            );
+                        })}
                     </div>
                     <div className="space-y-2">
                         <div className="flex gap-2 text-xs">
-                            <button className="px-3 py-1 bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded">Events</button>
-                            <button className="px-3 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 rounded">Meetings</button>
-                            <button className="px-3 py-1 bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded">Holidays</button>
+                            <button
+                                onClick={() => setScheduleTab('Events')}
+                                className={`px-3 py-1 rounded transition-colors ${scheduleTab === 'Events' ? 'bg-[#0f4c75] text-white' : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300'}`}
+                            >
+                                Events
+                            </button>
+                            <button
+                                onClick={() => setScheduleTab('Meetings')}
+                                className={`px-3 py-1 rounded transition-colors ${scheduleTab === 'Meetings' ? 'bg-[#0f4c75] text-white' : 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400'}`}
+                            >
+                                Meetings
+                            </button>
+                            <button
+                                onClick={() => setScheduleTab('Holidays')}
+                                className={`px-3 py-1 rounded transition-colors ${scheduleTab === 'Holidays' ? 'bg-[#0f4c75] text-white' : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300'}`}
+                            >
+                                Holidays
+                            </button>
                         </div>
                         <div className="space-y-2 mt-4">
-                            <div className="flex items-center justify-between p-2 bg-purple-50 dark:bg-purple-900/10 rounded">
-                                <span className="text-sm text-purple-700 dark:text-purple-400">Daily Standup</span>
-                                <span className="text-xs text-gray-600 dark:text-gray-400">9:30-10:00AM</span>
-                            </div>
-                            <div className="flex items-center justify-between p-2 bg-blue-50 dark:bg-blue-900/10 rounded">
-                                <span className="text-sm text-blue-700 dark:text-blue-400">Sync with Marketing</span>
-                                <span className="text-xs text-gray-600 dark:text-gray-400">10:30-11:00AM</span>
-                            </div>
-                            <div className="flex items-center justify-between p-2 bg-orange-50 dark:bg-orange-900/10 rounded">
-                                <span className="text-sm text-orange-700 dark:text-orange-400">Internal Review</span>
-                                <span className="text-xs text-gray-600 dark:text-gray-400">11:00-11:15AM</span>
-                            </div>
+                            {calendarLoading ? (
+                                <div className="flex justify-center py-4">
+                                    <div className="w-5 h-5 border-2 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+                                </div>
+                            ) : scheduleTab === 'Holidays' ? (
+                                <div className="text-center py-4 text-gray-500 dark:text-gray-400 text-sm italic">
+                                    No holiday yet
+                                </div>
+                            ) : filteredEvents.length > 0 ? (
+                                filteredEvents.map((event) => (
+                                    <div key={event.id} className={`flex items-center justify-between p-2 rounded ${event.type === 'MEETING' ? 'bg-blue-50 dark:bg-blue-900/10' : 'bg-purple-50 dark:bg-purple-900/10'}`}>
+                                        <span className={`text-sm ${event.type === 'MEETING' ? 'text-blue-700 dark:text-blue-400' : 'text-purple-700 dark:text-purple-400'}`}>
+                                            {event.title}
+                                        </span>
+                                        <span className="text-xs text-gray-600 dark:text-gray-400">
+                                            {new Date(event.startTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} - {new Date(event.endTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                        </span>
+                                    </div>
+                                ))
+                            ) : (
+                                <div className="text-center py-4 text-gray-500 dark:text-gray-400 text-sm">
+                                    No {scheduleTab.toLowerCase()} scheduled
+                                </div>
+                            )}
                         </div>
                     </div>
                 </div>
@@ -249,15 +297,15 @@ const Dashboard: React.FC = () => {
                             <thead>
                                 <tr className="border-b border-gray-200 dark:border-gray-800 text-left text-sm text-gray-600 dark:text-gray-400">
                                     <th className="pb-3 font-medium">
-                                        <input type="checkbox" className="rounded bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-700" />
+                                        <input type="checkbox" className="rounded bg-white dark:bg-gray-800 border-[#9FA9AF]  dark:border-gray-700" />
                                     </th>
-                                    <th className="pb-3 font-medium">Task Name</th>
-                                    <th className="pb-3 font-medium">Project Name</th>
-                                    <th className="pb-3 font-medium">Subtasks</th>
-                                    <th className="pb-3 font-medium">Status</th>
-                                    <th className="pb-3 font-medium">Priority</th>
-                                    <th className="pb-3 font-medium">Create Date</th>
-                                    <th className="pb-3 font-medium">End Date</th>
+                                    <th className="pb-3 font-medium text-[#9FA9AF]">Task Name</th>
+                                    <th className="pb-3 font-medium text-[#9FA9AF]">Project Name</th>
+                                    <th className="pb-3 font-medium text-[#9FA9AF]">Subtasks</th>
+                                    <th className="pb-3 font-medium text-[#9FA9AF]">Status</th>
+                                    <th className="pb-3 font-medium text-[#9FA9AF]">Priority</th>
+                                    <th className="pb-3 font-medium text-[#9FA9AF]">Start Date</th>
+                                    <th className="pb-3 font-medium text-[#9FA9AF]">End Date</th>
                                 </tr>
                             </thead>
                             <tbody>

@@ -11,9 +11,9 @@ const initialState: CalendarState = {
 
 export const fetchEvents = createAsyncThunk(
     'calendar/fetchEvents',
-    async ({ start, end }: { start?: string; end?: string }, { rejectWithValue }) => {
+    async ({ start, end, projectId }: { start?: string; end?: string; projectId?: string }, { rejectWithValue }) => {
         try {
-            const response = await api.get<{ events: CalendarEvent[] }>('/calendar', { params: { start, end } });
+            const response = await api.get<{ events: CalendarEvent[] }>('/calendar', { params: { start, end, projectId } });
             return response.data.events;
         } catch (err: unknown) {
             const error = err as AxiosError<{ message: string }>;

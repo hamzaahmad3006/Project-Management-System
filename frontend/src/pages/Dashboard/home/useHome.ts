@@ -3,6 +3,8 @@ import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '../../../store/store';
 import { fetchKPIs, fetchRecentActivity } from '../../../store/slices/dashboardSlice';
 import { fetchProjects, setSelectedProjectId } from '../../../store/slices/projectSlice';
+import { fetchEvents } from '../../../store/slices/calendarSlice';
+import { useState } from 'react';
 
 
 export const useHomeHook = () => {
@@ -10,7 +12,24 @@ export const useHomeHook = () => {
 
     const { kpis, recentActivity, loading: dashboardLoading } = useSelector((state: RootState) => state.dashboard);
     const { projects, selectedProjectId } = useSelector((state: RootState) => state.projects);
+    const { events, loading: calendarLoading } = useSelector((state: RootState) => state.calendar);
     const theme = useSelector((state: RootState) => state.theme.theme);
+
+    const [scheduleTab, setScheduleTab] = useState<'Events' | 'Meetings' | 'Holidays'>('Events');
+    const [selectedDate, setSelectedDate] = useState(new Date());
+
+    const weekDates = useMemo(() => {
+        const today = new Date();
+        const currentDay = today.getDay() || 7; // 1 (Mon) to 7 (Sun)
+        const monday = new Date(today);
+        monday.setDate(today.getDate() - currentDay + 1);
+
+        return Array.from({ length: 7 }, (_, i) => {
+            const date = new Date(monday);
+            date.setDate(monday.getDate() + i);
+            return date;
+        });
+    }, []);
 
     const isDark = useMemo(() => {
         return theme === 'dark' || (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
@@ -21,8 +40,10 @@ export const useHomeHook = () => {
     }, [dispatch]);
 
     useEffect(() => {
-        dispatch(fetchKPIs(selectedProjectId === 'all' ? undefined : selectedProjectId));
-        dispatch(fetchRecentActivity(selectedProjectId === 'all' ? undefined : selectedProjectId));
+        const projectId = selectedProjectId === 'all' ? undefined : selectedProjectId;
+        dispatch(fetchKPIs(projectId));
+        dispatch(fetchRecentActivity(projectId));
+        dispatch(fetchEvents({ projectId }));
     }, [dispatch, selectedProjectId]);
 
     const completionPercentage = useMemo(() => {
@@ -34,7 +55,7 @@ export const useHomeHook = () => {
     const completionData = useMemo(() => ({
         datasets: [{
             data: [kpis?.tasks?.completed || 0, (kpis?.tasks?.total || 0) - (kpis?.tasks?.completed || 0)],
-            backgroundColor: [isDark ? '#3b82f6' : '#1E3A8A', isDark ? '#1f2937' : '#E5E7EB'],
+            backgroundColor: [isDark ? '#3b82f6' : '#0f4c75', isDark ? '#1f2937' : '#E5E7EB'],
             borderWidth: 0,
         }]
     }), [kpis, isDark]);
@@ -188,9 +209,9 @@ export const useHomeHook = () => {
 
     const getStatusBadge = (status: string) => {
         const styles: Record<string, string> = {
-            'TODO': 'bg-blue-100 text-blue-700',
-            'IN_PROGRESS': 'bg-orange-100 text-orange-700',
-            'COMPLETED': 'bg-green-100 text-green-700',
+            'TODO': 'bg-[#0043C0] text-white font-bold text-sm',
+            'IN_PROGRESS': 'bg-[#DD7902] text-white font-bold text-sm',
+            'COMPLETED': 'bg-[#0A8401] text-white font-bold text-sm',
         };
         return styles[status] || 'bg-gray-100 text-gray-700';
     };
@@ -210,6 +231,25 @@ export const useHomeHook = () => {
 
     const latestTasks = useMemo(() => recentActivity.slice(0, 4), [recentActivity]);
 
+    const filteredEvents = useMemo(() => {
+        const dateFiltered = events.filter(e => {
+            const eventDate = new Date(e.startTime);
+            return (
+                eventDate.getDate() === selectedDate.getDate() &&
+                eventDate.getMonth() === selectedDate.getMonth() &&
+                eventDate.getFullYear() === selectedDate.getFullYear()
+            );
+        });
+
+        if (scheduleTab === 'Meetings') {
+            return dateFiltered.filter(e => e.type === 'MEETING');
+        }
+        if (scheduleTab === 'Events') {
+            return dateFiltered.filter(e => e.type === 'EVENT' || e.type === 'DEADLINE');
+        }
+        return []; // Holidays handled in UI
+    }, [events, scheduleTab, selectedDate]);
+
     return {
         kpis,
         projects,
@@ -221,6 +261,13 @@ export const useHomeHook = () => {
         budgetData,
         budgetOptions,
         latestTasks,
+        filteredEvents,
+        scheduleTab,
+        setScheduleTab,
+        selectedDate,
+        setSelectedDate,
+        weekDates,
+        calendarLoading,
         getStatusBadge,
         getPriorityBadge,
         handleProjectChange
