@@ -56,6 +56,7 @@ export interface UserProfile {
     role: string;
     email: string;
     avatar: string;
+    team?: string;
 }
 
 export interface ProfileSettingsProps {
@@ -144,11 +145,6 @@ export interface Comment {
     createdAt: string;
     updatedAt: string;
     taskId: string;
-    author: {
-        id: string;
-        name: string;
-        avatar?: string;
-    };
     author: {
         id: string;
         name: string;

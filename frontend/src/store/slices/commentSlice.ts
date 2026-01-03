@@ -55,6 +55,13 @@ const commentSlice = createSlice({
         clearComments: (state) => {
             state.comments = [];
             state.error = null;
+        },
+        receiveComment: (state, action: PayloadAction<Comment>) => {
+            // Check if comment already exists (to avoid duplicates if the sender also receives the event)
+            const exists = state.comments.some(c => c.id === action.payload.id);
+            if (!exists) {
+                state.comments.unshift(action.payload);
+            }
         }
     },
     extraReducers: (builder) => {
@@ -80,5 +87,5 @@ const commentSlice = createSlice({
     },
 });
 
-export const { clearComments } = commentSlice.actions;
+export const { clearComments, receiveComment } = commentSlice.actions;
 export default commentSlice.reducer;

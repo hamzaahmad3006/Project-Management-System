@@ -10,6 +10,7 @@ export const useSettings = (user: any, onClose: () => void) => {
         role: user?.role || "",
         email: user?.email || "",
         avatar: user?.avatar || "",
+        team: user?.teamMemberships?.[0]?.team?.name || "No team Yet",
     });
     const [file, setFile] = useState<File | null>(null);
     const [preview, setPreview] = useState<string | null>(null);

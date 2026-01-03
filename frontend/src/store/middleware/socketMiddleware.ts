@@ -1,6 +1,7 @@
 import { Middleware } from '@reduxjs/toolkit';
 import { io, Socket } from 'socket.io-client';
 import { addNotification } from '../slices/notificationSlice';
+import { receiveComment } from '../slices/commentSlice';
 import { toast } from 'react-toastify';
 
 let socket: Socket | null = null;
@@ -40,6 +41,15 @@ export const socketMiddleware: Middleware = (store) => (next) => (action: any) =
                 console.log('🔔 New notification received (Middleware):', notification);
                 dispatch(addNotification(notification));
                 toast.info(notification.message);
+            });
+
+            socket.on('new_comment', (data: { taskId: string; comment: any }) => {
+                console.log('💬 New comment received (Middleware):', data);
+                // Get current task from tasks state
+                const { tasks } = store.getState();
+                if (tasks.currentTask && tasks.currentTask.id === data.taskId) {
+                    dispatch(receiveComment(data.comment));
+                }
             });
         }
     } else {

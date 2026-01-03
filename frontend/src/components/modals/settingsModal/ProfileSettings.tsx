@@ -78,12 +78,12 @@ const ProfileSettings: React.FC<ProfileSettingsProps> = ({
                         labelClassName='text-sm font-medium !text-gray-500'
                     />
 
-                    {/* Team Dropdown - Placeholder as per your screenshot */}
+                    {/* Team Section */}
                     <div className="space-y-1">
-                        <label className="text-sm font-medium text-gray-500">Team</label>
-                        <select className="w-full p-2.5 border rounded-lg bg-white dark:bg-gray-800 dark:border-gray-700 outline-none focus:ring-2 focus:ring-blue-500">
-                            <option>Designer Team</option>
-                        </select>
+                        <label className="text-sm font-medium !text-gray-500">Team</label>
+                        <div className="w-full p-2.5 border rounded-lg bg-gray-50 dark:bg-gray-800 dark:border-gray-700 text-gray-700 dark:text-gray-300 font-medium">
+                            {profile.team}
+                        </div>
                     </div>
 
                     {/* Email with "Change email" link */}
