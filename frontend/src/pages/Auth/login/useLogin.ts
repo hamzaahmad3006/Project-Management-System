@@ -2,13 +2,15 @@ import { signInWithPopup } from 'firebase/auth';
 import { auth, provider } from '../../../config/firebase';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '../../../store/store';
-import { login, loginwithgoogle } from '../../../store/slices/authSlice';
+import { login, loginwithgoogle, forgotPassword } from '../../../store/slices/authSlice';
+import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 
 export const useLoginHook = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [forgotLoading, setForgotLoading] = useState(false);
     const dispatch = useDispatch<AppDispatch>();
     const navigate = useNavigate();
     const { loading, error } = useSelector((state: RootState) => state.auth);
@@ -41,6 +43,22 @@ export const useLoginHook = () => {
 
 
     };
+    const handleForgotPassword = async () => {
+        if (!email) {
+            toast.error("Please enter your email address first");
+            return;
+        }
+        setForgotLoading(true);
+        try {
+            await dispatch(forgotPassword({ email })).unwrap();
+            toast.success("Password reset link sent to your email!");
+        } catch (err: any) {
+            toast.error(err || "Failed to send reset link");
+        } finally {
+            setForgotLoading(false);
+        }
+    };
+
     return {
         email,
         setEmail,
@@ -48,6 +66,8 @@ export const useLoginHook = () => {
         setPassword,
         handleSubmit,
         handleSigninWithGoogle,
+        handleForgotPassword,
+        forgotLoading,
         loading,
         error,
         navigate

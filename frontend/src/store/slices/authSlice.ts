@@ -93,6 +93,30 @@ export const changePassword = createAsyncThunk<void, { currentPassword: string; 
     }
 );
 
+export const forgotPassword = createAsyncThunk<void, { email: string }>(
+    'auth/forgotPassword',
+    async (data, { rejectWithValue }) => {
+        try {
+            await api.post('/auth/forgot-password', data);
+        } catch (err: unknown) {
+            const error = err as AxiosError<{ message: string }>;
+            return rejectWithValue(error.response?.data?.message || 'Failed to send reset link');
+        }
+    }
+);
+
+export const resetPassword = createAsyncThunk<void, { token: string; newPassword: string }>(
+    'auth/resetPassword',
+    async (data, { rejectWithValue }) => {
+        try {
+            await api.post('/auth/reset-password', data);
+        } catch (err: unknown) {
+            const error = err as AxiosError<{ message: string }>;
+            return rejectWithValue(error.response?.data?.message || 'Failed to reset password');
+        }
+    }
+);
+
 const authSlice = createSlice({
     name: 'auth',
     initialState,

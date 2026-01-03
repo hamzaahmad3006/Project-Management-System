@@ -6,7 +6,7 @@ import ButtonForm from 'components/ui/buttons/ButtonForm';
 import SocialAuthButton from 'components/ui/buttons/SocialAuthButton';
 
 const Login: React.FC = () => {
-    const { email, setEmail, password, setPassword, handleSubmit, handleSigninWithGoogle, navigate } = useLoginHook();
+    const { email, setEmail, password, setPassword, handleSubmit, handleSigninWithGoogle, handleForgotPassword, forgotLoading, navigate } = useLoginHook();
 
     return (
         <div className="min-h-screen w-full flex items-center justify-center flex-col bg-gray-50 dark:bg-[#12141c] p-4 font-inter transition-colors duration-300">
@@ -70,7 +70,18 @@ const Login: React.FC = () => {
                     <div className="mb-4">
                         <div className="flex justify-between items-center mb-1">
                             <label className="text-sm font-medium text-[#2F2F2F] dark:text-gray-300">Password <span className='text-red-500'>*</span></label>
-                            <button className="text-sm text-[#8E94BB] dark:text-gray-500 hover:text-blue-600 dark:hover:text-blue-400 transition">Forgot password?</button>
+                            <button
+                                onClick={handleForgotPassword}
+                                disabled={forgotLoading}
+                                className={`text-sm font-medium transition flex items-center gap-2 ${forgotLoading ? 'text-blue-400 cursor-not-allowed' : 'text-[#8E94BB] dark:text-gray-500 hover:text-blue-600 dark:hover:text-blue-400'}`}
+                            >
+                                {forgotLoading ? (
+                                    <>
+                                        <div className="w-3 h-3 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+                                        Sending...
+                                    </>
+                                ) : "Forgot password?"}
+                            </button>
                         </div>
                         <InputForm
                             name="password"
