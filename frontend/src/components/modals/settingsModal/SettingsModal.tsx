@@ -19,6 +19,7 @@ const SettingsModal: React.FC<CreateModalProps> = ({ isOpen, onClose }) => {
         loading,
         preview,
         onImageSelect,
+        onRemoveImage,
         handleChange,
         handleSaveProfile,
         handleClose
@@ -91,6 +92,7 @@ const SettingsModal: React.FC<CreateModalProps> = ({ isOpen, onClose }) => {
                             <ProfileSettings
                                 profile={profile}
                                 onImageSelect={onImageSelect}
+                                onRemoveImage={onRemoveImage}
                                 handleChange={handleChange}
                                 handleSave={handleSaveProfile}
                                 onCancel={handleClose}

@@ -2,18 +2,18 @@ import React, { useState } from 'react';
 import {
     FaStar, FaEllipsisH, FaSearch, FaFilter, FaSort, FaList,
     FaTh, FaCalendarAlt, FaStream, FaPlus, FaChevronDown, FaChevronRight, FaChevronLeft,
-    FaRegCheckCircle, FaRegComment, FaPaperclip, FaUserCircle, FaTimes, FaBell, FaThLarge, FaUserPlus, FaLayerGroup
+    FaRegCheckCircle, FaRegComment, FaPaperclip, FaUserCircle, FaTimes, FaBell, FaThLarge, FaUserPlus, FaLayerGroup,
+    FaTable,
+
 } from 'react-icons/fa';
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
 import CreateProjectModal from '../../../components/modals/createProjectModal/CreateProjectModal';
-import TaskDetailPanel from '../../../components/dashboard/TaskDetailPanel';
 import { useProjectBoard } from './useProject';
-import { useAppDispatch, useAppSelector } from '../../../store/hooks';
-import { fetchTasks, createTask as createTaskAction, updateTask, updateTaskStatusOptimistic, setSelectedTask as setSelectedTaskAction, clearCurrentTask } from '../../../store/slices/taskSlice';
-import { fetchProjects, setSelectedProjectId } from '../../../store/slices/projectSlice';
-import { Task, Section, TaskStatus, Project } from '../../../types';
+import { useAppSelector } from '../../../store/hooks';
+import { TaskStatus } from '../../../types';
 import CreateEventModal from '../../../components/modals/createEventModal/CreateEventModal';
 import CreateGlobalTaskModal from '../../../components/modals/createTask/CreateGlobalTaskModal';
+import { MdChatBubbleOutline } from 'react-icons/md';
 
 
 const ProjectBoard: React.FC = () => {
@@ -51,6 +51,7 @@ const ProjectBoard: React.FC = () => {
     const [isProjectSelectorOpen, setIsProjectSelectorOpen] = useState(false);
     const [isEventModalOpen, setIsEventModalOpen] = useState(false);
     const [isTaskModalOpen, setIsTaskModalOpen] = useState(false);
+    const [isSearchExpanded, setIsSearchExpanded] = useState(false);
     const [initialTaskStatus, setInitialTaskStatus] = useState<TaskStatus | undefined>(undefined);
 
 
@@ -195,7 +196,7 @@ const ProjectBoard: React.FC = () => {
                                 className={`flex items-center gap-2 pb-2 border-b-2 transition-colors ${activeView === view ? 'border-gray-800 dark:border-gray-100 text-gray-900 dark:text-gray-100 font-medium' : 'border-transparent hover:text-gray-900 dark:hover:text-gray-200'}`}
                             >
                                 {view === 'Board' && <FaTh size={14} />}
-                                {view === 'Table' && <FaList size={14} />}
+                                {view === 'Table' && <FaTable size={14} />}
                                 {view === 'Calendar' && <FaCalendarAlt size={14} />}
                                 {view === 'Timeline' && <FaStream size={14} />}
                                 {view}
@@ -215,24 +216,40 @@ const ProjectBoard: React.FC = () => {
                     </div>
 
                     <div className="flex items-center gap-3 text-sm text-gray-600 dark:text-gray-400 min-w-max md:w-auto">
-                        <div className="relative group">
-                            <FaSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-blue-500 transition-colors" size={14} />
-                            <input
-                                type="text"
-                                placeholder="Search tasks or events..."
-                                value={searchQuery}
-                                onChange={(e) => setSearchQuery(e.target.value)}
-                                className="pl-9 pr-8 py-1.5 w-40 sm:w-64 bg-gray-100 dark:bg-gray-800 border-transparent focus:bg-white dark:focus:bg-gray-750 focus:border-blue-500/50 border rounded-full text-xs text-gray-800 dark:text-gray-200 placeholder-gray-500 focus:outline-none focus:ring-4 focus:ring-blue-500/10 transition-all"
-                            />
-                            {searchQuery && (
-                                <button
-                                    onClick={() => setSearchQuery('')}
-                                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors"
-                                >
-                                    <FaTimes size={12} />
-                                </button>
-                            )}
-                        </div>
+                        {isSearchExpanded || searchQuery ? (
+                            <div className="relative group">
+                                <FaSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-blue-500 transition-colors" size={14} />
+                                <input
+                                    autoFocus
+                                    type="text"
+                                    placeholder="Search tasks or events..."
+                                    value={searchQuery}
+                                    onChange={(e) => setSearchQuery(e.target.value)}
+                                    onBlur={() => {
+                                        if (!searchQuery) setIsSearchExpanded(false);
+                                    }}
+                                    className="pl-9 pr-8 py-1.5 w-40 sm:w-64 bg-gray-100 dark:bg-gray-800 border-transparent focus:bg-white dark:focus:bg-gray-750 focus:border-blue-500/50 border rounded-full text-xs text-gray-800 dark:text-gray-200 placeholder-gray-500 focus:outline-none focus:ring-4 focus:ring-blue-500/10 transition-all"
+                                />
+                                {searchQuery && (
+                                    <button
+                                        onClick={() => {
+                                            setSearchQuery('');
+                                            setIsSearchExpanded(false);
+                                        }}
+                                        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors"
+                                    >
+                                        <FaTimes size={12} />
+                                    </button>
+                                )}
+                            </div>
+                        ) : (
+                            <div
+                                onClick={() => setIsSearchExpanded(true)}
+                                className="flex items-center gap-2 hover:text-gray-900 dark:hover:text-gray-200 cursor-pointer transition-colors"
+                            >
+                                <FaSearch size={14} /> <span className="hidden sm:inline">Search</span>
+                            </div>
+                        )}
                         <div className="flex items-center gap-2 hover:text-gray-900 dark:hover:text-gray-200 cursor-pointer transition-colors">
                             <FaFilter size={14} /> <span className="hidden sm:inline">Filter</span>
                         </div>
@@ -340,7 +357,7 @@ const ProjectBoard: React.FC = () => {
                                                                             <div className="flex items-center gap-3 text-gray-400 dark:text-gray-500">
                                                                                 {task.comments && (
                                                                                     <div className="flex items-center gap-1 text-xs">
-                                                                                        <FaRegComment size={10} /> {task.comments}
+                                                                                        <MdChatBubbleOutline size={14} /> {task.comments}
                                                                                     </div>
                                                                                 )}
                                                                                 {task.attachments && (
@@ -746,11 +763,6 @@ const ProjectBoard: React.FC = () => {
                                                 return isSameDay(mDate, currentDate);
                                             });
 
-                                            // LOGGING FOR DEBUGGING
-                                            console.log('--- Timeline Debug ---');
-                                            console.log('Selected Date:', currentDate.toDateString());
-                                            console.log('Total Meetings in Redux:', meetings.length);
-                                            console.log('Meetings for this day:', timelineMeetings.length);
                                             if (meetings.length > 0 && timelineMeetings.length === 0) {
                                                 console.log('Sample Meetings in State:', meetings.map(m => ({
                                                     title: m.title,
@@ -772,8 +784,6 @@ const ProjectBoard: React.FC = () => {
                                                 };
                                             });
 
-                                            // Simple List Stacking Logic: Every meeting gets its own row
-                                            // This ensures they appear "neech" (below) regardless of time overlap
                                             const sortedMeetings = processedMeetings.sort((a, b) => a.visual.start - b.visual.start);
                                             const rows = sortedMeetings.map(pm => [pm]);
 

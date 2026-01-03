@@ -33,9 +33,11 @@ const initialState: DashboardState = {
 // Fetch KPIs
 export const fetchKPIs = createAsyncThunk(
     'dashboard/fetchKPIs',
-    async (projectId: string | undefined, { rejectWithValue }) => {
+    async (args: { projectId?: string, year?: string } | undefined, { rejectWithValue }) => {
         try {
-            const params = projectId && projectId !== 'all' ? { projectId } : {};
+            const params: any = args?.projectId && args.projectId !== 'all' ? { projectId: args.projectId } : {};
+            if (args?.year) params.year = args.year;
+
             const response = await api.get('/dashboard/kpis', { params });
             return response.data;
         } catch (error: any) {

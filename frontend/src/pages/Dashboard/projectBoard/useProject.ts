@@ -149,7 +149,7 @@ export const useProjectBoard = () => {
             {
                 id: 'postpone',
                 title: 'Postpone',
-                count: canceledTasks.length, // Mapping CANCELED to Postpone
+                count: canceledTasks.length,
                 color: 'red',
                 tasks: canceledTasks
             },
@@ -195,7 +195,7 @@ export const useProjectBoard = () => {
                     month: assignDate.getUTCMonth(),
                     year: assignDate.getUTCFullYear(),
                     type: 'assign',
-                    color: 'bg-green-600 text-white',
+                    color: 'bg-green-100 text-green-600',
                     task: t
                 });
             }
@@ -210,7 +210,7 @@ export const useProjectBoard = () => {
                     month: dueDate.getUTCMonth(),
                     year: dueDate.getUTCFullYear(),
                     type: 'due',
-                    color: 'bg-red-600 text-white',
+                    color: 'bg-red-100 text-red-600',
                     task: t
                 });
             }

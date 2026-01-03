@@ -75,6 +75,13 @@ export const useSettings = (user: any, onClose: () => void) => {
         }
     };
 
+    const onRemoveImage = () => {
+        if (preview) URL.revokeObjectURL(preview);
+        setPreview(null);
+        setFile(null);
+        setProfile((prev: UserProfile) => ({ ...prev, avatar: "" }));
+    };
+
     const handleClose = () => {
         if (preview) URL.revokeObjectURL(preview);
         onClose();
@@ -92,6 +99,7 @@ export const useSettings = (user: any, onClose: () => void) => {
         loading,
         setLoading,
         onImageSelect,
+        onRemoveImage,
         handleChange,
         handleSaveProfile,
         handleClose

@@ -3,11 +3,9 @@ import CreateGlobalTaskModal from '../../../components/modals/createTask/CreateG
 import { useTasks } from './useTasks';
 import { useAppSelector } from 'store/hooks';
 import { RootState } from 'store/store';
-import {
-    FaSearch, FaPlus, FaFilter, FaSortAmountDown, FaThLarge, FaList,
-    FaEllipsisH, FaPaperclip, FaCheckSquare, FaCalendarAlt, FaFlag,
-    FaRegCommentDots, FaRegFileAlt
-} from 'react-icons/fa';
+import { FaSearch, FaPlus, FaSortAmountDown, FaThLarge, FaList, FaEllipsisH, FaPaperclip, FaFlag, FaRegCommentDots, FaRegFileAlt, } from 'react-icons/fa';
+import { MdSettingsInputComponent } from 'react-icons/md';
+import { Loader } from 'components/loader/Loader';
 
 
 const Tasks: React.FC = () => {
@@ -15,11 +13,7 @@ const Tasks: React.FC = () => {
     const { user } = useAppSelector((state: RootState) => state.auth);
 
     if (loading && tasks.length === 0) {
-        return (
-            <div className="flex-1 flex items-center justify-center bg-gray-50 dark:bg-[#0f1117]">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
-            </div>
-        );
+        <Loader />
     }
 
     return (
@@ -57,7 +51,7 @@ const Tasks: React.FC = () => {
                             </div>
 
                             <button className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-gray-600 dark:text-gray-400 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-800 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700">
-                                <FaFilter size={12} /> Filters
+                                <MdSettingsInputComponent size={12} /> Filters
                             </button>
                             <button className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-gray-600 dark:text-gray-400 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-800 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700">
                                 <FaSortAmountDown size={12} /> Sort By
@@ -85,7 +79,7 @@ const Tasks: React.FC = () => {
                                     <div
                                         {...provided.droppableProps}
                                         ref={provided.innerRef}
-                                        className={`w-[290px] flex-shrink-0 flex flex-col h-full transition-colors duration-200 rounded-xl px-2 
+                                        className={`w-[270px] flex-shrink-0 flex flex-col h-full transition-colors duration-200 rounded-xl 
                                             ${snapshot.isDraggingOver ? 'bg-blue-50/50 dark:bg-blue-900/10' : ''}`}
                                     >
                                         <div className="flex items-center justify-between mb-4 px-1 pt-2">
@@ -133,20 +127,20 @@ const Tasks: React.FC = () => {
                                                                 <h4 className="text-lg font-bold text-gray-900 dark:text-gray-100 mb-1 leading-tight tracking-tight">
                                                                     {task.name}
                                                                 </h4>
-                                                                <p className="text-sm text-gray-500 dark:text-gray-400 line-clamp-2 leading-normal">
+                                                                <p className="text-sm text-[#74798B] dark:text-[#74798B] line-clamp-2 leading-normal">
                                                                     {task.description || "No description provided."}
                                                                 </p>
                                                             </div>
 
                                                             {/* Assignee Info & Priority Row */}
                                                             <div className="space-y-2 mb-5">
-                                                                <div className="flex items-center gap-3">
-                                                                    <div className="text-[11px] text-gray-400 dark:text-gray-500 uppercase tracking-wider font-semibold">Assignee:</div>
+                                                                <div className="flex items-center justify-between gap-3">
+                                                                    <div className="text-[10px] text-gray-400 dark:text-gray-500  tracking-wider font-semibold">Assignee:</div>
                                                                     {/* Assignee Avatar (Aligned with Label) */}
-                                                                    <div className="flex-shrink-0">
+                                                                    <div className="flex-shrink-0 ">
                                                                         {task.assignedTo ? (
                                                                             <img
-                                                                                src={task.assignedTo.avatar || `https://ui-avatars.com/api/?name=${task.assignedTo.name}`}
+                                                                                src={task.assignedTo.avatar}
                                                                                 alt={task.assignedTo.name}
                                                                                 className="w-7 h-7 rounded-full border-2 border-white dark:border-gray-800 shadow-sm object-cover"
                                                                             />
@@ -159,7 +153,7 @@ const Tasks: React.FC = () => {
                                                                     {/* Date with Flag */}
                                                                     <div className="flex items-center gap-2 text-gray-400 dark:text-gray-500 text-sm font-medium">
                                                                         <FaFlag size={14} className="text-gray-600 dark:text-gray-400" />
-                                                                        <span>{task.dueDate ? new Date(task.dueDate).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' }) : 'No Deadline'}</span>
+                                                                        <span className='text-[#74798B] font-normal'>{task.dueDate ? new Date(task.dueDate).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' }) : 'No Deadline'}</span>
                                                                     </div>
 
                                                                     {/* Priority with Dot */}
@@ -179,16 +173,16 @@ const Tasks: React.FC = () => {
                                                             {/* Meta Info Bottom Row */}
                                                             <div className="flex items-center gap-5 text-gray-400 dark:text-gray-500">
                                                                 <div className="flex items-center gap-2 text-sm font-medium">
-                                                                    <FaRegFileAlt size={16} />
-                                                                    <span className="text-sm font-semibold">3/4</span>
+                                                                    <FaRegFileAlt size={16} className='text-gray-600' />
+                                                                    <span className="text-sm font-semibold text-[#74798B]">3/4</span>
                                                                 </div>
                                                                 <div className="flex items-center gap-2 text-sm font-medium">
-                                                                    <FaRegCommentDots size={16} />
-                                                                    <span className="text-sm font-semibold">{task.comments || 0}</span>
+                                                                    <FaRegCommentDots size={16} className='text-gray-600' />
+                                                                    <span className="text-sm font-semibold text-[#74798B]">{task.comments || 0}</span>
                                                                 </div>
                                                                 <div className="flex items-center gap-2 text-sm font-medium">
-                                                                    <FaPaperclip size={16} />
-                                                                    <span className="text-sm font-semibold">{task.attachments || 7}</span>
+                                                                    <FaPaperclip size={16} className='text-gray-600 -rotate-45' />
+                                                                    <span className="text-sm font-semibold text-[#74798B]">{task.attachments || 7}</span>
                                                                 </div>
                                                             </div>
                                                         </div>

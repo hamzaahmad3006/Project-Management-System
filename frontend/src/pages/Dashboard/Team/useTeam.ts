@@ -7,6 +7,7 @@ import { useAppDispatch, useAppSelector } from "store/hooks";
 import { useParams, useOutletContext } from "react-router-dom";
 import { fetchAllUsers } from '../../../store/slices/authSlice';
 import { fetchKPIs, fetchRecentActivity } from "../../../store/slices/dashboardSlice";
+import { fetchEvents } from "../../../store/slices/calendarSlice";
 
 
 
@@ -112,6 +113,8 @@ export const useDashboardTabHook = () => {
     const { allTeams, stats: teamStats, loading: teamLoading } = useSelector((state: RootState) => state.team);
     const { selectedProjectId, projects } = useSelector((state: RootState) => state.projects);
     const { kpis, recentActivity, loading: dashLoading } = useSelector((state: RootState) => state.dashboard);
+    const { events, loading: calendarLoading } = useSelector((state: RootState) => state.calendar);
+    const [selectedYear, setSelectedYear] = useState('2026');
     const theme = useSelector((state: RootState) => state.theme.theme);
     const isDark = theme === 'dark' || (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
 
@@ -131,16 +134,20 @@ export const useDashboardTabHook = () => {
 
     useEffect(() => {
         if (teamId) {
-            dispatch(fetchTeamStats(teamId));
+            dispatch(fetchTeamStats({ teamId, year: selectedYear }));
         }
+
+        const projectIdForEvents = selectedProjectId && selectedProjectId !== 'all' ? selectedProjectId : undefined;
+        dispatch(fetchEvents({ projectId: projectIdForEvents }));
+
         if (selectedProjectId && selectedProjectId !== 'all') {
-            dispatch(fetchKPIs(selectedProjectId));
+            dispatch(fetchKPIs({ projectId: selectedProjectId, year: selectedYear }));
             dispatch(fetchRecentActivity(selectedProjectId));
         } else if (!teamId) {
-            dispatch(fetchKPIs('all'));
+            dispatch(fetchKPIs({ projectId: 'all', year: selectedYear }));
             dispatch(fetchRecentActivity('all'));
         }
-    }, [dispatch, teamId, selectedProjectId]);
+    }, [dispatch, teamId, selectedProjectId, selectedYear]);
 
     const loading = teamLoading || dashLoading;
 
@@ -178,17 +185,21 @@ export const useDashboardTabHook = () => {
 
     const chartData = useMemo(() => {
         if (!displayStats?.overview?.chartData) return null;
-        const labels = displayStats.overview.chartData.map((d: any) => d.label);
+        const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
         const values = displayStats.overview.chartData.map((d: any) => d.value);
 
+        const currentMonthIndex = new Date().getMonth();
+        const isCurrentYear = selectedYear === new Date().getFullYear().toString();
+
         return {
-            labels,
+            labels: months,
             datasets: [{
                 data: values,
-                backgroundColor: values.map((_: any, i: number) =>
-                    i === values.length - 1 ? (isDark ? '#3b82f6' : '#0070f3') : (isDark ? '#2d333b' : '#e5e7eb')
-                ),
-                borderRadius: 4,
+                backgroundColor: values.map((_: any, i: number) => {
+                    const shouldHighlight = isCurrentYear ? i === currentMonthIndex : i === 0;
+                    return shouldHighlight ? '#0070f3' : (isDark ? '#2d333b' : '#e5e7eb');
+                }),
+                borderRadius: 8,
                 barThickness: 32,
             }]
         };
@@ -196,19 +207,41 @@ export const useDashboardTabHook = () => {
 
     const chartOptions = {
         responsive: true,
+        maintainAspectRatio: false,
         plugins: {
             legend: { display: false },
             tooltip: {
+                enabled: true,
+                backgroundColor: isDark ? '#1a1c23' : '#fff',
+                titleColor: isDark ? '#fff' : '#000',
+                bodyColor: isDark ? '#fff' : '#000',
+                borderColor: isDark ? '#374151' : '#e5e7eb',
+                borderWidth: 1,
+                padding: 10,
+                displayColors: false,
                 callbacks: {
-                    label: (context: any) => `$${context.raw.toLocaleString()}`
+                    label: (context: any) => `Tasks: ${context.raw}`
                 }
             }
         },
         scales: {
-            y: { display: false, beginAtZero: true },
+            y: {
+                display: false,
+                beginAtZero: true
+            },
             x: {
-                grid: { display: false },
-                ticks: { color: isDark ? '#4b5563' : '#9ca3af', font: { size: 10 } }
+                grid: {
+                    display: false,
+                    drawBorder: false,
+                },
+                ticks: {
+                    color: isDark ? '#4b5563' : '#9ca3af',
+                    font: {
+                        size: 11,
+                        weight: '500'
+                    },
+                    padding: 10
+                }
             }
         }
     };
@@ -219,17 +252,39 @@ export const useDashboardTabHook = () => {
         return projects.filter(p => !teamId || p.teamId === teamId);
     }, [projects, teamId]);
 
+    const todayEvents = useMemo(() => {
+        const today = new Date();
+        return events.filter(e => {
+            const eventDate = new Date(e.startTime);
+            return (
+                eventDate.getDate() === today.getDate() &&
+                eventDate.getMonth() === today.getMonth() &&
+                eventDate.getFullYear() === today.getFullYear()
+            );
+        });
+    }, [events]);
+
+    const currentDateDisplay = new Date().toLocaleDateString('en-US', {
+        month: 'long',
+        day: 'numeric',
+        year: 'numeric'
+    });
+
     return {
-        loading,
+        loading: loading || calendarLoading,
         allTeams,
         teamId,
         displayStats,
         chartData,
         chartOptions,
         hours,
+        todayEvents,
+        currentDateDisplay,
         filteredTeamProjects,
         setSelectedProjectId,
         selectedProjectId,
+        selectedYear,
+        setSelectedYear,
         dispatch
     }
 }

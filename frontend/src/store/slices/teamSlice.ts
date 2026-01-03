@@ -125,9 +125,9 @@ export const fetchTeamMembersById = createAsyncThunk(
 
 export const fetchTeamStats = createAsyncThunk(
     'team/fetchStats',
-    async (teamId: string, { rejectWithValue }) => {
+    async ({ teamId, year }: { teamId: string, year?: string }, { rejectWithValue }) => {
         try {
-            const response = await api.get(`/teams/${teamId}/stats`);
+            const response = await api.get(`/teams/${teamId}/stats`, { params: { year } });
             return response.data;
         } catch (error: any) {
             return rejectWithValue(error.response?.data?.message || 'Failed to fetch team stats');
