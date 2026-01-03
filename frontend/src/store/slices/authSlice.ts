@@ -81,6 +81,18 @@ export const fetchAllUsers = createAsyncThunk<User[], void>(
     }
 );
 
+export const changePassword = createAsyncThunk<void, { currentPassword: string; newPassword: string }>(
+    'auth/changePassword',
+    async (passwords, { rejectWithValue }) => {
+        try {
+            await api.put('/auth/change-password', passwords);
+        } catch (err: unknown) {
+            const error = err as AxiosError<{ message: string }>;
+            return rejectWithValue(error.response?.data?.message || 'Failed to change password');
+        }
+    }
+);
+
 const authSlice = createSlice({
     name: 'auth',
     initialState,

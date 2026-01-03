@@ -27,12 +27,17 @@ const SettingsModal: React.FC<CreateModalProps> = ({ isOpen, onClose }) => {
 
     if (!isOpen) return null;
 
-    const tabs = [
+    const allTabs = [
         { id: 'profile', label: 'My Profile', },
         { id: 'security', label: 'Security', },
         { id: 'notifications', label: 'Notifications', },
         { id: 'general', label: 'General', },
     ];
+
+    const tabs = allTabs.filter(tab => {
+        if (tab.id === 'security' && user?.hasPassword === false) return false;
+        return true;
+    });
 
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 backdrop-blur-sm">

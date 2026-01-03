@@ -80,6 +80,7 @@ export interface User {
     role: "MEMBER" | "MANAGER";
     avatar?: string;
     teamMemberships?: { team: { name: string } }[];
+    hasPassword?: boolean;
 }
 
 export interface AuthState {
