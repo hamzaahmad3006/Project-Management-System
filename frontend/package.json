@@ -33,7 +33,9 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "test:e2e": "cypress open",
+    "test:e2e:run": "cypress run"
   },
   "eslintConfig": {
     "extends": [
@@ -57,6 +59,7 @@
     "@types/node": "^24.10.1",
     "@types/react": "^19.2.7",
     "@types/react-dom": "^19.2.3",
+    "cypress": "^15.8.1",
     "tailwindcss": "^3.4.17",
     "typescript": "^5.9.3"
   }
