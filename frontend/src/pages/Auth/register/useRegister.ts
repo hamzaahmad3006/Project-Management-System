@@ -4,14 +4,15 @@ import { signInWithPopup } from "firebase/auth";
 import { auth, githubProvider, provider } from "config/firebase";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
-import { loginwithgoogle } from "store/slices/authSlice";
+import { loginwithgoogle, register } from "store/slices/authSlice";
+import { toast } from 'react-toastify';
 
 export const useRegister = () => {
     const [formData, setFormData] = useState({
         name: '',
         email: '',
         password: '',
-        role: 'MEMBER'
+        role: 'MEMBER' as 'MEMBER' | 'MANAGER'
     });
     const dispatch = useDispatch<AppDispatch>();
     const navigate = useNavigate();
@@ -54,12 +55,30 @@ export const useRegister = () => {
         alert('Figma Signin')
     };
 
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        try {
+            const result = await dispatch(register({
+                email: formData.email,
+                name: formData.name || formData.email.split('@')[0],
+                role: formData.role
+            })).unwrap();
+
+            window.toastify("Account created successfully! Check your email for password.");
+            navigate('/auth/login');
+        } catch (err: any) {
+            toast.error(err || "Registration failed");
+            console.error("Registration error:", err);
+        }
+    };
+
     return {
         formData,
         handleChange,
         handleSinginWithGoogle,
         handleSigninWithGithub,
         handleSinginWithFigma,
+        handleSubmit,
         loading,
         error
     }

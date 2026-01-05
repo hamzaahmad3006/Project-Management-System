@@ -1,4 +1,10 @@
-// Loader Props in Component Folder
+// ====== Global Types For Toast======
+declare global {
+    interface Window {
+        toastify: (msg: string, type?: "success" | "info" | "error" | "warning") => void;
+    }
+}
+// === Loader Props in Component Folder ===
 export interface LoaderProps {
     size?: number;
     color?: "primary" | "secondary" | "inherit";

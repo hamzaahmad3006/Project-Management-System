@@ -2,10 +2,12 @@ import React from 'react';
 import { useRegister } from './useRegister';
 import InputForm from 'components/ui/inputFields/InputForm';
 import SocialAuthButton from 'components/ui/buttons/SocialAuthButton';
+import { Loader } from 'lucide-react';
+import { ButtonLoader } from 'components/loader/Loader';
 
 
 const Register: React.FC = () => {
-    const { handleSinginWithGoogle, handleSigninWithGithub, handleSinginWithFigma } = useRegister();
+    const { formData, handleChange, handleSubmit, handleSinginWithGoogle, handleSigninWithGithub, handleSinginWithFigma, loading } = useRegister();
     return (
         <div className="min-h-screen w-full flex flex-col items-center justify-around bg-white dark:bg-[#12141c] px-4 py-8 font-inter transition-colors duration-300">
             {/* Logo - Top */}
@@ -43,32 +45,30 @@ const Register: React.FC = () => {
                 />
 
                 {/* Email Section */}
-                <div className="mt-10">
+                <form onSubmit={handleSubmit} className="mt-10">
                     <InputForm
                         label="Email Address"
                         name="email"
                         type="email"
                         placeholder="name@company.com"
                         className="py-2.5 px-4 transition-all"
-                        value={""}
-                        onChange={() => { }}
+                        value={formData.email}
+                        onChange={handleChange}
                         required
                     />
-                    {/* <label className="block text-xs text-[#8F929C] dark:text-gray-500 mb-2 uppercase tracking-wider font-bold">Email</label>
-                    <input
-                        type="email"
-                        placeholder="Enter your email address..."
-                        className="w-full h-[36px] bg-white dark:bg-gray-800 border border-[#E2E4E9] dark:border-gray-700 py-2.5 px-4 text-sm font-medium text-[#25272D] dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-800 transition-all rounded-md"
-                    /> */}
                     <p className="text-[11px] text-gray-400 dark:text-gray-500 mt-2.5 leading-relaxed">
                         Use an organization email to easily collaborate with teammates
                     </p>
-                </div>
 
-                {/* Continue Button */}
-                <button className="w-full h-[36px] bg-[#6696F5] dark:bg-blue-600 text-white py-2.5 rounded-md mt-5 hover:bg-blue-600 dark:hover:bg-blue-700 transition text-sm font-medium shadow-sm">
-                    Continue
-                </button>
+                    {/* Continue Button */}
+                    <button
+                        type="submit"
+                        disabled={loading}
+                        className="w-full h-[36px] bg-[#6696F5] dark:bg-blue-600 text-white py-2.5 rounded-md mt-5 hover:bg-blue-600 dark:hover:bg-blue-700 transition text-sm font-medium shadow-sm flex items-center justify-center gap-2"
+                    >
+                        {loading ? <ButtonLoader /> : "Continue"}
+                    </button>
+                </form>
             </div>
 
             {/* Footer - Bottom */}
