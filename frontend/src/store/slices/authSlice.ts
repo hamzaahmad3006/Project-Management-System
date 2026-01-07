@@ -26,6 +26,20 @@ export const loginwithgoogle = createAsyncThunk<AuthResponse, GoogleAuthData>(
         }
     }
 )
+export const loginwithgithub = createAsyncThunk<AuthResponse, GoogleAuthData>(
+    '/auth/github',
+    async (githubData, { rejectWithValue }) => {
+        try {
+            const response = await api.post<AuthResponse>('/auth/github', githubData)
+            localStorage.setItem('token', response.data.token)
+            return response.data
+        }
+        catch (err: unknown) {
+            const error = err as AxiosError<{ message: string }>;
+            return rejectWithValue(error.response?.data?.message || 'Login failed')
+        }
+    }
+)
 
 export const login = createAsyncThunk<AuthResponse, LoginCredentials>(
     'auth/login',
@@ -161,6 +175,21 @@ const authSlice = createSlice({
                 state.token = action.payload.token;
             })
             .addCase(loginwithgoogle.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload as string;
+            })
+            //Github Login
+            .addCase(loginwithgithub.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(loginwithgithub.fulfilled, (state, action) => {
+                state.loading = false;
+                state.isAuthenticated = true;
+                state.user = action.payload.user;
+                state.token = action.payload.token;
+            })
+            .addCase(loginwithgithub.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.payload as string;
             })

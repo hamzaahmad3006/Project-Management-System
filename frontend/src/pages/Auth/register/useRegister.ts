@@ -4,7 +4,7 @@ import { signInWithPopup } from "firebase/auth";
 import { auth, githubProvider, provider } from "config/firebase";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
-import { loginwithgoogle, register } from "store/slices/authSlice";
+import { loginwithgithub, loginwithgoogle, register } from "store/slices/authSlice";
 import { toast } from 'react-toastify';
 
 export const useRegister = () => {
@@ -44,7 +44,23 @@ export const useRegister = () => {
         try {
             const result = await signInWithPopup(auth, githubProvider);
             const user = result.user;
+            const email =
+                user.email ||
+                user.providerData?.find(p => p.email)?.email ||
+                null;
+
             console.log("GitHub user:", user);
+            const payload = await dispatch(loginwithgithub({
+                email,
+                name: user.displayName,
+                photoURL: user.photoURL
+            })).unwrap();
+
+            console.log("PyayLoad", payload);
+
+
+            // Navigate only if login success
+            navigate('/');
 
 
         } catch (err) {
