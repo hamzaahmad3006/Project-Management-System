@@ -1,36 +1,13 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { FaTimes } from 'react-icons/fa';
-import { useAppDispatch } from '../../store/hooks';
-import { addSubtask } from '../../store/slices/taskSlice';
+import { useSubtaskModal } from './useSubtaskModal';
+import { AddSubtaskModalProps } from 'types';
 
-interface AddSubtaskModalProps {
-    isOpen: boolean;
-    onClose: () => void;
-    taskId: string;
-}
 
 const AddSubtaskModal: React.FC<AddSubtaskModalProps> = ({ isOpen, onClose, taskId }) => {
-    const [title, setTitle] = useState('');
-    const dispatch = useAppDispatch();
-    const [loading, setLoading] = useState(false);
+    const { title, setTitle, loading, handleSubmit } = useSubtaskModal(onClose, taskId);
 
     if (!isOpen) return null;
-
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-        if (!title.trim()) return;
-
-        setLoading(true);
-        try {
-            await dispatch(addSubtask({ taskId, title })).unwrap();
-            setTitle('');
-            onClose();
-        } catch (error) {
-            console.error("Failed to add subtask:", error);
-        } finally {
-            setLoading(false);
-        }
-    };
 
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
@@ -45,7 +22,7 @@ const AddSubtaskModal: React.FC<AddSubtaskModalProps> = ({ isOpen, onClose, task
                     <input
                         type="text"
                         value={title}
-                        onChange={(e) => setTitle(e.target.value)}
+                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => setTitle(e.target.value)}
                         placeholder="What needs to be done?"
                         className="w-full px-4 py-3 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 mb-6"
                         autoFocus

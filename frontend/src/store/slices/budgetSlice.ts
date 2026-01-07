@@ -1,7 +1,7 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import { AxiosError } from 'axios';
 import api from '../../api/axios';
-import { BudgetState, BudgetOverview, BudgetProject, UpdateBudgetData } from '../../types';
+import { BudgetState, BudgetOverview, BudgetProject, UpdateBudgetData } from 'types';
 
 const initialState: BudgetState = {
     overview: null,

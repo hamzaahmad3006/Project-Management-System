@@ -6,9 +6,7 @@ export default function Team() {
 
     return (
         <div className="flex w-full h-screen bg-white dark:bg-[#12141c]">
-            {/* Main area */}
             <main className="flex-1 p-8 overflow-auto custom-scrollbar">
-                {/* Header (team name) */}
                 <div className="flex items-center justify-between mb-6">
                     <div>
                         <div className="flex items-center gap-3">
@@ -29,7 +27,6 @@ export default function Team() {
                     </div>
                 </div>
 
-                {/* Top tabs (projects / dashboard / members / files) */}
                 <div className="mb-6 border-b border-gray-100 dark:border-gray-800">
                     <nav className="flex gap-6 text-sm">
                         <NavLink
@@ -79,7 +76,6 @@ export default function Team() {
                     </nav>
                 </div>
 
-                {/* Outlet will render Projects / Dashboard / Members / Files */}
                 <div className="animate-in fade-in duration-500">
                     <Outlet context={{ teamId: team?.id }} />
                 </div>

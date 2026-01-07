@@ -1,9 +1,9 @@
 import { useState } from "react";
 import axios, { AxiosError } from "axios";
 import api from "../../../api/axios";
-import { UserProfile } from "../../../types";
+import { UserProfile, User } from "types";
 
-export const useSettings = (user: any, onClose: () => void) => {
+export const useSettings = (user: User | null, onClose: () => void) => {
     const [activeTab, setActiveTab] = useState('profile');
     const [profile, setProfile] = useState<UserProfile>({
         name: user?.name || "",
@@ -40,7 +40,6 @@ export const useSettings = (user: any, onClose: () => void) => {
             setLoading(true);
             let avatarUrl = profile.avatar;
 
-            // Upload file to Cloudinary if exists
             if (file) {
                 const formData = new FormData();
                 formData.append("file", file);
@@ -61,7 +60,7 @@ export const useSettings = (user: any, onClose: () => void) => {
 
             const result = saveRes.data;
 
-            setProfile((prev) => ({ ...prev, avatar: result.avatar || avatarUrl }));
+            setProfile((prev: UserProfile) => ({ ...prev, avatar: result.avatar || avatarUrl }));
             window.toastify("Profile updated!", "success");
 
             if (preview) URL.revokeObjectURL(preview);

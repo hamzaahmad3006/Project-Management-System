@@ -1,5 +1,6 @@
 import { Loader } from "components/loader/Loader";
 import { useMemberTabHook } from "./useTeam";
+import { MemberListItem, TeamMember, User } from "types";
 
 export default function MembersTab() {
     const { loading, allTeams, teamId, displayMembers } = useMemberTabHook();
@@ -7,7 +8,6 @@ export default function MembersTab() {
 
     return (
         <div className="flex-1 animate-in fade-in slide-in-from-bottom-2 duration-500 overflow-auto custom-scrollbar">
-            {/* MEMBERS TABLE */}
             <div className="border border-gray-200 dark:border-gray-800 rounded-xl overflow-hidden shadow-sm bg-white dark:bg-[#1a1c23]">
                 <table className="w-full text-sm">
                     <thead className="bg-gray-50 dark:bg-gray-800/50 text-gray-500 dark:text-gray-400">
@@ -21,9 +21,8 @@ export default function MembersTab() {
 
                     <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
                         {displayMembers && displayMembers.length > 0 ? (
-                            displayMembers.map((item: any, index: number) => {
-                                // item is a TeamMember object which has a user object, or a User object
-                                const user = item.user || item;
+                            displayMembers.map((item: MemberListItem, index: number) => {
+                                const user = (item as { user: User | TeamMember }).user || item as User | TeamMember;
                                 return (
                                     <tr key={user.id || index} className="hover:bg-gray-50 dark:hover:bg-gray-800/30 transition-colors">
                                         <td className="p-4">
@@ -56,7 +55,7 @@ export default function MembersTab() {
 
                                         <td className="p-4">
                                             <span className="text-gray-600 dark:text-gray-400">
-                                                {item.role || 'Member'}
+                                                {user.role || 'Member'}
                                             </span>
                                         </td>
 

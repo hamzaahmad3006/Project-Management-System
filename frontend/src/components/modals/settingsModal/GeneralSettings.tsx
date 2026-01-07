@@ -27,7 +27,7 @@ const GeneralSettings = () => {
                         name="theme"
                         icon={<FaChevronDown size={12} />}
                         value={localTheme}
-                        onChange={(e) => setLocalTheme(e.target.value as ThemeType)}
+                        onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setLocalTheme(e.target.value as ThemeType)}
                         options={[
                             { label: "Light", value: "light" },
                             { label: "Dark", value: "dark" },
@@ -46,7 +46,7 @@ const GeneralSettings = () => {
                         label="Language"
                         name="language"
                         value={localTheme}
-                        onChange={(e) => setLocalTheme(e.target.value as ThemeType)}
+                        onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setLocalTheme(e.target.value as ThemeType)}
                         options={[
                             { label: "English", value: "english" },
                             { label: "Urdu", value: "urdu" },
@@ -63,7 +63,7 @@ const GeneralSettings = () => {
                         label="Time zone"
                         name="timezone"
                         value={localTheme}
-                        onChange={(e) => setLocalTheme(e.target.value as ThemeType)}
+                        onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setLocalTheme(e.target.value as ThemeType)}
                         options={[
                             { label: "Islamabad", value: "islamabad" },
                             { label: "Karachi", value: "karachi" },
@@ -81,7 +81,7 @@ const GeneralSettings = () => {
                         label="Time format"
                         name="timeformat"
                         value={localTheme}
-                        onChange={(e) => setLocalTheme(e.target.value as ThemeType)}
+                        onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setLocalTheme(e.target.value as ThemeType)}
                         options={[
                             { label: "13:00", value: "13:00" },
                             { label: "01:00 PM", value: "01:00 PM" },
@@ -97,7 +97,7 @@ const GeneralSettings = () => {
                         label="Date format"
                         name="dateformat"
                         value={localTheme}
-                        onChange={(e) => setLocalTheme(e.target.value as ThemeType)}
+                        onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setLocalTheme(e.target.value as ThemeType)}
                         options={[
                             { label: "DD-MM-YYYY", value: "dd-mm-yyyy" },
                             { label: "MM-DD-YYYY", value: "mm-dd-yyyy" },

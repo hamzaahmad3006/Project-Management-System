@@ -2,13 +2,14 @@ import React, { useEffect, useState } from 'react';
 import { useAppDispatch, useAppSelector } from '../../../store/hooks';
 import { createTask } from '../../../store/slices/taskSlice';
 import { fetchProjects } from '../../../store/slices/projectSlice';
-import { TaskPriority, TaskStatus } from '../../../types';
+import { AxiosError } from 'axios';
+import { TaskPriority, TaskStatus } from 'types';
 
 export const useCreateTaskHook = (isOpen: boolean, onClose: () => void, initialStatus?: TaskStatus, initialProjectId?: string) => {
     const dispatch = useAppDispatch();
     const { projects } = useAppSelector((state) => state.projects);
 
-    // Form State
+
     const [name, setName] = useState('');
     const [description, setDescription] = useState('');
     const [status, setStatus] = useState<TaskStatus>(initialStatus || 'TODO');
@@ -82,8 +83,9 @@ export const useCreateTaskHook = (isOpen: boolean, onClose: () => void, initialS
             window.toastify("Task created successfully", "success");
             onClose();
             resetForm();
-        } catch (err: any) {
-            window.toastify(err || "Failed to create task", "error");
+        } catch (err: unknown) {
+            const error = err as AxiosError<{ message: string }>;
+            window.toastify(error.response?.data?.message || "Failed to create task", "error");
         } finally {
             setLoading(false);
         }

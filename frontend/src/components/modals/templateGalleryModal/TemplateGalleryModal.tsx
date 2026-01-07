@@ -1,6 +1,6 @@
 import React from 'react';
 import { FaSearch, FaStar, FaRocket, FaPencilRuler, FaBullhorn, FaCode, FaUsers, FaLaptopHouse, FaBriefcase, FaRegLightbulb, FaTimes } from 'react-icons/fa';
-import { TemplateGalleryModalProps } from '../../../types';
+import { TemplateGalleryModalProps } from 'types';
 import { useTemplateGallery } from './useTemplateGallery';
 
 const TemplateGalleryModal: React.FC<TemplateGalleryModalProps> = ({ isOpen, onClose, onSelectTemplate }) => {

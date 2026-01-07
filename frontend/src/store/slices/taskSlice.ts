@@ -1,6 +1,6 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import api from '../../api/axios';
-import { Task, TaskState, Subtask } from '../../types';
+import { Task, TaskState, Subtask } from 'types';
 import { AxiosError } from 'axios';
 
 
@@ -12,7 +12,6 @@ const initialState: TaskState = {
     error: null,
 };
 
-// Consolidated createTask action
 export const createTask = createAsyncThunk(
     'tasks/createTask',
     async (taskData: Partial<Task>, { rejectWithValue }) => {
@@ -95,7 +94,6 @@ export const addSubtask = createAsyncThunk(
     }
 );
 
-// Toggle Subtask
 export const toggleSubtask = createAsyncThunk(
     'tasks/toggleSubtask',
     async ({ subtaskId }: { subtaskId: string }, { rejectWithValue }) => {

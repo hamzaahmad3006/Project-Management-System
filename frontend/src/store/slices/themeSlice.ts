@@ -1,10 +1,9 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { ThemeState } from 'types';
 
 export type ThemeType = 'light' | 'dark' | 'system';
 
-interface ThemeState {
-    theme: ThemeType;
-}
+
 
 const getInitialTheme = (): ThemeType => {
     const savedTheme = localStorage.getItem('theme') as ThemeType;

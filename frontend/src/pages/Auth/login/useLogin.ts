@@ -4,6 +4,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '../../../store/store';
 import { login, loginwithgoogle, forgotPassword } from '../../../store/slices/authSlice';
 import { toast } from 'react-toastify';
+import { AxiosError } from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 
@@ -37,8 +38,10 @@ export const useLoginHook = () => {
 
             navigate('/');
             window.toastify("Signin successful", "success");
-        } catch (err) {
-            console.error("Google sign in error:", err);
+        } catch (err: unknown) {
+            const error = err as AxiosError<{ message: string }>;
+            window.toastify(error.response?.data?.message || "Google sign in failed", "error");
+            console.error("Google sign in error:", error);
         }
 
 
@@ -52,12 +55,17 @@ export const useLoginHook = () => {
         try {
             await dispatch(forgotPassword({ email })).unwrap();
             toast.success("Password reset link sent to your email!");
-        } catch (err: any) {
-            toast.error(err || "Failed to send reset link");
+        } catch (err: unknown) {
+            const error = err as AxiosError<{ message: string }>;
+            toast.error(error.response?.data?.message || "Failed to send reset link");
         } finally {
             setForgotLoading(false);
         }
     };
+
+    const handleMicrosoft = () => {
+        alert("Microsoft sign in not implemented yet");
+    }
 
     return {
         email,
@@ -66,6 +74,7 @@ export const useLoginHook = () => {
         setPassword,
         handleSubmit,
         handleSigninWithGoogle,
+        handleMicrosoft,
         handleForgotPassword,
         forgotLoading,
         loading,

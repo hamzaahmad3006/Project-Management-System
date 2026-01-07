@@ -6,6 +6,7 @@ import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { loginwithgithub, loginwithgoogle, register } from "store/slices/authSlice";
 import { toast } from 'react-toastify';
+import { AxiosError } from 'axios';
 
 export const useRegister = () => {
     const [formData, setFormData] = useState({
@@ -33,10 +34,12 @@ export const useRegister = () => {
                 photoURL: user.photoURL
             })).unwrap();
 
-            // Navigate only if login success
+
             navigate('/');
-        } catch (err) {
-            console.error("Google sign in error:", err);
+        } catch (err: unknown) {
+            const error = err as AxiosError<{ message: string }>;
+            window.toastify(error.response?.data?.message || "Google sign in failed", "error");
+
         }
     };
     const handleSigninWithGithub = async (e: React.FormEvent) => {
@@ -49,22 +52,20 @@ export const useRegister = () => {
                 user.providerData?.find(p => p.email)?.email ||
                 null;
 
-            console.log("GitHub user:", user);
             const payload = await dispatch(loginwithgithub({
                 email,
                 name: user.displayName,
                 photoURL: user.photoURL
             })).unwrap();
 
-            console.log("PyayLoad", payload);
 
-
-            // Navigate only if login success
             navigate('/');
 
 
-        } catch (err) {
-            console.log(err);
+        } catch (err: unknown) {
+            const error = err as AxiosError<{ message: string }>;
+            window.toastify(error.response?.data?.message || "GitHub sign in failed", "error");
+
         }
     };
     const handleSinginWithFigma = async (e: React.FormEvent) => {
@@ -82,9 +83,9 @@ export const useRegister = () => {
 
             window.toastify("Account created successfully! Check your email for password.");
             navigate('/auth/login');
-        } catch (err: any) {
-            toast.error(err || "Registration failed");
-            console.error("Registration error:", err);
+        } catch (err: unknown) {
+            const error = err as AxiosError<{ message: string }>;
+            toast.error(error.response?.data?.message || "Registration failed");
         }
     };
 

@@ -2,7 +2,7 @@ import React from 'react';
 import { useCreateProject } from './useCreateProject';
 import TemplateGalleryModal from '../templateGalleryModal/TemplateGalleryModal';
 import { FaTimes, FaMagic, FaChevronDown, FaProjectDiagram } from 'react-icons/fa';
-import { CreateModalProps } from '../../../types';
+import { CreateModalProps } from 'types';
 import { ButtonLoader } from 'components/loader/Loader';
 import InputForm from 'components/ui/inputFields/InputForm';
 import SelectField from 'components/ui/inputFields/SelectedForm';
@@ -34,7 +34,7 @@ const CreateProjectModal: React.FC<CreateModalProps> = ({ isOpen, onClose }) => 
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
             <div className="bg-white dark:bg-[#1a1c23] rounded-lg shadow-xl w-full max-w-lg mx-4 overflow-hidden animate-fade-in-up border border-transparent dark:border-gray-800">
-                {/* Header */}
+
                 <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 dark:border-gray-800">
                     <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-100">Create new project</h3>
                     <button onClick={onClose} className="text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 transition-colors">
@@ -42,23 +42,20 @@ const CreateProjectModal: React.FC<CreateModalProps> = ({ isOpen, onClose }) => 
                     </button>
                 </div>
 
-                {/* Body */}
                 <div className="p-6 space-y-5">
-                    {/* Project Name */}
                     <div className="space-y-1.5">
                         <InputForm
                             label="Project name"
                             name="projectName"
                             placeholder="e.g. Website Redesign"
                             value={name}
-                            onChange={(e) => setName(e.target.value)}
+                            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setName(e.target.value)}
                             className="text-gray-800 dark:text-gray-100 bg-white dark:bg-gray-800 focus:ring-1 focus:ring-blue-500 border-blue-400 dark:border-blue-500/50"
                             labelClassName="text-gray-700 dark:text-gray-300"
 
                         />
                     </div>
 
-                    {/* Template */}
                     <div className="space-y-1.5">
                         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Template</label>
                         <div
@@ -83,7 +80,7 @@ const CreateProjectModal: React.FC<CreateModalProps> = ({ isOpen, onClose }) => 
                                 label="Select a team"
                                 name="team"
                                 value={teamId}
-                                onChange={(e) => setTeamId(e.target.value)}
+                                onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setTeamId(e.target.value)}
                                 options={[
                                     { label: "No Team", value: "" },
                                     ...(allTeams || []).map(team => ({ label: team.name, value: team.id }))
@@ -110,7 +107,6 @@ const CreateProjectModal: React.FC<CreateModalProps> = ({ isOpen, onClose }) => 
                                 icon={<FaChevronDown size={12} />}
                                 className="border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200"
                                 labelClassName="text-gray-700 dark:text-gray-300"
-                            // Note: Logic for setting privacy wasn't in original code, value hardcoded to option 1 visual
                             />
                         </div>
 
@@ -122,7 +118,7 @@ const CreateProjectModal: React.FC<CreateModalProps> = ({ isOpen, onClose }) => 
                                 type="number"
                                 placeholder="0"
                                 value={budget}
-                                onChange={(e) => setBudget(parseFloat(e.target.value) || 0)}
+                                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setBudget(parseFloat(e.target.value))}
                                 className="border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100"
                                 labelClassName="text-gray-700 dark:text-gray-300"
                             />
@@ -137,7 +133,7 @@ const CreateProjectModal: React.FC<CreateModalProps> = ({ isOpen, onClose }) => 
                             rows={3}
                             placeholder="Please share your main reason..."
                             value={description}
-                            onChange={(e) => setDescription(e.target.value)}
+                            onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setDescription(e.target.value)}
                             className="border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100"
                             labelClassName="text-gray-700 dark:text-gray-300"
                         />
@@ -163,14 +159,12 @@ const CreateProjectModal: React.FC<CreateModalProps> = ({ isOpen, onClose }) => 
                     </div>
                 </div>
 
-                {/* Footer */}
                 <div className="px-6 py-4 bg-gray-50 dark:bg-[#12141c] border-t border-gray-100 dark:border-gray-800">
                     <p className="text-xs text-center text-gray-500 dark:text-gray-400">
                         Learn more about projects by watching <a href="#" className="text-blue-500 dark:text-blue-400 hover:underline">tutorial video</a>.
                     </p>
                 </div>
             </div>
-            {/* Template Gallery */}
             <TemplateGalleryModal
                 isOpen={isGalleryOpen}
                 onClose={() => setIsGalleryOpen(false)}

@@ -1,7 +1,7 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { AxiosError } from 'axios';
 import api from '../../api/axios';
-import { CalendarEvent, CalendarState } from '../../types';
+import { CalendarEvent, CalendarState, CreateCalendarEventData } from 'types';
 
 const initialState: CalendarState = {
     events: [],
@@ -24,7 +24,7 @@ export const fetchEvents = createAsyncThunk(
 
 export const createCalendarEvent = createAsyncThunk(
     'calendar/createEvent',
-    async (eventData: any, { rejectWithValue }) => {
+    async (eventData: CreateCalendarEventData, { rejectWithValue }) => {
         try {
             const response = await api.post<{ event: CalendarEvent }>('/calendar', eventData);
             return response.data.event;

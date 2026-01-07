@@ -8,6 +8,8 @@ import { useParams, useOutletContext } from "react-router-dom";
 import { fetchAllUsers } from '../../../store/slices/authSlice';
 import { fetchKPIs, fetchRecentActivity } from "../../../store/slices/dashboardSlice";
 import { fetchEvents } from "../../../store/slices/calendarSlice";
+import { ChartData, ChartOptions, ScriptableContext } from 'chart.js';
+import { DashboardTask, CalendarEvent, Project, Team, Task } from 'types';
 
 
 
@@ -24,11 +26,11 @@ export const useTeamHook = () => {
 
 
     const team = (() => {
-        if (teamIdFromUrl) return allTeams.find(t => t.id === teamIdFromUrl);
+        if (teamIdFromUrl) return allTeams.find((t: Team) => t.id === teamIdFromUrl);
         if (selectedProjectId !== 'all') {
-            const project = projects.find(p => p.id === selectedProjectId);
+            const project = projects.find((p: Project) => p.id === selectedProjectId);
             if (project?.teamId) {
-                return allTeams.find(t => t.id === project.teamId);
+                return allTeams.find((t: Team) => t.id === project.teamId);
             }
         }
         return allTeams[0];
@@ -61,14 +63,14 @@ export const useProjectTabHook = () => {
         if (contextTeamId) return contextTeamId;
         if (teamIdFromUrl) return teamIdFromUrl;
         if (selectedProjectId !== 'all') {
-            const project = projects.find(p => p.id === selectedProjectId);
+            const project = projects.find((p: Project) => p.id === selectedProjectId);
             if (project?.teamId) return project.teamId;
             return null;
         }
         return null; // Show all projects if 'all' is selected
     })();
 
-    const filteredProjects = projects.filter(p => !teamId || p.teamId === teamId);
+    const filteredProjects = projects.filter((p: Project) => !teamId || p.teamId === teamId);
 
     const getStatusColor = (status: string) => {
         switch (status.toLowerCase()) {
@@ -125,7 +127,7 @@ export const useDashboardTabHook = () => {
         if (contextTeamId) return contextTeamId;
         if (teamIdFromUrl) return teamIdFromUrl;
         if (selectedProjectId !== 'all') {
-            const project = projects.find(p => p.id === selectedProjectId);
+            const project = projects.find((p: Project) => p.id === selectedProjectId);
             if (project?.teamId) return project.teamId;
             return null;
         }
@@ -151,7 +153,7 @@ export const useDashboardTabHook = () => {
 
     const loading = teamLoading || dashLoading;
 
-    // Map global/project KPIs to the UI structure
+
     const mappedGlobalStats = useMemo(() => {
         if (!kpis) return null;
         return {
@@ -165,9 +167,9 @@ export const useDashboardTabHook = () => {
                 totalSpent: `$${kpis.projects.totalSpent.toLocaleString()}`,
                 chartData: kpis.chartData || []
             },
-            topMembers: teamStats?.topMembers || [], // Use team rankings for context
-            topProjects: teamStats?.topProjects || [], // Use team rankings for context
-            recentActivities: recentActivity.map(a => ({
+            topMembers: teamStats?.topMembers || [],
+            topProjects: teamStats?.topProjects || [],
+            recentActivities: recentActivity.map((a: DashboardTask) => ({
                 id: a.id,
                 name: a.name,
                 updatedAt: a.updatedAt,
@@ -176,17 +178,16 @@ export const useDashboardTabHook = () => {
         };
     }, [kpis, recentActivity, teamStats]);
 
-    // Final display logic: Project KPIs take priority for cards, but Sidebar/Chart use Team context
     const displayStats = useMemo(() => {
         if (selectedProjectId && selectedProjectId !== 'all') return mappedGlobalStats;
         if (teamId && teamStats) return teamStats;
         return mappedGlobalStats;
     }, [selectedProjectId, teamId, teamStats, mappedGlobalStats]);
 
-    const chartData = useMemo(() => {
+    const chartData: ChartData<'bar'> | null = useMemo(() => {
         if (!displayStats?.overview?.chartData) return null;
         const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-        const values = displayStats.overview.chartData.map((d: any) => d.value);
+        const values = displayStats.overview.chartData.map((d: { value: number }) => d.value);
 
         const currentMonthIndex = new Date().getMonth();
         const isCurrentYear = selectedYear === new Date().getFullYear().toString();
@@ -195,7 +196,7 @@ export const useDashboardTabHook = () => {
             labels: months,
             datasets: [{
                 data: values,
-                backgroundColor: values.map((_: any, i: number) => {
+                backgroundColor: values.map((_: number, i: number) => {
                     const shouldHighlight = isCurrentYear ? i === currentMonthIndex : i === 0;
                     return shouldHighlight ? '#0070f3' : (isDark ? '#2d333b' : '#e5e7eb');
                 }),
@@ -203,9 +204,9 @@ export const useDashboardTabHook = () => {
                 barThickness: 32,
             }]
         };
-    }, [displayStats, isDark]);
+    }, [displayStats, isDark, selectedYear]);
 
-    const chartOptions = {
+    const chartOptions: ChartOptions<'bar'> = {
         responsive: true,
         maintainAspectRatio: false,
         plugins: {
@@ -220,7 +221,7 @@ export const useDashboardTabHook = () => {
                 padding: 10,
                 displayColors: false,
                 callbacks: {
-                    label: (context: any) => `Tasks: ${context.raw}`
+                    label: (context: { raw: unknown }) => `Tasks: ${context.raw}`
                 }
             }
         },
@@ -232,13 +233,12 @@ export const useDashboardTabHook = () => {
             x: {
                 grid: {
                     display: false,
-                    drawBorder: false,
                 },
                 ticks: {
                     color: isDark ? '#4b5563' : '#9ca3af',
                     font: {
                         size: 11,
-                        weight: '500'
+                        weight: 500
                     },
                     padding: 10
                 }
@@ -249,12 +249,12 @@ export const useDashboardTabHook = () => {
     const hours = ["8:00", "9:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00", "17:00"];
 
     const filteredTeamProjects = useMemo(() => {
-        return projects.filter(p => !teamId || p.teamId === teamId);
+        return projects.filter((p: Project) => !teamId || p.teamId === teamId);
     }, [projects, teamId]);
 
     const todayEvents = useMemo(() => {
         const today = new Date();
-        return events.filter(e => {
+        return events.filter((e: CalendarEvent) => {
             const eventDate = new Date(e.startTime);
             return (
                 eventDate.getDate() === today.getDate() &&

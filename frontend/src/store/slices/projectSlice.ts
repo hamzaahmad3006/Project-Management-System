@@ -1,7 +1,7 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import { AxiosError } from 'axios';
 import api from '../../api/axios';
-import { Project, ProjectState, CreateProjectData, UpdateProjectData } from '../../types';
+import { Project, ProjectState, CreateProjectData, UpdateProjectData } from 'types';
 
 const initialState: ProjectState = {
     projects: [],

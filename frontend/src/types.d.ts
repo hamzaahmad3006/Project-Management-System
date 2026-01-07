@@ -39,6 +39,13 @@ export interface CreateModalProps {
     initialProjectId?: string;
 }
 
+//==== TaskCard.tsx Interface ====== 
+export interface TaskCardProps {
+    task: Task;
+    onEdit: (task: Task) => void;
+    onDelete: (id: string) => void;
+}
+
 //==== SearchModalProps Interface ====== 
 export interface RecentItem {
     id: string;
@@ -53,8 +60,56 @@ export interface TeamMember {
     id: string;
     name: string;
     email?: string;
+    role?: string;
+    avatar?: string;
+    _count?: { assignedTasks: number };
 }
 
+export type MemberListItem = TeamMember | User | { user: User | TeamMember };
+
+//==== SubtaskModal Props Interface ====== 
+export interface AddSubtaskModalProps {
+    isOpen: boolean;
+    onClose: () => void;
+    taskId: string;
+}
+
+//==== Theme Props Interface ====== 
+export interface ThemeState {
+    theme: ThemeType;
+}
+
+//==== TeamModal Props Interface ====== 
+export interface TeamFile {
+    id: string;
+    name: string;
+    type: 'pdf' | 'image' | 'ppt';
+    size: string;
+    date: string;
+    author: {
+        name: string;
+        avatar: string;
+    };
+    url: string;
+}
+
+export interface TeamState {
+    members: TeamMember[];
+    allTeams: Team[];
+    stats: TeamStatsData | null;
+    files: TeamFile[];
+    loading: boolean;
+    error: string | null;
+}
+
+const initialState: TeamState = {
+    members: [],
+    allTeams: [],
+    stats: null,
+    files: [],
+    loading: false,
+    error: null,
+};
 
 // ====== SettingsModalProps Interface ====== 
 export interface UserProfile {
@@ -67,7 +122,6 @@ export interface UserProfile {
 
 export interface ProfileSettingsProps {
     profile: UserProfile;
-    setProfile: React.Dispatch<React.SetStateAction<UserProfile>>;
 }
 
 
@@ -185,6 +239,7 @@ export interface DashboardTask {
     dueDate?: string;
     budget?: number;
     createdAt?: string;
+    updatedAt?: string;
     subtasks?: Subtask[];
 }
 
@@ -236,6 +291,16 @@ export interface CalendarEvent {
     attendees: User[];
 }
 
+export interface CreateCalendarEventData {
+    title: string;
+    description?: string;
+    type: EventType;
+    startTime: string;
+    endTime: string;
+    projectId?: string;
+    attendees: string[];
+}
+
 export interface CalendarState {
     events: CalendarEvent[];
     loading: boolean;
@@ -247,6 +312,28 @@ export interface CommentState {
     comments: Comment[];
     loading: boolean;
     error: string | null;
+}
+
+//===== SearchModal.tsx Interface ======
+export interface SearchResultItem {
+    id: string;
+    title: string;
+    subtitle: string;
+    type: 'project' | 'task';
+    date: string;
+    avatar?: string;
+    original: Project | Task;
+}
+
+export interface ProfileSettingsProps {
+    profile: UserProfile;
+    onImageSelect: (e: React.ChangeEvent<HTMLInputElement>) => void;
+    onRemoveImage: () => void;
+    handleChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
+    handleSave: () => Promise<void>;
+    onCancel: () => void;
+    preview: string | null;
+    loading: boolean;
 }
 
 //===== Notification.tsx Interface ======
@@ -296,6 +383,42 @@ export interface Project {
     _count?: { tasks: number };
 }
 
+export interface Team {
+    id: string;
+    name: string;
+}
+
+export interface TeamStat {
+    title: string;
+    value: string | number;
+    meta: string;
+}
+
+export interface TeamMemberStat {
+    id: string;
+    name: string;
+    avatar?: string;
+    role: string;
+    completedTasks: number;
+}
+
+export interface TeamProjectStat {
+    id: string;
+    name: string;
+    spent: number;
+    completedTasks: number;
+}
+
+export interface TeamStatsData {
+    stats: TeamStat[];
+    topMembers: TeamMemberStat[];
+    topProjects: TeamProjectStat[];
+    overview: {
+        totalSpent: string;
+        chartData: { month: string; value: number }[];
+    };
+}
+
 export interface ProjectState {
     projects: Project[];
     currentProject: Project | null;
@@ -329,6 +452,37 @@ export interface UpdateProjectData {
 export interface TaskState {
     tasks: Task[];
     currentTask: Task | null;
+    loading: boolean;
+    error: string | null;
+}
+
+//===== Dashboard related Interface ======
+export interface ChartPoint {
+    label: string;
+    value: number;
+    month?: string;
+}
+
+export interface DashboardKPIs {
+    tasks: {
+        total: number;
+        completed: number;
+        inProgress: number;
+        canceled: number;
+        overdue: number;
+    };
+    projects: {
+        active: number;
+        totalBudget: number;
+        totalSpent: number;
+    };
+    chartData: ChartPoint[];
+    initialSpend: number;
+}
+
+export interface DashboardState {
+    kpis: DashboardKPIs | null;
+    recentActivity: DashboardTask[];
     loading: boolean;
     error: string | null;
 }

@@ -5,6 +5,7 @@ import ButtonForm from 'components/ui/buttons/ButtonForm';
 import InputForm from 'components/ui/inputFields/InputForm';
 import { toast } from 'react-toastify';
 import { ButtonLoader } from 'components/loader/Loader';
+import { AxiosError } from 'axios';
 
 const SecuritySettings = () => {
     const dispatch = useAppDispatch();
@@ -45,14 +46,16 @@ const SecuritySettings = () => {
                 newPassword: passwords.newPassword
             })).unwrap();
 
-            // toast.success('Password updated successfully');
+            toast.success('Password updated successfully');
             setPasswords({
                 currentPassword: '',
                 newPassword: '',
                 confirmPassword: ''
             });
-        } catch (error: any) {
-            toast.error(error || 'Failed to update password');
+        } catch (err: unknown) {
+            const error = err as AxiosError<{ message: string }>;
+            const errorMessage = error.response?.data?.message || "Failed to update password";
+            toast.error(errorMessage);
         } finally {
             setLoading(false);
         }

@@ -3,7 +3,7 @@ import { AxiosError } from "axios";
 import api from "../../../api/axios";
 import { useAppDispatch, useAppSelector } from '../../../store/hooks';
 import { fetchAllUsers } from '../../../store/slices/authSlice';
-import { User } from "../../../types";
+import { User } from "types";
 
 export const useCreateTeam = (onClose: () => void) => {
     const dispatch = useAppDispatch();
@@ -49,7 +49,6 @@ export const useCreateTeam = (onClose: () => void) => {
 
             setSuccess(true);
 
-            // Close modal after short delay to show success
             setTimeout(() => {
                 onClose();
                 setSuccess(false);

@@ -3,20 +3,31 @@ import { io, Socket } from 'socket.io-client';
 import { addNotification } from '../slices/notificationSlice';
 import { receiveComment } from '../slices/commentSlice';
 import { toast } from 'react-toastify';
+import { Notification, Comment } from 'types';
+
+interface MiddlewareState {
+    auth: {
+        token: string | null;
+        isAuthenticated: boolean;
+    };
+    tasks: {
+        currentTask: { id: string } | null;
+    };
+}
 
 let socket: Socket | null = null;
 
-export const socketMiddleware: Middleware = (store) => (next) => (action: any) => {
+export const socketMiddleware: Middleware<{}, MiddlewareState> = (store) => (next) => (action) => {
     const { dispatch, getState } = store;
     const state = getState();
-    const { token, isAuthenticated } = state.auth;
+    const auth = state.auth;
+    const { token, isAuthenticated } = auth || {};
 
-    // Handle connection logic
+
     if (isAuthenticated && token) {
         if (!socket) {
-            console.log('Redux Middleware: Initializing Socket.io connection');
 
-            // Fix: Strip /api or other paths from the URL to avoid "Invalid namespace" error
+
             const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:5000';
             const socketUrl = new URL(apiUrl).origin;
 
@@ -37,15 +48,12 @@ export const socketMiddleware: Middleware = (store) => (next) => (action: any) =
                 console.log(' Socket disconnected (Middleware):', reason);
             });
 
-            socket.on('new_notification', (notification) => {
-                console.log(' New notification received (Middleware):', notification);
+            socket.on('new_notification', (notification: Notification) => {
                 dispatch(addNotification(notification));
                 toast.info(notification.message);
             });
 
-            socket.on('new_comment', (data: { taskId: string; comment: any }) => {
-                console.log('💬 New comment received (Middleware):', data);
-                // Get current task from tasks state
+            socket.on('new_comment', (data: { taskId: string; comment: Comment }) => {
                 const { tasks } = store.getState();
                 if (tasks.currentTask && tasks.currentTask.id === data.taskId) {
                     dispatch(receiveComment(data.comment));

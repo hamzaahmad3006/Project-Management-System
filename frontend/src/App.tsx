@@ -3,23 +3,21 @@ import 'react-toastify/dist/ReactToastify.css';
 import './App.css';
 import Routes from './pages/Routes'
 import { useEffect } from 'react';
-import { useDispatch } from 'react-redux';
 import { fetchProfile } from './store/slices/authSlice';
-import { useSelector } from 'react-redux';
-import { RootState } from './store/store';
 import { Loader } from 'components/loader/Loader';
 import { useTheme } from './hooks/useTheme';
+import { useAppDispatch, useAppSelector } from './store/hooks';
 
 
 function App() {
   useTheme();
-  const dispatch = useDispatch();
-  const { loading, user } = useSelector((state: RootState) => state.auth);
+  const dispatch = useAppDispatch();
+  const { loading, user } = useAppSelector((state) => state.auth);
   const token = localStorage.getItem('token');
 
   useEffect(() => {
     if (token && !user) {
-      dispatch(fetchProfile() as any);
+      dispatch(fetchProfile());
     }
   }, [dispatch, token, user]);
 

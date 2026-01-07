@@ -17,12 +17,12 @@ const ResetPassword: React.FC = () => {
 
     return (
         <div className="min-h-screen w-full flex items-center justify-center flex-col bg-gray-50 dark:bg-[#12141c] p-4 font-inter transition-colors duration-300">
-            {/* Logo */}
+
             <div className="mb-10">
                 <img src="/assets/logo.png" alt="DEFCON Logo" className="w-[173px] h-[42px] object-contain" />
             </div>
 
-            {/* Content Card */}
+
             <div className="w-full max-w-md bg-white dark:bg-[#1a1c23] shadow-md dark:shadow-none p-10 dark:border dark:border-gray-800 rounded-xl">
                 <h2 className="text-xl font-bold text-gray-800 dark:text-gray-100 mb-2">Reset Password</h2>
                 <p className="text-sm text-gray-600 dark:text-gray-400 mb-8">
@@ -36,7 +36,7 @@ const ResetPassword: React.FC = () => {
                         type="password"
                         placeholder="••••••••"
                         value={newPassword}
-                        onChange={(e) => setNewPassword(e.target.value)}
+                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => setNewPassword(e.target.value)}
                         required
                         className="w-full px-4 py-2 border dark:border-gray-700 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-300 dark:focus:ring-blue-800 outline-none transition-all"
                         labelClassName="text-sm font-medium text-gray-700 dark:text-gray-300"
@@ -48,7 +48,7 @@ const ResetPassword: React.FC = () => {
                         type="password"
                         placeholder="••••••••"
                         value={confirmPassword}
-                        onChange={(e) => setConfirmPassword(e.target.value)}
+                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => setConfirmPassword(e.target.value)}
                         required
                         className="w-full px-4 py-2 border dark:border-gray-700 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-300 dark:focus:ring-blue-800 outline-none transition-all"
                         labelClassName="text-sm font-medium text-gray-700 dark:text-gray-300"

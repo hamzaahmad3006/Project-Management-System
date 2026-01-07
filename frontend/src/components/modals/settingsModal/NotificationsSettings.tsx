@@ -1,8 +1,31 @@
-import React from 'react';
-import { Switch } from '@mui/material';
+import React, { useState } from 'react';
 import ButtonForm from 'components/ui/buttons/ButtonForm';
 
+const TailwindSwitch = ({ checked, onChange }: { checked: boolean, onChange: (val: boolean) => void }) => (
+    <button
+        onClick={() => onChange(!checked)}
+        className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${checked ? 'bg-blue-600' : 'bg-gray-200 dark:bg-gray-700'
+            }`}
+    >
+        <span
+            className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${checked ? 'translate-x-5' : 'translate-x-0'
+                }`}
+        />
+    </button>
+);
+
 const NotificationsSettings = () => {
+    const [settings, setSettings] = useState({
+        activityUpdates: true,
+        mentions: true,
+        dailyDigest: true,
+        tipsAndTricks: true
+    });
+
+    const handleToggle = (key: keyof typeof settings) => {
+        setSettings(prev => ({ ...prev, [key]: !prev[key] }));
+    };
+
     return (
         <div className="w-full max-w-2xl bg-white dark:bg-[#1a1c23] rounded-lg space-y-8 animate-in fade-in duration-300">
             <h2 className="text-lg font-bold text-gray-900 dark:text-gray-100 uppercase tracking-tight">Notifications</h2>
@@ -15,10 +38,9 @@ const NotificationsSettings = () => {
                             New tasks assigned to you, @mentions, and completion notifications for tasks you're a collaborator on
                         </p>
                     </div>
-                    <Switch
-                        checked={true}
-                        onChange={() => { }}
-                        color="primary"
+                    <TailwindSwitch
+                        checked={settings.activityUpdates}
+                        onChange={() => handleToggle('activityUpdates')}
                     />
                 </div>
 
@@ -29,10 +51,9 @@ const NotificationsSettings = () => {
                             New tasks assigned to you, direct messages, and @mentions
                         </p>
                     </div>
-                    <Switch
-                        checked={true}
-                        onChange={() => { }}
-                        color="primary"
+                    <TailwindSwitch
+                        checked={settings.mentions}
+                        onChange={() => handleToggle('mentions')}
                     />
                 </div>
                 <hr className="border-gray-100 dark:border-gray-800" />
@@ -48,10 +69,9 @@ const NotificationsSettings = () => {
                             Personalized productivity stats plus your tasks due today.
                         </p>
                     </div>
-                    <Switch
-                        checked={true}
-                        onChange={() => { }}
-                        color="primary"
+                    <TailwindSwitch
+                        checked={settings.dailyDigest}
+                        onChange={() => handleToggle('dailyDigest')}
                     />
                 </div>
 
@@ -62,10 +82,9 @@ const NotificationsSettings = () => {
                             Powerful productivity advice in your inbox, Sent once a month.
                         </p>
                     </div>
-                    <Switch
-                        checked={true}
-                        onChange={() => { }}
-                        color="primary"
+                    <TailwindSwitch
+                        checked={settings.tipsAndTricks}
+                        onChange={() => handleToggle('tipsAndTricks')}
                     />
                 </div>
             </div>

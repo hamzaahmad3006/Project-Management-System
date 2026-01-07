@@ -2,7 +2,8 @@ import { useState, useEffect } from 'react';
 import { useAppDispatch, useAppSelector } from '../../../store/hooks';
 import { createCalendarEvent } from '../../../store/slices/calendarSlice';
 import { fetchProjects } from '../../../store/slices/projectSlice';
-import { EventType } from '../../../types';
+import { EventType } from 'types';
+import { AxiosError } from 'axios';
 
 export const useCreateEvent = (onClose: () => void) => {
     const dispatch = useAppDispatch();
@@ -22,7 +23,6 @@ export const useCreateEvent = (onClose: () => void) => {
         if (projects.length === 0) {
             dispatch(fetchProjects());
         }
-        // Set default project if only one exists or if we can derive from context
         if (projects.length > 0 && !projectId) {
             setProjectId(projects[0].id);
         }
@@ -49,15 +49,15 @@ export const useCreateEvent = (onClose: () => void) => {
                 attendees
             })).unwrap();
             onClose();
-            // Reset form
             setTitle('');
             setDescription('');
             setStartTime('');
             setEndTime('');
             setProjectId('');
             setAttendees([]);
-        } catch (error) {
-            console.error('Failed to create event:', error);
+        } catch (err: unknown) {
+            const error = err as AxiosError<{ message: string }>;
+            window.toastify(error.response?.data?.message || "Failed to create event", "error");
         } finally {
             setIsLoading(false);
         }

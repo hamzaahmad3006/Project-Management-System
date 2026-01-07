@@ -1,10 +1,18 @@
 import React from 'react';
 import { FaUserCircle } from 'react-icons/fa';
-import { NotificationPopoverProps, Notification } from '../../../types';
+import { NotificationPopoverProps, Notification } from 'types';
 import { formatDistanceToNow } from 'date-fns';
 import { useNotificationHook } from './useNotificationHook';
 
 const NotificationPopover: React.FC<NotificationPopoverProps> = ({ isOpen, onClose, leftOffset = 80 }) => {
+    const [isMobile, setIsMobile] = React.useState(window.innerWidth < 640);
+
+    React.useEffect(() => {
+        const handleResize = () => setIsMobile(window.innerWidth < 640);
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
+
     const {
         notifications,
         loading,
@@ -21,8 +29,11 @@ const NotificationPopover: React.FC<NotificationPopoverProps> = ({ isOpen, onClo
             <div className="fixed inset-0 z-40 bg-transparent" onClick={onClose}></div>
 
             <div
-                className="fixed top-4 bottom-4 w-[450px] bg-white dark:bg-[#1a1c23] rounded-2xl shadow-2xl z-50 overflow-hidden flex flex-col font-sans animate-in slide-in-from-left-4 duration-200 border border-gray-100 dark:border-gray-800"
-                style={{ left: `${leftOffset + 16}px` }}
+                className="fixed top-2 bottom-2 sm:top-4 sm:bottom-4 w-auto sm:w-[450px] bg-white dark:bg-[#1a1c23] rounded-2xl shadow-2xl z-50 overflow-hidden flex flex-col font-sans animate-in slide-in-from-left-4 duration-200 border border-gray-100 dark:border-gray-800"
+                style={{
+                    left: isMobile ? '12px' : `${leftOffset + 16}px`,
+                    right: isMobile ? '12px' : 'auto'
+                }}
             >
                 <div className="p-5 flex items-center justify-between border-b border-gray-100 dark:border-gray-800 bg-white dark:bg-[#1a1c23] sticky top-0 z-10">
                     <h3 className="text-xl font-bold text-gray-800 dark:text-gray-100 tracking-tight">Notifications</h3>
@@ -34,7 +45,6 @@ const NotificationPopover: React.FC<NotificationPopoverProps> = ({ isOpen, onClo
                     </button>
                 </div>
 
-                {/* List */}
                 <div className="flex-1 overflow-y-auto custom-scrollbar bg-white dark:bg-[#1a1c23]">
                     {loading && notifications.length === 0 ? (
                         <div className="p-10 text-center text-gray-500 dark:text-gray-400 flex flex-col items-center gap-3">
@@ -81,7 +91,6 @@ const NotificationPopover: React.FC<NotificationPopoverProps> = ({ isOpen, onClo
                                             {formatDistanceToNow(new Date(notif.createdAt), { addSuffix: true })}
                                         </div>
 
-                                        {/* Type: TEAM_INVITATION (Accept/Decline) */}
                                         {notif.type === 'TEAM_INVITATION' && !notif.isRead && notif.data && (
                                             <div className="flex gap-3 pt-3">
                                                 <button

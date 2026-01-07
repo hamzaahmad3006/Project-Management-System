@@ -3,6 +3,9 @@ import { useAppSelector, useAppDispatch } from '../../../store/hooks';
 import { useNavigate } from 'react-router-dom';
 import { setCurrentProject, fetchProjects } from '../../../store/slices/projectSlice';
 import { fetchTasks } from '../../../store/slices/taskSlice';
+import { Project, Task, SearchResultItem } from 'types';
+
+
 
 export const useSearch = (isOpen: boolean, onClose: () => void) => {
     const dispatch = useAppDispatch();
@@ -13,16 +16,13 @@ export const useSearch = (isOpen: boolean, onClose: () => void) => {
 
     const isLoading = tasksLoading || projectsLoading;
 
-    // Fetch data if missing or stale when modal opens
+
     useEffect(() => {
         if (isOpen) {
-            // Re-fetch to ensure we have latest data
             dispatch(fetchTasks({}));
             dispatch(fetchProjects());
         }
     }, [isOpen, dispatch]);
-
-    // Close on escape key
     useEffect(() => {
         const handleKeyDown = (e: KeyboardEvent) => {
             if (e.key === 'Escape') onClose();
@@ -31,7 +31,6 @@ export const useSearch = (isOpen: boolean, onClose: () => void) => {
         return () => window.removeEventListener('keydown', handleKeyDown);
     }, [isOpen, onClose]);
 
-    // Reset search term when modal closes
     useEffect(() => {
         if (!isOpen) setSearchTerm('');
     }, [isOpen]);
@@ -73,16 +72,17 @@ export const useSearch = (isOpen: boolean, onClose: () => void) => {
         return [...filteredProjects, ...filteredTasks];
     }, [searchTerm, tasks, projects]);
 
-    const handleSelect = (item: any) => {
+    const handleSelect = (item: SearchResultItem) => {
         if (item.type === 'project') {
-            dispatch(setCurrentProject(item.original));
+            dispatch(setCurrentProject(item.original as Project));
             navigate('/dashboard/board');
         } else {
-            const project = projects.find(p => p.id === item.original.projectId);
+            const task = item.original as Task;
+            const project = projects.find(p => p.id === task.projectId);
             if (project) {
                 dispatch(setCurrentProject(project));
                 navigate('/dashboard/board');
-            } else if (item.original.id) {
+            } else if (task.id) {
                 navigate('/dashboard/tasks');
             }
         }

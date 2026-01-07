@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import api from '../../../api/axios';
+import { AxiosError } from 'axios';
 
 export const useInvitationHandler = () => {
     const { token, action } = useParams<{ token: string; action: string }>();
@@ -21,13 +22,13 @@ export const useInvitationHandler = () => {
                 setStatus('success');
                 setMessage(response.data.message);
 
-                // Redirect to dashboard after 3 seconds if success
                 setTimeout(() => {
                     navigate('/dashboard');
                 }, 3000);
-            } catch (error: any) {
+            } catch (error) {
+                const err = error as AxiosError<{ message: string }>;
                 setStatus('error');
-                setMessage(error.response?.data?.message || 'Something went wrong');
+                setMessage(err.response?.data?.message || 'Something went wrong');
             }
         };
 

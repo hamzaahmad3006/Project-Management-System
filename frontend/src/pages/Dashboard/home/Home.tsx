@@ -1,8 +1,8 @@
 import React from 'react';
 import { FaArrowUp, FaArrowDown, FaCalendar, FaChevronDown } from 'react-icons/fa';
-import { Chart as ChartJS, ArcElement, CategoryScale, LinearScale, PointElement, LineElement, BarElement, Filler, Tooltip, Legend } from 'chart.js';
+import { Chart as ChartJS, ArcElement, CategoryScale, LinearScale, PointElement, LineElement, BarElement, Filler, Tooltip, Legend, Chart } from 'chart.js';
 import { Doughnut, Line } from 'react-chartjs-2';
-import { DashboardTask } from '../../../types';
+import { DashboardTask, Project, CalendarEvent, Subtask } from 'types';
 import { useHomeHook } from './useHome';
 import { Loader } from '../../../components/loader/Loader';
 import { MdSettingsInputComponent } from 'react-icons/md';
@@ -12,11 +12,13 @@ ChartJS.register(ArcElement, CategoryScale, LinearScale, PointElement, LineEleme
 // Custom plugin for vertical dotted line on hover
 const verticalLinePlugin = {
     id: 'verticalLine',
-    afterDraw: (chart: any) => {
-        if (chart.tooltip?._active?.length) {
-            const activePoint = chart.tooltip._active[0];
+    afterDraw: (chart: Chart) => {
+        const activeElements = chart.getActiveElements();
+        if (activeElements.length) {
+            const activePoint = activeElements[0];
             const { ctx } = chart;
-            const { x } = activePoint.element;
+            const element = activePoint.element as PointElement;
+            const x = element.x;
             const topY = chart.scales.y.top;
             const bottomY = chart.scales.y.bottom;
 
@@ -72,7 +74,6 @@ const Dashboard: React.FC = () => {
                 </div>
 
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 dark:bg-[#1a1c23] p-3 rounded-xl shadow-sm">
-                    {/* Left side: Project Selector and Filters */}
                     <div className="flex items-center gap-3">
                         <div className="relative min-w-[180px]">
                             <select
@@ -81,7 +82,7 @@ const Dashboard: React.FC = () => {
                                 className="w-full pl-3 pr-10 py-1.5 bg-[#FEFEFE] dark:border-gray-700 dark:bg-gray-800/50 text-[#A6AEB4]   text-sm outline-none focus:ring-2 focus:ring-blue-500/20 transition-all cursor-pointer appearance-none font-medium"
                             >
                                 <option value="all">All Projects</option>
-                                {projects.map((project) => (
+                                {projects.map((project: Project) => (
                                     <option key={project.id} value={project.id}>
                                         {project.name}
                                     </option>
@@ -97,7 +98,7 @@ const Dashboard: React.FC = () => {
                         </button>
                     </div>
 
-                    {/* Right side: Calendar and Periods */}
+
                     <div className="flex flex-wrap items-center gap-3">
                         <div className="flex items-center gap-2 px-3 py-1.5 bg-gray-50 dark:bg-gray-800/50 text-gray-700 text-xs border border-gray-100 dark:border-gray-700/50">
                             <FaCalendar size={12} className="text-black" />
@@ -256,7 +257,7 @@ const Dashboard: React.FC = () => {
                                     No holiday yet
                                 </div>
                             ) : filteredEvents.length > 0 ? (
-                                filteredEvents.map((event) => (
+                                filteredEvents.map((event: CalendarEvent) => (
                                     <div key={event.id} className={`flex items-center justify-between p-2 rounded ${event.type === 'MEETING' ? 'bg-blue-50 dark:bg-blue-900/10' : 'bg-purple-50 dark:bg-purple-900/10'}`}>
                                         <span className={`text-sm ${event.type === 'MEETING' ? 'text-blue-700 dark:text-blue-400' : 'text-purple-700 dark:text-purple-400'}`}>
                                             {event.title}
@@ -319,7 +320,7 @@ const Dashboard: React.FC = () => {
                                         <td className="py-3 text-[#7E8184] dark:text-gray-400">
                                             {task.subtasks && task.subtasks.length > 0 ? (
                                                 <span className="flex items-center gap-1">
-                                                    {task.subtasks.filter(s => s.completed).length}/{task.subtasks.length}
+                                                    {task.subtasks.filter((s: Subtask) => s.completed).length}/{task.subtasks.length}
                                                 </span>
                                             ) : '-'}
                                         </td>

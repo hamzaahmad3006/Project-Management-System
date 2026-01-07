@@ -6,7 +6,7 @@ import ButtonForm from 'components/ui/buttons/ButtonForm';
 import SocialAuthButton from 'components/ui/buttons/SocialAuthButton';
 
 const Login: React.FC = () => {
-    const { email, setEmail, password, setPassword, handleSubmit, handleSigninWithGoogle, handleForgotPassword, forgotLoading, navigate } = useLoginHook();
+    const { email, setEmail, password, setPassword, handleSubmit, handleSigninWithGoogle, handleMicrosoft, handleForgotPassword, forgotLoading, navigate } = useLoginHook();
 
     return (
         <div className="min-h-screen w-full flex items-center justify-center flex-col bg-gray-50 dark:bg-[#12141c] p-4 font-inter transition-colors duration-300">
@@ -60,7 +60,7 @@ const Login: React.FC = () => {
                             className="w-full mt-1 px-4 py-2 border dark:border-gray-700 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-300 dark:focus:ring-blue-800 outline-none transition-all"
                             labelClassName="text-sm font-medium text-[#2F2F2F] dark:text-gray-300"
                             value={email}
-                            onChange={(e) => setEmail(e.target.value)}
+                            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEmail(e.target.value)}
                             required
                         />
                     </div>
@@ -89,7 +89,7 @@ const Login: React.FC = () => {
                             placeholder="Password"
                             className="w-full px-4 py-2 border dark:border-gray-700 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-300 dark:focus:ring-blue-800 outline-none transition-all"
                             value={password}
-                            onChange={(e) => setPassword(e.target.value)}
+                            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPassword(e.target.value)}
                         />
                     </div>
 
@@ -112,7 +112,7 @@ const Login: React.FC = () => {
                         <SocialAuthButton
                             label="Microsoft"
                             iconSrc="/assets/microsoft.png"
-                            onClick={() => { }}
+                            onClick={handleMicrosoft}
                             className="w-auto mb-0 border dark:border-gray-700 px-4 py-2 text-[#F57D2C] dark:text-[#F57D2C]"
                         />
                     </div>
@@ -122,7 +122,7 @@ const Login: React.FC = () => {
                     <ButtonForm
                         label="Sign in with your identity provider (SSO/SAML)"
                         variant='secondary'
-
+                        onClick={handleMicrosoft}
                         className="text-sm text-[#2F2F2F] appearance-none outline-none mt-4 py-2 "
                     />
 

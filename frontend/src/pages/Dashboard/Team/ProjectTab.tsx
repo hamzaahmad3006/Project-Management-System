@@ -8,9 +8,7 @@ export default function ProjectTab() {
 
     return (
         <div className="flex w-full h-screen bg-white dark:bg-[#12141c]">
-            {/* RIGHT MAIN CONTENT */}
             <main className="flex-1 p-0 animate-in fade-in slide-in-from-bottom-2 duration-500 overflow-auto custom-scrollbar">
-                {/* PROJECT TABLE */}
                 <div className="border border-gray-200 dark:border-gray-800 rounded-xl overflow-hidden shadow-sm bg-white dark:bg-[#1a1c23]">
                     <table className="w-full text-sm">
                         <thead className="bg-gray-50 dark:bg-gray-800/50 text-gray-500 dark:text-gray-400">

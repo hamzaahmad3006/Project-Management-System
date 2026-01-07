@@ -9,11 +9,9 @@ const FilesTab: React.FC = () => {
     const { teamId } = useOutletContext<{ teamId: string }>();
     const { files, loading } = useAppSelector(state => state.team);
 
-    console.log("FilesTab mounted with teamId:", teamId);
 
     useEffect(() => {
         if (teamId) {
-            console.log("Dispatching fetchTeamFiles for:", teamId);
             dispatch(fetchTeamFiles(teamId));
         }
     }, [dispatch, teamId]);
@@ -37,7 +35,7 @@ const FilesTab: React.FC = () => {
 
     return (
         <div className="w-full bg-white dark:bg-[#1a1c23] rounded-xl shadow-sm border border-gray-100 dark:border-gray-800">
-            {/* Header */}
+
             <div className="grid grid-cols-[2fr_1fr_1fr_1.5fr_auto] gap-4 px-6 py-4 bg-gray-50/50 dark:bg-gray-800/50 border-b border-gray-100 dark:border-gray-800 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                 <div>Name</div>
                 <div>size</div>
@@ -46,7 +44,7 @@ const FilesTab: React.FC = () => {
                 <div className="w-8"></div>
             </div>
 
-            {/* List */}
+
             <div className="divide-y divide-gray-50 dark:divide-gray-800/50">
                 {files.length === 0 ? (
                     <div className="text-center py-8 text-sm text-gray-400">No files found for this team.</div>
@@ -57,7 +55,7 @@ const FilesTab: React.FC = () => {
                             className="grid grid-cols-[2fr_1fr_1fr_1.5fr_auto] gap-4 px-6 py-4 items-center hover:bg-gray-50 dark:hover:bg-gray-800/30 transition-colors group cursor-pointer"
                             onClick={() => window.open(file.url, '_blank')}
                         >
-                            {/* Name */}
+
                             <div className="flex items-center gap-3">
                                 <div className="w-8 h-8 rounded-lg flex items-center justify-center bg-gray-50 dark:bg-gray-800">
                                     {getFileIcon(file.type)}
@@ -67,17 +65,16 @@ const FilesTab: React.FC = () => {
                                 </span>
                             </div>
 
-                            {/* Size */}
+
                             <div className="text-sm text-gray-500 dark:text-gray-400">
                                 2.3 MB
                             </div>
 
-                            {/* Date */}
+
                             <div className="text-sm text-gray-500 dark:text-gray-400">
                                 {file.date}
                             </div>
 
-                            {/* Author */}
                             <div className="flex items-center gap-2">
                                 <img
                                     src={file.author.avatar || `https://ui-avatars.com/api/?name=${file.author.name}`}
@@ -89,7 +86,7 @@ const FilesTab: React.FC = () => {
                                 </span>
                             </div>
 
-                            {/* Action */}
+
                             <div className="flex justify-end">
                                 <button className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 p-1 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors opacity-0 group-hover:opacity-100">
                                     <FaEllipsisH />

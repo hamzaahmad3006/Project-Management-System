@@ -43,7 +43,6 @@ export const useCreateProject = (onClose: () => void) => {
                 endDate: endDate.toISOString()
             })).unwrap();
 
-            // Reset
             setName('');
             setDescription('');
             setTeamId('');

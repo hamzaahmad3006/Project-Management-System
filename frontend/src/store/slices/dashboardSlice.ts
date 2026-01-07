@@ -1,27 +1,7 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import api from '../../api/axios';
-
-interface DashboardState {
-    kpis: {
-        tasks: {
-            total: number;
-            completed: number;
-            inProgress: number;
-            canceled: number;
-            overdue: number;
-        };
-        projects: {
-            active: number;
-            totalBudget: number;
-            totalSpent: number;
-        };
-        chartData: any[];
-        initialSpend: number;
-    } | null;
-    recentActivity: any[];
-    loading: boolean;
-    error: string | null;
-}
+import { AxiosError } from 'axios';
+import { DashboardState } from 'types';
 
 const initialState: DashboardState = {
     kpis: null,
@@ -30,23 +10,22 @@ const initialState: DashboardState = {
     error: null,
 };
 
-// Fetch KPIs
 export const fetchKPIs = createAsyncThunk(
     'dashboard/fetchKPIs',
     async (args: { projectId?: string, year?: string } | undefined, { rejectWithValue }) => {
         try {
-            const params: any = args?.projectId && args.projectId !== 'all' ? { projectId: args.projectId } : {};
+            const params: Record<string, string> = args?.projectId && args.projectId !== 'all' ? { projectId: args.projectId } : {};
             if (args?.year) params.year = args.year;
 
             const response = await api.get('/dashboard/kpis', { params });
             return response.data;
-        } catch (error: any) {
-            return rejectWithValue(error.response?.data?.message || 'Failed to fetch KPIs');
+        } catch (error) {
+            const err = error as AxiosError<{ message: string }>;
+            return rejectWithValue(err.response?.data?.message || 'Failed to fetch KPIs');
         }
     }
 );
 
-// Fetch Recent Activity
 export const fetchRecentActivity = createAsyncThunk(
     'dashboard/fetchRecentActivity',
     async (projectId: string | undefined, { rejectWithValue }) => {
@@ -54,8 +33,9 @@ export const fetchRecentActivity = createAsyncThunk(
             const params = projectId && projectId !== 'all' ? { projectId } : {};
             const response = await api.get('/dashboard/recent-activity', { params });
             return response.data.recentActivity;
-        } catch (error: any) {
-            return rejectWithValue(error.response?.data?.message || 'Failed to fetch recent activity');
+        } catch (error) {
+            const err = error as AxiosError<{ message: string }>;
+            return rejectWithValue(err.response?.data?.message || 'Failed to fetch recent activity');
         }
     }
 );

@@ -1,23 +1,9 @@
-import React, { useEffect, useMemo } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { useParams, useOutletContext } from "react-router-dom";
-import { fetchTeamStats } from "../../../store/slices/teamSlice";
-import { fetchKPIs, fetchRecentActivity } from "../../../store/slices/dashboardSlice";
-import { fetchProjects, setSelectedProjectId } from "../../../store/slices/projectSlice";
-import { AppDispatch, RootState } from "../../../store/store";
 import { Loader } from "components/loader/Loader";
 import { Bar } from 'react-chartjs-2';
 import { useDashboardTabHook } from "./useTeam";
-import {
-    Chart as ChartJS,
-    CategoryScale,
-    LinearScale,
-    BarElement,
-    Title,
-    Tooltip,
-    Legend
-} from 'chart.js';
-import SelectField from "components/ui/inputFields/SelectedForm";
+import { TeamStat, CalendarEvent, TeamMemberStat, TeamProjectStat } from "types";
+import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend } from 'chart.js';
+
 
 ChartJS.register(
     CategoryScale,
@@ -53,7 +39,7 @@ export default function DashboardPage() {
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                {displayStats.stats.map((s: any, i: number) => (
+                {displayStats.stats.map((s: TeamStat, i: number) => (
                     <div key={i} className="bg-white dark:bg-[#1a1c23] border border-gray-100 dark:border-gray-800 rounded-xl p-5 shadow-sm">
                         <div className="text-xs font-semibold text-gray-400 dark:text-gray-500">{s.title}</div>
                         <div className="flex items-baseline justify-between mt-2">
@@ -97,7 +83,7 @@ export default function DashboardPage() {
                             </div>
                         </div>
                         <div className="h-[240px] w-full mt-4">
-                            {chartData && <Bar data={chartData} options={chartOptions as any} />}
+                            {chartData && <Bar data={chartData} options={chartOptions} />}
                         </div>
                     </div>
 
@@ -116,7 +102,6 @@ export default function DashboardPage() {
 
                         <div className="overflow-x-auto custom-scrollbar">
                             <div className="min-w-[800px]">
-                                {/* Hour Labels Header */}
                                 <div className="flex bg-gray-50/50 dark:bg-gray-800/30 border-b border-gray-100 dark:border-gray-800/50">
                                     {hours.map(h => (
                                         <div key={h} className="flex-1 py-3 text-center border-r border-gray-100/50 dark:border-gray-800/20 last:border-0">
@@ -127,11 +112,10 @@ export default function DashboardPage() {
 
                                 <div className="relative h-[220px] p-6 pt-8">
                                     {todayEvents.length > 0 ? (
-                                        todayEvents.slice(0, 4).map((event: any, idx: number) => {
+                                        todayEvents.slice(0, 4).map((event: CalendarEvent, idx: number) => {
                                             const start = new Date(event.startTime);
                                             const end = new Date(event.endTime);
 
-                                            // Calculate position (Timeline is 8:00 to 17:00 = 9 hours)
                                             const startHour = start.getHours() + start.getMinutes() / 60;
                                             const endHour = end.getHours() + end.getMinutes() / 60;
 
@@ -187,7 +171,7 @@ export default function DashboardPage() {
                             </select>
                         </div>
                         <ul className="space-y-5">
-                            {(displayStats.topMembers.length > 0 ? displayStats.topMembers : []).map((member: any) => (
+                            {(displayStats.topMembers.length > 0 ? displayStats.topMembers : []).map((member: TeamMemberStat) => (
                                 <li key={member.id} className="flex items-center justify-between">
                                     <div className="flex items-center gap-3">
                                         <div className="w-8 h-8 rounded-full overflow-hidden border border-gray-100 dark:border-gray-800">
@@ -205,7 +189,7 @@ export default function DashboardPage() {
                         </ul>
                     </div>
 
-                    {/* Top Earning */}
+
                     <div className="bg-white dark:bg-[#1a1c23] border border-gray-100 dark:border-gray-800 rounded-xl p-5 shadow-sm">
                         <div className="flex justify-between items-center mb-6">
                             <div className="text-sm font-bold text-gray-900 dark:text-gray-100">Top earning</div>
@@ -214,7 +198,7 @@ export default function DashboardPage() {
                             </select>
                         </div>
                         <ul className="space-y-5">
-                            {(displayStats.topProjects.length > 0 ? displayStats.topProjects : []).map((project: any, i: number) => (
+                            {(displayStats.topProjects.length > 0 ? displayStats.topProjects : []).map((project: TeamProjectStat, i: number) => (
                                 <li key={project.id} className="flex items-center justify-between">
                                     <div className="flex items-center gap-3">
                                         <div className={`w-8 h-8 rounded flex items-center justify-center text-sm ${i % 2 === 0 ? 'bg-cyan-50 text-cyan-500' : 'bg-orange-50 text-orange-500'}`}>
@@ -222,7 +206,7 @@ export default function DashboardPage() {
                                         </div>
                                         <div>
                                             <div className="text-xs font-bold text-gray-900 dark:text-gray-100">{project.name}</div>
-                                            <div className="text-[10px] text-gray-400 dark:text-gray-500">72 completed tasks</div>
+                                            <div className="text-[10px] text-gray-400 dark:text-gray-500">{project.completedTasks} completed tasks</div>
                                         </div>
                                     </div>
                                     <div className="text-xs font-bold text-gray-900 dark:text-gray-100">${project.spent.toLocaleString()}</div>

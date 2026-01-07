@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import api from "../../../api/axios";
 import { toast } from "react-toastify";
+import { AxiosError } from "axios";
 
 export const useInviteTeammates = (isOpen: boolean, onClose: () => void) => {
     const [emailInput, setEmailInput] = useState('');
@@ -20,7 +21,7 @@ export const useInviteTeammates = (isOpen: boolean, onClose: () => void) => {
                         setSelectedTeam(response.data.users[0].name);
                     }
                 } catch (error) {
-                    console.error('Fetch teams error:', error);
+                    toast.error('Failed to fetch teams');
                 }
             };
             fetchTeams();
@@ -50,8 +51,10 @@ export const useInviteTeammates = (isOpen: boolean, onClose: () => void) => {
             onClose();
             setEmailInput('');
             setPersonalMessage('');
-        } catch (error: any) {
-            toast.error(error.response?.data?.message || 'Failed to send invitations');
+        } catch (err: unknown) {
+            const error = err as AxiosError<{ message: string }>;
+            const errorMessage = error.response?.data?.message || "Failed to send invitations!";
+            toast.error(errorMessage);
         } finally {
             setLoading(false);
         }

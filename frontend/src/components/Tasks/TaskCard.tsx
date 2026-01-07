@@ -1,20 +1,15 @@
 import React from 'react';
 import { FaEdit, FaTrash, FaUserCircle } from 'react-icons/fa';
-
-interface TaskCardProps {
-    task: any;
-    onEdit: (task: any) => void;
-    onDelete: (id: string) => void;
-}
+import { TaskCardProps, TaskPriority, TaskStatus } from 'types';
 
 const TaskCard: React.FC<TaskCardProps> = ({ task, onEdit, onDelete }) => {
-    const priorityColors = {
+    const priorityColors: Record<TaskPriority, string> = {
         LOW: 'bg-green-100 text-green-800',
         MEDIUM: 'bg-yellow-100 text-yellow-800',
         HIGH: 'bg-red-100 text-red-800',
     };
 
-    const statusColors = {
+    const statusColors: Record<TaskStatus, string> = {
         TODO: 'bg-gray-100 text-gray-800',
         IN_PROGRESS: 'bg-blue-100 text-blue-800',
         COMPLETED: 'bg-green-100 text-green-800',
@@ -39,10 +34,10 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, onEdit, onDelete }) => {
 
             <div className="flex items-center justify-between mt-auto">
                 <div className="flex gap-2">
-                    <span className={`text-xs px-2 py-1 rounded-full font-medium ${(priorityColors as any)[task.priority]}`}>
+                    <span className={`text-xs px-2 py-1 rounded-full font-medium ${priorityColors[task.priority]}`}>
                         {task.priority}
                     </span>
-                    <span className={`text-xs px-2 py-1 rounded-full font-medium ${(statusColors as any)[task.status]}`}>
+                    <span className={`text-xs px-2 py-1 rounded-full font-medium ${statusColors[task.status]}`}>
                         {task.status.replace('_', ' ')}
                     </span>
                 </div>

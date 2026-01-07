@@ -1,9 +1,23 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import api from '../../api/axios';
+import { AxiosError } from 'axios';
+
+interface ProductivityData {
+    name: string;
+    completedTasks: number;
+    createdTasks: number;
+    score: number;
+}
+
+interface PerformanceData {
+    total: number;
+    byStatus: { status: string; _count: { _all: number } }[];
+    byPriority: { priority: string; _count: { _all: number } }[];
+}
 
 interface ReportState {
-    productivity: any[];
-    performance: any | null;
+    productivity: ProductivityData[];
+    performance: PerformanceData | null;
     loading: boolean;
     error: string | null;
 }
@@ -21,7 +35,8 @@ export const fetchProductivity = createAsyncThunk(
         try {
             const response = await api.get('/reports/productivity');
             return response.data.productivity;
-        } catch (error: any) {
+        } catch (err: unknown) {
+            const error = err as AxiosError<{ message: string }>;
             return rejectWithValue(error.response?.data?.message || 'Failed to fetch productivity');
         }
     }
@@ -33,7 +48,8 @@ export const fetchPerformance = createAsyncThunk(
         try {
             const response = await api.get('/reports/performance');
             return response.data;
-        } catch (error: any) {
+        } catch (err: unknown) {
+            const error = err as AxiosError<{ message: string }>;
             return rejectWithValue(error.response?.data?.message || 'Failed to fetch performance');
         }
     }

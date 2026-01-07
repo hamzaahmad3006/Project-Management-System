@@ -2,16 +2,16 @@ import React from 'react';
 import {
     FaTimes, FaExpandAlt, FaShare, FaStar, FaLink, FaEllipsisH,
     FaCheckCircle, FaPlus, FaPaperclip, FaRegFilePdf, FaRegFileWord,
-    FaRegCheckCircle, FaRegComment, FaTrash, FaSpinner
+    FaRegComment, FaSpinner
 } from 'react-icons/fa';
 
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import { fetchTaskById, clearCurrentTask } from '../../store/slices/taskSlice';
 import { fetchComments, addComment, clearComments } from '../../store/slices/commentSlice';
 import { toggleSubtask } from '../../store/slices/taskSlice';
-import { Task, Comment } from '../../types';
-import { uploadToCloudinary } from '../../utils/uploadCloudinary';
-import AddSubtaskModal from '../modals/AddSubtaskModal';
+import { Task, Comment } from 'types';
+import { uploadToCloudinary } from '../../services/uploadCloudinary';
+import AddSubtaskModal from '../modals/subTaskModal/AddSubtaskModal';
 
 interface TaskDetailPanelProps {
     task: Task;
@@ -59,7 +59,6 @@ const TaskDetailPanel: React.FC<TaskDetailPanelProps> = ({ task: initialTask, on
             setIsUploading(true);
             const attachmentUrls: string[] = [];
 
-            // Upload files if any
             if (selectedFiles.length > 0) {
                 for (const file of selectedFiles) {
                     const url = await uploadToCloudinary(file);
@@ -76,8 +75,7 @@ const TaskDetailPanel: React.FC<TaskDetailPanelProps> = ({ task: initialTask, on
             setCommentText('');
             setSelectedFiles([]);
         } catch (error) {
-            console.error("Failed to post comment:", error);
-            // Optionally add toast notification here
+            window.toastify("Failed to post comment");
         } finally {
             setIsUploading(false);
         }
@@ -88,7 +86,6 @@ const TaskDetailPanel: React.FC<TaskDetailPanelProps> = ({ task: initialTask, on
 
     return (
         <div className="fixed inset-y-0 right-0 w-[600px] bg-white dark:bg-[#1a1c23] shadow-2xl transform transition-transform duration-300 ease-in-out z-[100] border-l border-gray-200 dark:border-gray-800 flex flex-col hover:overflow-y-auto">
-            {/* Header Toolbar */}
             <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 dark:border-gray-800">
                 <div className="flex items-center gap-4 text-gray-400 dark:text-gray-500">
                     <button className="hover:text-gray-600 dark:hover:text-gray-300 transition-colors"><FaCheckCircle size={16} /></button>
@@ -106,16 +103,11 @@ const TaskDetailPanel: React.FC<TaskDetailPanelProps> = ({ task: initialTask, on
                 </div>
             </div>
 
-            {/* Scrollable Content */}
             <div className="flex-1 overflow-y-auto p-8 custom-scrollbar">
-                {/* Title */}
                 <h2 className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-8 leading-tight">
                     {task.name}
                 </h2>
-
-                {/* Properties Grid */}
                 <div className="grid grid-cols-[140px_1fr] gap-y-6 mb-10 text-sm">
-                    {/* Status */}
                     <div className="text-gray-500 dark:text-gray-400 pt-1">Status</div>
                     <div>
                         <span className="inline-flex items-center gap-2 px-3 py-1 rounded bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 font-medium text-xs border border-green-200 dark:border-green-800 uppercase">
@@ -123,8 +115,6 @@ const TaskDetailPanel: React.FC<TaskDetailPanelProps> = ({ task: initialTask, on
                             {task.status?.replace('_', ' ')}
                         </span>
                     </div>
-
-                    {/* Assignee */}
                     <div className="text-gray-500 dark:text-gray-400 pt-1">Assignee</div>
                     <div className="flex items-center gap-2">
                         {task.assignedTo ? (
@@ -184,8 +174,6 @@ const TaskDetailPanel: React.FC<TaskDetailPanelProps> = ({ task: initialTask, on
                             <span className="text-xs text-gray-400 italic">No labels</span>
                         )}
                     </div>
-
-                    {/* Custom Field */}
                     <div className="text-gray-400 dark:text-gray-600 pt-1 flex items-center gap-1 hover:text-blue-500 dark:hover:text-blue-400 cursor-pointer transition-colors">
                         <FaPlus size={10} /> Add custom field
                     </div>
@@ -208,8 +196,6 @@ const TaskDetailPanel: React.FC<TaskDetailPanelProps> = ({ task: initialTask, on
                                 {task.description || "No description provided."}
                             </div>
                         </div>
-
-                        {/* Attachments */}
                         <div className="mb-8">
                             {(() => {
                                 const allAttachments = comments.flatMap(c => c.attachments || []);
@@ -264,7 +250,6 @@ const TaskDetailPanel: React.FC<TaskDetailPanelProps> = ({ task: initialTask, on
                     </>
                 )}
 
-                {/* Subtasks */}
                 <div className="mb-8">
                     <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-3 flex items-center gap-2">
                         Subtasks <span className="text-gray-400 dark:text-gray-600 font-normal">{task.subtasks?.length || 0}</span>
@@ -304,8 +289,6 @@ const TaskDetailPanel: React.FC<TaskDetailPanelProps> = ({ task: initialTask, on
                         />
                     )}
                 </div>
-
-                {/* Comments List */}
                 <div className="mb-8 mt-12">
                     <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-6 flex items-center justify-between">
                         <div className="flex items-center gap-2">
@@ -363,7 +346,6 @@ const TaskDetailPanel: React.FC<TaskDetailPanelProps> = ({ task: initialTask, on
                 </div>
 
             </div>
-            {/* Footer Comment Input */}
             <form onSubmit={handleSendComment} className="p-4 border-t border-gray-100 dark:border-gray-800 bg-white dark:bg-[#1a1c23]">
                 <div className="flex items-center gap-3">
                     <img
@@ -372,7 +354,6 @@ const TaskDetailPanel: React.FC<TaskDetailPanelProps> = ({ task: initialTask, on
                         alt="Me"
                     />
                     <div className="flex-1 relative">
-                        {/* File Previews */}
                         {selectedFiles.length > 0 && (
                             <div className="flex flex-wrap gap-2 px-4 pb-2">
                                 {selectedFiles.map((file, idx) => (

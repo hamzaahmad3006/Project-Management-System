@@ -1,6 +1,6 @@
 import React from 'react';
 import { FaTimes } from 'react-icons/fa';
-import { CreateModalProps } from '../../../types';
+import { CreateModalProps } from 'types';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../../store/store';
 import { useSettings } from './useSettings';

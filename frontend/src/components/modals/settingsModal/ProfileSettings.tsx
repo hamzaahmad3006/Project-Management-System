@@ -1,21 +1,12 @@
 import React from 'react';
-import { FaUser, FaTimes } from 'react-icons/fa'; // FaTimes for close icon
+import { FaUser, FaTimes } from 'react-icons/fa';
 import { ButtonLoader } from '../../loader/Loader';
-import { UserProfile } from '../../../types';
+import { ProfileSettingsProps } from 'types';
 import InputForm from 'components/ui/inputFields/InputForm';
 import FileInputForm from 'components/ui/inputFields/FileInputForm';
-import ButtonForm from 'components/ui/buttons/ButtonForm';
 
-interface ProfileSettingsProps {
-    profile: UserProfile;
-    onImageSelect: (e: React.ChangeEvent<HTMLInputElement>) => void;
-    onRemoveImage: () => void;
-    handleChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
-    handleSave: () => Promise<void>;
-    onCancel: () => void;
-    preview: string | null;
-    loading: boolean;
-}
+
+
 
 const ProfileSettings: React.FC<ProfileSettingsProps> = ({
     profile, onImageSelect, onRemoveImage, handleChange, handleSave, onCancel, preview, loading
@@ -24,7 +15,6 @@ const ProfileSettings: React.FC<ProfileSettingsProps> = ({
         <div className="w-full max-w-2xl bg-white dark:bg-[#1a1c23] rounded-xl shadow-sm overflow-hidden">
 
             <div className=" space-y-4">
-                {/* Profile Photo Section */}
                 <div className="space-y-3">
                     <label className="text-sm font-medium text-gray-500 dark:text-gray-400">Photo</label>
                     <div className="flex items-center gap-5">
@@ -58,7 +48,6 @@ const ProfileSettings: React.FC<ProfileSettingsProps> = ({
                     </div>
                 </div>
 
-                {/* Form Fields */}
                 <div className="grid gap-6">
                     <InputForm
                         label="Full name"
@@ -78,7 +67,6 @@ const ProfileSettings: React.FC<ProfileSettingsProps> = ({
                         labelClassName='text-sm font-medium !text-gray-500'
                     />
 
-                    {/* Team Section */}
                     <div className="space-y-1">
                         <label className="text-sm font-medium !text-gray-500">Team</label>
                         <div className="w-full p-2.5 border rounded-lg bg-gray-50 dark:bg-gray-800 dark:border-gray-700 text-gray-700 dark:text-gray-300 font-medium">
@@ -86,7 +74,6 @@ const ProfileSettings: React.FC<ProfileSettingsProps> = ({
                         </div>
                     </div>
 
-                    {/* Email with "Change email" link */}
                     <div className="space-y-1">
                         <div className="flex justify-between items-center">
                             <label className="text-sm font-medium text-gray-500">Email</label>
@@ -103,7 +90,6 @@ const ProfileSettings: React.FC<ProfileSettingsProps> = ({
                 </div>
             </div>
 
-            {/* Footer Actions */}
             <div className="p-6 bg-gray-50 dark:bg-[#15171c] flex justify-between items-center">
                 <div className="flex gap-3">
                     <button

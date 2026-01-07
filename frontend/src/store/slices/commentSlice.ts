@@ -1,7 +1,7 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import { AxiosError } from 'axios';
 import api from '../../api/axios';
-import { Comment, CommentState } from '../../types';
+import { Comment, CommentState } from 'types';
 
 const initialState: CommentState = {
     comments: [],
@@ -57,7 +57,6 @@ const commentSlice = createSlice({
             state.error = null;
         },
         receiveComment: (state, action: PayloadAction<Comment>) => {
-            // Check if comment already exists (to avoid duplicates if the sender also receives the event)
             const exists = state.comments.some(c => c.id === action.payload.id);
             if (!exists) {
                 state.comments.unshift(action.payload);
@@ -79,7 +78,7 @@ const commentSlice = createSlice({
                 state.error = action.payload as string;
             })
             .addCase(addComment.fulfilled, (state, action: PayloadAction<Comment>) => {
-                state.comments.unshift(action.payload); // Add new comment to top
+                state.comments.unshift(action.payload);
             })
             .addCase(deleteComment.fulfilled, (state, action: PayloadAction<string>) => {
                 state.comments = state.comments.filter(c => c.id !== action.payload);

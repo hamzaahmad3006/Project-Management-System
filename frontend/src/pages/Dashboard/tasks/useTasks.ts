@@ -1,6 +1,7 @@
 import { useAppDispatch, useAppSelector } from '../../../store/hooks';
 import { fetchTasks, updateTask, updateTaskStatusOptimistic } from '../../../store/slices/taskSlice';
-import { TaskStatus, Task } from '../../../types';
+import { TaskStatus, Task } from 'types';
+import { AxiosError } from 'axios';
 import { useEffect, useMemo, useState } from 'react';
 import { DragDropContext, Droppable, Draggable, DropResult } from '@hello-pangea/dnd';
 
@@ -18,14 +19,14 @@ export const useTasks = () => {
     const filteredTasks = useMemo(() => {
         if (!searchTerm.trim()) return tasks;
         const term = searchTerm.toLowerCase();
-        return tasks.filter(t =>
+        return tasks.filter((t: Task) =>
             t.name.toLowerCase().includes(term) ||
             (t.description && t.description.toLowerCase().includes(term))
         );
     }, [tasks, searchTerm]);
 
     useEffect(() => {
-        const filters: any = {};
+        const filters: { projectId?: string } = {};
         if (selectedProjectId && selectedProjectId !== 'all') {
             filters.projectId = selectedProjectId;
         }
@@ -40,24 +41,24 @@ export const useTasks = () => {
 
         const newStatus = destination.droppableId as TaskStatus;
 
-        // Optimistic UI Update
         dispatch(updateTaskStatusOptimistic({ id: draggableId, status: newStatus }));
 
         try {
             await dispatch(updateTask({ id: draggableId, data: { status: newStatus } })).unwrap();
             window.toastify(`Task moved to ${newStatus.toLowerCase().replace('_', ' ')}`, "success");
-        } catch (error: any) {
-            // Revert on error
+        } catch (err: unknown) {
+
+            const error = err as AxiosError<{ message: string }>;
             dispatch(fetchTasks({}));
-            window.toastify(error || "Failed to move task", "error");
+            window.toastify(error.response?.data?.message || "Failed to move task", "error");
         }
     };
 
     const columns = [
-        { id: 'TODO', title: 'To-Do', color: 'bg-blue-500', items: filteredTasks.filter(t => t.status === 'TODO' || !t.status) },
-        { id: 'IN_PROGRESS', title: 'In Progress', color: 'bg-orange-500', items: filteredTasks.filter(t => t.status === 'IN_PROGRESS') },
-        { id: 'COMPLETED', title: 'Completed', color: 'bg-green-500', items: filteredTasks.filter(t => t.status === 'COMPLETED') },
-        { id: 'CANCELED', title: 'Cancelled', color: 'bg-red-500', items: filteredTasks.filter(t => t.status === 'CANCELED') },
+        { id: 'TODO', title: 'To-Do', color: 'bg-blue-500', items: filteredTasks.filter((t: Task) => t.status === 'TODO' || !t.status) },
+        { id: 'IN_PROGRESS', title: 'In Progress', color: 'bg-orange-500', items: filteredTasks.filter((t: Task) => t.status === 'IN_PROGRESS') },
+        { id: 'COMPLETED', title: 'Completed', color: 'bg-green-500', items: filteredTasks.filter((t: Task) => t.status === 'COMPLETED') },
+        { id: 'CANCELED', title: 'Cancelled', color: 'bg-red-500', items: filteredTasks.filter((t: Task) => t.status === 'CANCELED') },
     ];
 
     return {

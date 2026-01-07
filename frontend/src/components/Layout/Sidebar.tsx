@@ -9,12 +9,11 @@ import CreateTeamModal from '../modals/createTeamModal/CreateTeamModal';
 import SettingsModal from '../modals/settingsModal/SettingsModal';
 import SearchModal from '../modals/searchModal/SearchModal';
 import NotificationPopover from '../modals/notificationModal/NotificationModal';
-import { FaSearch, FaBell, FaChevronRight, FaChevronDown, FaUserPlus, FaCog, FaBars, FaTimes, FaRegCheckCircle, FaRegFile, FaPlus, } from 'react-icons/fa';
+import { FaSearch, FaBell, FaUserPlus, FaCog, FaBars, FaTimes, FaRegCheckCircle, FaRegFile, FaPlus, } from 'react-icons/fa';
 import { logout } from 'store/slices/authSlice';
 import { fetchProjects, setSelectedProjectId } from '../../store/slices/projectSlice';
 import { getTeams } from '../../store/slices/teamSlice';
 import { MdLogout } from 'react-icons/md';
-import { PanelLeft } from 'lucide-react';
 
 const Sidebar: React.FC = () => {
     const dispatch = useDispatch<AppDispatch>();
@@ -25,7 +24,7 @@ const Sidebar: React.FC = () => {
     const { projects, selectedProjectId } = useSelector((state: RootState) => state.projects);
     const [isOpen, setIsOpen] = useState(true);
     const [isMobileOpen, setIsMobileOpen] = useState(false);
-    const unreadCount = notifications.filter(n => !n.isRead).length;
+    const unreadCount = notifications.filter((n) => !n.isRead).length;
     const isManager = user?.role === 'MANAGER';
     const [isMobileDesignExpanded, setIsMobileDesignExpanded] = useState(true);
     const [isTeamSubExpanded, setIsTeamSubExpanded] = useState(false);
@@ -45,11 +44,8 @@ const Sidebar: React.FC = () => {
     }, [dispatch]);
 
     useEffect(() => {
-        console.log('Sidebar - isCreateTeamOpen changed to:', isCreateTeamOpen);
+
     }, [isCreateTeamOpen]);
-
-
-
 
     return (
         <>
@@ -81,7 +77,6 @@ const Sidebar: React.FC = () => {
                         onClick={() => setIsOpen(!isOpen)}
                         className="flex items-center gap-3 px-3 py-2 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-800 rounded md:block"
                     >
-                        {/* <PanelLeft size={20} /> */}
                         <img src="/assets/collapse.svg" alt="" className="w-4 h-4 text-gray-600 dark:text-gray-400" />
 
                     </button>
@@ -200,7 +195,6 @@ const Sidebar: React.FC = () => {
                                 )}
                             </div>
 
-                            {/* Diadora Section */}
                             <div className="mt-2">
                                 <div
                                     onClick={() => {
@@ -219,7 +213,6 @@ const Sidebar: React.FC = () => {
                                     <div className="ml-9 mt-1 space-y-1">
                                         <div className="px-3 py-1.5 text-sm text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 rounded cursor-pointer">Ideas and details</div>
 
-                                        {/* Nested Projects Folder */}
                                         <div>
                                             <div
                                                 onClick={() => setIsProjectSubExpanded(!isProjectSubExpanded)}

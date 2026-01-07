@@ -1,7 +1,8 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
 import { Doughnut } from 'react-chartjs-2';
 import { useBudgetHook } from './useBudget';
+import { BudgetProject } from 'types';
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
@@ -40,7 +41,7 @@ const Budget: React.FC = () => {
                                     </tr>
                                 </thead>
                                 <tbody className="bg-white dark:bg-[#1a1c23] divide-y divide-gray-200 dark:divide-gray-800">
-                                    {projects.map((project: any) => (
+                                    {projects.map((project: BudgetProject) => (
                                         <tr key={project.id}>
                                             <td className="px-6 py-4 whitespace-nowrap font-medium text-gray-900 dark:text-gray-100">{project.name}</td>
                                             <td className="px-6 py-4 whitespace-nowrap text-gray-500 dark:text-gray-400">${project.budget.toLocaleString()}</td>

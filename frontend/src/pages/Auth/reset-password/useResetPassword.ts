@@ -3,6 +3,7 @@ import { useSearchParams, useNavigate } from 'react-router-dom';
 import { useAppDispatch } from 'store/hooks';
 import { resetPassword } from 'store/slices/authSlice';
 import { toast } from 'react-toastify';
+import { AxiosError } from 'axios';
 
 export const useResetPasswordHook = () => {
     const [searchParams] = useSearchParams();
@@ -36,8 +37,9 @@ export const useResetPasswordHook = () => {
             await dispatch(resetPassword({ token, newPassword })).unwrap();
             toast.success("Password reset successfully! Please log in with your new password.");
             navigate('/auth/login');
-        } catch (error: any) {
-            toast.error(error || "Failed to reset password");
+        } catch (err: unknown) {
+            const error = err as AxiosError<{ message: string }>;
+            toast.error(error.response?.data?.message || "Failed to reset password");
         } finally {
             setLoading(false);
         }

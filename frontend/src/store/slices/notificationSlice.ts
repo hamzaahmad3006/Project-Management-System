@@ -1,7 +1,7 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import { AxiosError } from 'axios';
 import api from '../../api/axios';
-import { Notification, NotificationState } from '../../types';
+import { Notification, NotificationState } from 'types';
 
 const initialState: NotificationState = {
     notifications: [],
@@ -69,7 +69,6 @@ const notificationSlice = createSlice({
             state.error = null;
         },
         addNotification: (state, action: PayloadAction<Notification>) => {
-            // Add new notification to the beginning of the list
             state.notifications.unshift(action.payload);
         }
     },
@@ -88,7 +87,7 @@ const notificationSlice = createSlice({
                 state.error = action.payload as string;
             })
             .addCase(markNotificationAsRead.fulfilled, (state, action: PayloadAction<Notification>) => {
-                const index = state.notifications.findIndex(n => n.id === action.payload.id);
+                const index = state.notifications.findIndex((n: Notification) => n.id === action.payload.id);
                 if (index !== -1) {
                     state.notifications[index] = action.payload;
                 }

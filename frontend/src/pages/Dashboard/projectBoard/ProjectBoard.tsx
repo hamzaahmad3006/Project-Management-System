@@ -10,7 +10,7 @@ import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
 import CreateProjectModal from '../../../components/modals/createProjectModal/CreateProjectModal';
 import { useProjectBoard } from './useProject';
 import { useAppSelector } from '../../../store/hooks';
-import { TaskStatus } from '../../../types';
+import { TaskStatus, CalendarEvent } from 'types';
 import CreateEventModal from '../../../components/modals/createEventModal/CreateEventModal';
 import CreateGlobalTaskModal from '../../../components/modals/createTask/CreateGlobalTaskModal';
 import { MdChatBubbleOutline } from 'react-icons/md';
@@ -70,7 +70,7 @@ const ProjectBoard: React.FC = () => {
 
     return (
         <div className="flex flex-col h-full bg-white dark:bg-[#12141c]">
-            {/* Header */}
+
             <header className="px-4 md:px-6 py-4 border-b border-gray-200 dark:border-gray-800">
                 <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-4 gap-4">
                     <div className="flex items-center gap-3 w-full md:w-auto justify-between md:justify-start">
@@ -143,7 +143,6 @@ const ProjectBoard: React.FC = () => {
                     </div>
 
                     <div className="flex w-full md:w-auto items-center justify-between md:justify-end gap-3">
-                        {/* Team Avatars */}
                         <div className="flex -space-x-2">
                             {(currentProject?.team?.members || []).slice(0, 2).map((member) => (
                                 <img
@@ -186,7 +185,7 @@ const ProjectBoard: React.FC = () => {
                     </div>
                 </div>
 
-                {/* Tabs & Filters */}
+
                 <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 overflow-x-auto no-scrollbar">
                     <div className="flex items-center gap-6 text-sm text-gray-600 dark:text-gray-400 min-w-max">
                         {['Board', 'Table', 'Calendar', 'Timeline'].map(view => (
@@ -279,7 +278,6 @@ const ProjectBoard: React.FC = () => {
                                                 ${section.id === 'postpone' ? 'w-10 items-center rounded-lg pt-4' : 'w-72'}
                                                 ${snapshot.isDraggingOver ? (section.id === 'postpone' ? 'bg-red-50 dark:bg-red-900/20' : 'bg-blue-50/50 dark:bg-blue-900/10') : (section.id === 'postpone' ? 'bg-gray-50 dark:bg-[#1a1c23]' : '')}`}
                                         >
-                                            {/* Column Header */}
                                             {section.id === 'postpone' ? (
                                                 <div className="flex-1 flex flex-col items-center pointer-events-none">
                                                     <div className="w-2 h-2 rounded-full bg-red-500 mb-6 font-bold"></div>
@@ -680,7 +678,7 @@ const ProjectBoard: React.FC = () => {
                                     {currentDate.toLocaleDateString('en-GB', { day: 'numeric', month: 'long' })}
                                 </h2>
                                 {(() => {
-                                    const count = meetings.filter(m => {
+                                    const count = meetings.filter((m: CalendarEvent) => {
                                         const mDate = new Date(m.startTime);
                                         return mDate.getFullYear() === currentDate.getFullYear() &&
                                             mDate.getMonth() === currentDate.getMonth() &&
@@ -761,19 +759,19 @@ const ProjectBoard: React.FC = () => {
                                             };
 
                                             // Filter meetings for the current selected date
-                                            const timelineMeetings = meetings.filter(m => {
+                                            const timelineMeetings = meetings.filter((m: CalendarEvent) => {
                                                 const mDate = new Date(m.startTime);
                                                 return isSameDay(mDate, currentDate);
                                             });
 
                                             if (meetings.length > 0 && timelineMeetings.length === 0) {
-                                                console.log('Sample Meetings in State:', meetings.map(m => ({
+                                                console.log('Sample Meetings in State:', meetings.map((m: CalendarEvent) => ({
                                                     title: m.title,
                                                     start: new Date(m.startTime).toDateString()
                                                 })));
                                             }
 
-                                            const processedMeetings = timelineMeetings.map(meeting => {
+                                            const processedMeetings = timelineMeetings.map((meeting: CalendarEvent) => {
                                                 const start = new Date(meeting.startTime);
                                                 const end = new Date(meeting.endTime);
 
@@ -787,8 +785,13 @@ const ProjectBoard: React.FC = () => {
                                                 };
                                             });
 
+                                            interface ProcessedMeeting {
+                                                meeting: CalendarEvent;
+                                                visual: { start: number; end: number; duration: number };
+                                            }
+
                                             const sortedMeetings = processedMeetings.sort((a, b) => a.visual.start - b.visual.start);
-                                            const rows = sortedMeetings.map(pm => [pm]);
+                                            const rows = sortedMeetings.map((pm) => [pm]);
 
                                             if (rows.length === 0) {
                                                 return (
@@ -799,9 +802,9 @@ const ProjectBoard: React.FC = () => {
                                                 );
                                             }
 
-                                            return rows.map((row, rowIndex) => (
+                                            return rows.map((row: ProcessedMeeting[], rowIndex: number) => (
                                                 <div key={rowIndex} className="relative h-24 w-full">
-                                                    {row.map(pm => {
+                                                    {row.map((pm: ProcessedMeeting) => {
                                                         const { meeting, visual: v } = pm;
                                                         const leftPercent = ((v.start - 8) / 10) * 100;
                                                         const widthPercent = (v.duration / 10) * 100;

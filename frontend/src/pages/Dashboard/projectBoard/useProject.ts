@@ -3,7 +3,9 @@ import { useAppDispatch, useAppSelector } from '../../../store/hooks';
 import { fetchTasks, createTask as createTaskAction, updateTask, updateTaskStatusOptimistic, setSelectedTask as setSelectedTaskAction } from '../../../store/slices/taskSlice';
 import { fetchProjects, setSelectedProjectId } from '../../../store/slices/projectSlice';
 import { fetchEvents } from '../../../store/slices/calendarSlice';
-import { Task, Section, TaskStatus, Project, CalendarEvent } from '../../../types';
+import { Task, Section, TaskStatus, Project, CalendarEvent } from 'types';
+import { AxiosError } from 'axios';
+import { DropResult } from '@hello-pangea/dnd';
 
 export const useProjectBoard = () => {
     const dispatch = useAppDispatch();
@@ -20,7 +22,6 @@ export const useProjectBoard = () => {
         dispatch(setSelectedTaskAction(task));
     };
 
-    // Derive the current project based on global selection
     const currentProject = useMemo(() => {
         if (selectedProjectId === 'all') {
             return {
@@ -42,27 +43,27 @@ export const useProjectBoard = () => {
             } as Project;
         }
         if (selectedProjectId) {
-            return projects.find(p => p.id === selectedProjectId) || stateCurrentProject;
+            return projects.find((p: Project) => p.id === selectedProjectId) || stateCurrentProject;
         }
         return stateCurrentProject || (projects.length > 0 ? projects[0] : null);
     }, [projects, selectedProjectId, stateCurrentProject]);
 
     useEffect(() => {
-        // Fetch projects if not already loaded
+
         if (projects.length === 0) {
             dispatch(fetchProjects());
         }
 
-        // Use global selectedProjectId if set
+
         const projectIdToFetch = (selectedProjectId && selectedProjectId !== 'all')
             ? selectedProjectId
             : (selectedProjectId === 'all' ? undefined : currentProject?.id);
 
         dispatch(fetchTasks(projectIdToFetch ? { projectId: projectIdToFetch } : {}));
 
-        // Fetch calendar events (meetings)
+
         dispatch(fetchEvents({}));
-    }, [dispatch, currentProject?.id, selectedProjectId]); // Note: excluding projects.length to avoid loops, only fetch once if empty
+    }, [dispatch, currentProject?.id, selectedProjectId]);
 
     const handleAddTask = (taskName: string, sectionId: string) => {
         const activeProjectId = (selectedProjectId && selectedProjectId !== 'all')
@@ -84,13 +85,12 @@ export const useProjectBoard = () => {
         dispatch(createTaskAction(newTaskData));
     };
 
-    const handleDragEnd = async (result: any) => {
+    const handleDragEnd = async (result: DropResult) => {
         const { destination, source, draggableId } = result;
 
         if (!destination) return;
         if (destination.droppableId === source.droppableId && destination.index === source.index) return;
 
-        // Map section IDs to TaskStatus
         const statusMap: Record<string, TaskStatus> = {
             'backlog': 'TODO',
             'inprogress': 'IN_PROGRESS',
@@ -101,7 +101,6 @@ export const useProjectBoard = () => {
         const newStatus = statusMap[destination.droppableId];
         if (!newStatus) return;
 
-        // Optimistic UI Update: Update status in Redux immediately
         dispatch(updateTaskStatusOptimistic({ id: draggableId, status: newStatus }));
 
         try {
@@ -110,10 +109,10 @@ export const useProjectBoard = () => {
                 data: { status: newStatus }
             })).unwrap();
             window.toastify(`Task moved to ${destination.droppableId}`, "success");
-        } catch (err: any) {
-            // Revert on failure: Re-fetching tasks is the safest way to sync
+        } catch (err) {
+            const error = err as AxiosError<{ message: string }>;
             dispatch(fetchTasks(currentProject ? { projectId: currentProject.id } : {}));
-            window.toastify(err || "Failed to move task", "error");
+            window.toastify(error.response?.data?.message || "Failed to move task", "error");
         }
     };
 
@@ -125,18 +124,16 @@ export const useProjectBoard = () => {
         );
     };
 
-    // Transform raw tasks into grouped sections for the UI
     const dynamicSections = useMemo((): Section[] => {
-        // Filter tasks by search query
-        const filteredTasks = tasks.filter(t =>
+        const filteredTasks = tasks.filter((t: Task) =>
             t.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
             (t.project?.name || '').toLowerCase().includes(searchQuery.toLowerCase())
         );
 
-        const backlogTasks = filteredTasks.filter(t => t.status === 'TODO');
-        const inProgressTasks = filteredTasks.filter(t => t.status === 'IN_PROGRESS');
-        const qaTasks = filteredTasks.filter(t => t.status === 'COMPLETED');
-        const canceledTasks = filteredTasks.filter(t => t.status === 'CANCELED');
+        const backlogTasks = filteredTasks.filter((t: Task) => t.status === 'TODO');
+        const inProgressTasks = filteredTasks.filter((t: Task) => t.status === 'IN_PROGRESS');
+        const qaTasks = filteredTasks.filter((t: Task) => t.status === 'COMPLETED');
+        const canceledTasks = filteredTasks.filter((t: Task) => t.status === 'CANCELED');
 
         return [
             {
@@ -172,20 +169,18 @@ export const useProjectBoard = () => {
 
     const [currentDate, setCurrentDate] = useState(new Date());
 
-    // Transform raw tasks into calendar events (Assign Date -> Green, Due Date -> Red)
     const calendarEvents = useMemo(() => {
         const filteredTasks = tasks.filter(t =>
             t.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
             (t.project?.name || '').toLowerCase().includes(searchQuery.toLowerCase())
         );
 
-        return filteredTasks.flatMap(t => {
+        return filteredTasks.flatMap((t: Task) => {
             const events = [];
             const dueDate = t.dueDate ? new Date(t.dueDate) : null;
             const assignDate = t.createdAt ? new Date(t.createdAt) : null;
             const projectName = t.project?.name || 'No Project';
 
-            // 1. Assign Date Event (Green Badge)
             if (assignDate) {
                 events.push({
                     id: `${t.id}-assign`,
@@ -200,7 +195,6 @@ export const useProjectBoard = () => {
                 });
             }
 
-            // 2. Due Date Event (Red Badge)
             if (dueDate) {
                 events.push({
                     id: `${t.id}-due`,
@@ -219,15 +213,13 @@ export const useProjectBoard = () => {
         });
     }, [tasks, searchQuery]);
 
-    // Helper to generate calendar grid
     const calendarDays = useMemo(() => {
         const year = currentDate.getFullYear();
         const month = currentDate.getMonth();
-        const firstDayOfMonth = new Date(year, month, 1).getDay(); // 0-6 (Sun-Sat)
+        const firstDayOfMonth = new Date(year, month, 1).getDay(); //
         const daysInMonth = new Date(year, month + 1, 0).getDate();
         const prevMonthLastDay = new Date(year, month, 0).getDate();
 
-        // Adjust Sun=0 to Mon=0 for Mon-Sun grid
         const offset = (firstDayOfMonth + 6) % 7;
 
         return Array.from({ length: 42 }).map((_, i) => {
@@ -292,7 +284,7 @@ export const useProjectBoard = () => {
         projects,
         selectedProjectId,
         handleProjectChange,
-        meetings: meetings.filter(m => m.title.toLowerCase().includes(searchQuery.toLowerCase())),
+        meetings: meetings.filter((m: CalendarEvent) => m.title.toLowerCase().includes(searchQuery.toLowerCase())),
         searchQuery,
         setSearchQuery
     };

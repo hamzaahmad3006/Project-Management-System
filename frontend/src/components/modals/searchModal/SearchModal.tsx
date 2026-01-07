@@ -1,6 +1,6 @@
 import React from 'react';
 import { FaSearch, FaCheckCircle, FaSortAmountDown, FaCalendarAlt, FaProjectDiagram } from 'react-icons/fa';
-import { CreateModalProps } from '../../../types';
+import { CreateModalProps } from 'types';
 import { useSearch } from './useSearch';
 
 const SearchModal: React.FC<CreateModalProps> = ({ isOpen, onClose }) => {
@@ -31,12 +31,11 @@ const SearchModal: React.FC<CreateModalProps> = ({ isOpen, onClose }) => {
                         placeholder="Search projects or tasks..."
                         className="flex-1 text-lg text-gray-700 dark:text-gray-200 placeholder-gray-400 dark:placeholder:text-gray-600 outline-none bg-transparent"
                         value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
+                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchTerm(e.target.value)}
                         autoFocus
                     />
                 </div>
 
-                {/* Filters */}
                 <div className="px-4 py-2 border-b border-gray-100 dark:border-gray-800 flex items-center gap-2 overflow-x-auto no-scrollbar bg-gray-50/50 dark:bg-gray-800/10">
                     <FilterButton icon={<FaSortAmountDown />} label="Sort" />
                     <FilterButton icon={<FaProjectDiagram />} label="Projects" />
@@ -44,7 +43,6 @@ const SearchModal: React.FC<CreateModalProps> = ({ isOpen, onClose }) => {
                     <FilterButton icon={<FaCalendarAlt />} label="Date" />
                 </div>
 
-                {/* Content */}
                 <div className="flex-1 overflow-y-auto p-2 custom-scrollbar min-h-[200px]">
                     {searchTerm.trim() ? (
                         <>
@@ -85,7 +83,6 @@ const SearchModal: React.FC<CreateModalProps> = ({ isOpen, onClose }) => {
                     )}
                 </div>
 
-                {/* Footer */}
                 <div className="p-3 border-t border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-800/20 flex items-center justify-end gap-6 text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider">
                     <div className="flex items-center gap-1.5">
                         <kbd className="px-1.5 py-0.5 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded shadow-sm text-gray-900 dark:text-gray-100">↵</kbd>

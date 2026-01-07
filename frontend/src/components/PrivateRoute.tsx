@@ -3,7 +3,11 @@ import { Navigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { RootState } from "../store/store";
 
-export default function PrivateRoute({ Component }: any) {
+interface PrivateRouteProps {
+    Component: React.ComponentType;
+}
+
+export default function PrivateRoute({ Component }: PrivateRouteProps) {
     const { isAuthenticated } = useSelector((state: RootState) => state.auth);
 
     if (!isAuthenticated) {

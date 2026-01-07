@@ -116,7 +116,6 @@ const Tasks: React.FC = () => {
                                                                 ${snapshot.isDragging ? 'shadow-2xl border-blue-500 scale-105 z-50 ring-2 ring-blue-500/20' : 'border-gray-100 dark:border-gray-800 hover:shadow-md'}`}
                                                                 onClick={() => setSelectedTask(task)}
                                                             >
-                                                                {/* Card Top: Project Badge & Menu */}
                                                                 <div className="flex justify-between items-center mb-4">
                                                                     <span className="px-3 py-1 text-[11px] font-semibold text-blue-600 dark:text-blue-400 bg-blue-50/80 dark:bg-blue-900/40 rounded-md border border-blue-100/50 dark:border-blue-900/30">
                                                                         {task.project?.name || 'Internal'}
@@ -126,7 +125,6 @@ const Tasks: React.FC = () => {
                                                                     </button>
                                                                 </div>
 
-                                                                {/* Middle Content Row: Text */}
                                                                 <div className="mb-4">
                                                                     <h4 className="text-lg font-bold text-gray-900 dark:text-gray-100 mb-1 leading-tight tracking-tight">
                                                                         {task.name}
@@ -136,11 +134,9 @@ const Tasks: React.FC = () => {
                                                                     </p>
                                                                 </div>
 
-                                                                {/* Assignee Info & Priority Row */}
                                                                 <div className="space-y-2 mb-5">
                                                                     <div className="flex items-center justify-between gap-3">
                                                                         <div className="text-[10px] text-gray-400 dark:text-gray-500  tracking-wider font-semibold">Assignee:</div>
-                                                                        {/* Assignee Avatar (Aligned with Label) */}
                                                                         <div className="flex-shrink-0 ">
                                                                             {task.assignedTo ? (
                                                                                 <img src={task.assignedTo.avatar || "https://ui-avatars.com/api/?name=" + task.assignedTo.name} alt={task.assignedTo.name} className="w-5 h-5 rounded-full" />
@@ -150,13 +146,11 @@ const Tasks: React.FC = () => {
                                                                         </div>
                                                                     </div>
                                                                     <div className="flex items-center justify-between">
-                                                                        {/* Date with Flag */}
                                                                         <div className="flex items-center gap-2 text-gray-400 dark:text-gray-500 text-sm font-medium">
                                                                             <FaFlag size={14} className="text-gray-600 dark:text-gray-400" />
                                                                             <span className='text-[#74798B] font-normal'>{task.dueDate ? new Date(task.dueDate).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' }) : 'No Deadline'}</span>
                                                                         </div>
 
-                                                                        {/* Priority with Dot */}
                                                                         <div className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold border uppercase tracking-wider
                                                                         ${task.priority === 'HIGH' ? 'bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 border-red-100/50 dark:border-red-900/30' :
                                                                                 task.priority === 'LOW' ? 'bg-green-50 dark:bg-green-900/20 text-green-600 dark:text-green-400 border-green-100/50 dark:border-green-900/30' :
@@ -167,14 +161,14 @@ const Tasks: React.FC = () => {
                                                                     </div>
                                                                 </div>
 
-                                                                {/* Horizontal Separator */}
                                                                 <div className="h-px bg-gray-100 dark:bg-gray-800 -mx-5 mb-4" />
 
-                                                                {/* Meta Info Bottom Row */}
                                                                 <div className="flex items-center gap-5 text-gray-400 dark:text-gray-500">
                                                                     <div className="flex items-center gap-2 text-sm font-medium">
                                                                         <FaRegFileAlt size={16} className='text-gray-600' />
-                                                                        <span className="text-sm font-semibold text-[#74798B]">3/4</span>
+                                                                        <span className="text-sm font-semibold text-[#74798B]">
+                                                                            {task.subtasks ? `${task.subtasks.filter(s => s.completed).length}/${task.subtasks.length}` : '0/0'}
+                                                                        </span>
                                                                     </div>
                                                                     <div className="flex items-center gap-2 text-sm font-medium">
                                                                         <FaRegCommentDots size={16} className='text-gray-600' />
@@ -182,7 +176,7 @@ const Tasks: React.FC = () => {
                                                                     </div>
                                                                     <div className="flex items-center gap-2 text-sm font-medium">
                                                                         <FaPaperclip size={16} className='text-gray-600 -rotate-45' />
-                                                                        <span className="text-sm font-semibold text-[#74798B]">{task.attachments || 7}</span>
+                                                                        <span className="text-sm font-semibold text-[#74798B]">{task.attachments || 0}</span>
                                                                     </div>
                                                                 </div>
                                                             </div>
@@ -192,7 +186,6 @@ const Tasks: React.FC = () => {
                                             })}
                                             {provided.placeholder}
 
-                                            {/* Add Card Ghost Button */}
                                             {user?.role === 'MANAGER' && (
                                                 <button
                                                     onClick={() => setIsCreateModalOpen(true)}
@@ -210,13 +203,12 @@ const Tasks: React.FC = () => {
                 </DragDropContext>
             </div>
 
-            {/* Create Task Modal */}
             <CreateGlobalTaskModal
                 isOpen={isCreateModalOpen}
                 onClose={() => setIsCreateModalOpen(false)}
             />
 
-            {/* Task Detail Panel */}
+
             {selectedTask && (
                 <TaskDetailPanel
                     task={selectedTask}

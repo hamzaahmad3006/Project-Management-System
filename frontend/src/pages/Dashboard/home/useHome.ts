@@ -1,11 +1,11 @@
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '../../../store/store';
 import { fetchKPIs, fetchRecentActivity } from '../../../store/slices/dashboardSlice';
 import { fetchProjects, setSelectedProjectId } from '../../../store/slices/projectSlice';
 import { fetchEvents } from '../../../store/slices/calendarSlice';
-import { useState } from 'react';
-
+import { ChartData, ChartOptions, ScriptableContext } from 'chart.js';
+import { ChartPoint, CalendarEvent, DashboardTask } from 'types';
 
 export const useHomeHook = () => {
     const dispatch = useDispatch<AppDispatch>();
@@ -20,7 +20,7 @@ export const useHomeHook = () => {
 
     const weekDates = useMemo(() => {
         const today = new Date();
-        const currentDay = today.getDay() || 7; // 1 (Mon) to 7 (Sun)
+        const currentDay = today.getDay() || 7;
         const monday = new Date(today);
         monday.setDate(today.getDate() - currentDay + 1);
 
@@ -60,23 +60,20 @@ export const useHomeHook = () => {
         }]
     }), [kpis, isDark]);
 
-    const budgetData: any = useMemo(() => {
+    const budgetData: ChartData<'line'> = useMemo(() => {
         const chartPoints = kpis?.chartData || [];
-        const labels = chartPoints.map((d: any) => d.label);
-        const rawSpendData = chartPoints.map((d: any) => d.value);
+        const labels = chartPoints.map((d: ChartPoint) => d.label);
+        const rawSpendData = chartPoints.map((d: ChartPoint) => d.value);
 
-        // Fallback for empty data
         const displayLabels = labels.length > 0 ? labels : Array.from({ length: 30 }, (_, i) => (i + 1).toString().padStart(2, '0'));
         const displaySpend = rawSpendData.length > 0 ? rawSpendData : new Array(30).fill(0);
 
-        // Cumulative spending
         const initialSpend = kpis?.initialSpend || 0;
         const cumulativeSpend = displaySpend.reduce((acc: number[], val: number, i: number) => {
             acc.push((acc[i - 1] || initialSpend) + val);
             return acc;
         }, []);
 
-        // Budget line (Total budget or fallback)
         const totalBudget = kpis?.projects?.totalBudget || 0;
         const budgetDataLine = new Array(cumulativeSpend.length).fill(totalBudget);
 
@@ -87,7 +84,7 @@ export const useHomeHook = () => {
                     label: 'Budget',
                     data: budgetDataLine,
                     borderColor: '#34d399',
-                    backgroundColor: (context: any) => {
+                    backgroundColor: (context: ScriptableContext<'line'>) => {
                         const chart = context.chart;
                         const { ctx, chartArea } = chart;
                         if (!chartArea) return 'rgba(52, 211, 153, 0.05)';
@@ -109,7 +106,7 @@ export const useHomeHook = () => {
                     label: 'Expenses',
                     data: cumulativeSpend,
                     borderColor: '#0f4c75',
-                    backgroundColor: (context: any) => {
+                    backgroundColor: (context: ScriptableContext<'line'>) => {
                         const chart = context.chart;
                         const { ctx, chartArea } = chart;
                         if (!chartArea) return 'rgba(15, 76, 117, 0.2)';
@@ -131,7 +128,7 @@ export const useHomeHook = () => {
         };
     }, [kpis, isDark]);
 
-    const budgetOptions: any = useMemo(() => ({
+    const budgetOptions: ChartOptions<'line'> = useMemo(() => ({
         responsive: true,
         maintainAspectRatio: false,
         interaction: {
@@ -160,14 +157,14 @@ export const useHomeHook = () => {
                 boxPadding: 6,
                 usePointStyle: true,
                 callbacks: {
-                    label: (context: any) => {
-                        let value = context.raw;
-                        let formatted = value;
+                    label: (context) => {
+                        let value = context.raw as number;
+                        let formatted: string | number = value;
                         if (value >= 1000000) formatted = `${(value / 1000000).toFixed(1)}M`;
                         else if (value >= 1000) formatted = `${(value / 1000).toFixed(0)}k`;
                         return `${context.dataset.label}: ${formatted}`;
                     },
-                    title: (items: any) => {
+                    title: (items) => {
                         if (!items || items.length === 0) return '';
                         const index = items[0].dataIndex;
                         const dataPoint = kpis?.chartData?.[index];
@@ -188,10 +185,11 @@ export const useHomeHook = () => {
                 ticks: {
                     color: isDark ? '#4b5563' : '#94a3b8',
                     font: { size: 10 },
-                    callback: (value: any) => {
-                        if (value >= 1000000) return `${value / 1000000}M`;
-                        if (value >= 1000) return `${value / 1000}k`;
-                        return value;
+                    callback: (value) => {
+                        const val = value as number;
+                        if (val >= 1000000) return `${val / 1000000}M`;
+                        if (val >= 1000) return `${val / 1000}k`;
+                        return val;
                     }
                 }
             },
@@ -205,7 +203,7 @@ export const useHomeHook = () => {
                 }
             }
         },
-    }), [isDark]);
+    }), [isDark, kpis]);
 
     const getStatusBadge = (status: string) => {
         const styles: Record<string, string> = {
@@ -229,10 +227,10 @@ export const useHomeHook = () => {
         dispatch(setSelectedProjectId(projectId));
     };
 
-    const latestTasks = useMemo(() => recentActivity.slice(0, 4), [recentActivity]);
+    const latestTasks = useMemo(() => recentActivity.slice(0, 4) as DashboardTask[], [recentActivity]);
 
     const filteredEvents = useMemo(() => {
-        const dateFiltered = events.filter(e => {
+        const dateFiltered = events.filter((e: CalendarEvent) => {
             const eventDate = new Date(e.startTime);
             return (
                 eventDate.getDate() === selectedDate.getDate() &&
@@ -242,12 +240,12 @@ export const useHomeHook = () => {
         });
 
         if (scheduleTab === 'Meetings') {
-            return dateFiltered.filter(e => e.type === 'MEETING');
+            return dateFiltered.filter((e: CalendarEvent) => e.type === 'MEETING');
         }
         if (scheduleTab === 'Events') {
-            return dateFiltered.filter(e => e.type === 'EVENT' || e.type === 'DEADLINE');
+            return dateFiltered.filter((e: CalendarEvent) => e.type === 'EVENT' || e.type === 'DEADLINE');
         }
-        return []; // Holidays handled in UI
+        return [];
     }, [events, scheduleTab, selectedDate]);
 
     return {

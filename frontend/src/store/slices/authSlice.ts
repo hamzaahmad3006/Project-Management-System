@@ -1,7 +1,7 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import axios, { AxiosError } from 'axios';
 import api from '../../api/axios';
-import { User, AuthState, LoginCredentials, RegisterData, GoogleAuthData, AuthResponse } from '../../types';
+import { User, AuthState, LoginCredentials, RegisterData, GoogleAuthData, AuthResponse } from 'types';
 
 const initialState: AuthState = {
     user: null,
