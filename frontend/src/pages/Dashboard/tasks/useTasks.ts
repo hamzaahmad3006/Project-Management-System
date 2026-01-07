@@ -1,6 +1,6 @@
 import { useAppDispatch, useAppSelector } from '../../../store/hooks';
 import { fetchTasks, updateTask, updateTaskStatusOptimistic } from '../../../store/slices/taskSlice';
-import { TaskStatus } from '../../../types';
+import { TaskStatus, Task } from '../../../types';
 import { useEffect, useMemo, useState } from 'react';
 import { DragDropContext, Droppable, Draggable, DropResult } from '@hello-pangea/dnd';
 
@@ -13,6 +13,7 @@ export const useTasks = () => {
     const [viewMode, setViewMode] = useState<'KANBAN' | 'LIST'>('KANBAN');
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
     const [searchTerm, setSearchTerm] = useState('');
+    const [selectedTask, setSelectedTask] = useState<Task | null>(null);
 
     const filteredTasks = useMemo(() => {
         if (!searchTerm.trim()) return tasks;
@@ -71,6 +72,8 @@ export const useTasks = () => {
         setViewMode,
         setIsCreateModalOpen,
         setSearchTerm,
+        selectedTask,
+        setSelectedTask,
         DragDropContext, Droppable, Draggable,
     }
 }

@@ -6,7 +6,7 @@ import { Project, ProjectState, CreateProjectData, UpdateProjectData } from '../
 const initialState: ProjectState = {
     projects: [],
     currentProject: null,
-    selectedProjectId: 'all',
+    selectedProjectId: localStorage.getItem('selectedProjectId') || 'all',
     loading: false,
     error: null,
 };
@@ -88,6 +88,7 @@ const projectSlice = createSlice({
         },
         setSelectedProjectId: (state, action: PayloadAction<string>) => {
             state.selectedProjectId = action.payload;
+            localStorage.setItem('selectedProjectId', action.payload);
         },
     },
     extraReducers: (builder) => {

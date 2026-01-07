@@ -316,66 +316,69 @@ const ProjectBoard: React.FC = () => {
 
                                                     {/* Tasks List */}
                                                     <div className="flex-1 space-y-3 overflow-y-auto pr-1">
-                                                        {section.tasks.map((task, index) => (
-                                                            <Draggable key={task.id} draggableId={task.id} index={index}>
-                                                                {(provided, snapshot) => (
-                                                                    <div
-                                                                        ref={provided.innerRef}
-                                                                        {...provided.draggableProps}
-                                                                        {...provided.dragHandleProps}
-                                                                        onClick={() => setSelectedTask(task)}
-                                                                        className={`bg-white dark:bg-[#1a1c23] border rounded-lg p-3 hover:shadow-md transition-all cursor-pointer group
+                                                        {section.tasks.map((task, index) => {
+                                                            const isDragDisabled = user?.role !== 'MANAGER' && task.assignedTo?.id !== user?.id;
+                                                            return (
+                                                                <Draggable key={task.id} draggableId={task.id} index={index} isDragDisabled={isDragDisabled}>
+                                                                    {(provided, snapshot) => (
+                                                                        <div
+                                                                            ref={provided.innerRef}
+                                                                            {...provided.draggableProps}
+                                                                            {...provided.dragHandleProps}
+                                                                            onClick={() => setSelectedTask(task)}
+                                                                            className={`bg-white dark:bg-[#1a1c23] border rounded-lg p-3 hover:shadow-md transition-all cursor-pointer group
                                                                             ${snapshot.isDragging ? 'shadow-2xl border-blue-500 scale-105 z-50' : 'border-gray-200 dark:border-gray-800'}`}
-                                                                    >
-                                                                        <h4 className="text-sm font-medium text-gray-800 dark:text-gray-100 mb-2 leading-tight">{task.name}</h4>
+                                                                        >
+                                                                            <h4 className="text-sm font-medium text-gray-800 dark:text-gray-100 mb-2 leading-tight">{task.name}</h4>
 
-                                                                        {/* Labels */}
-                                                                        {(task.label?.length || 0) > 0 && (
-                                                                            <div className="flex flex-wrap gap-1 mb-3">
-                                                                                {task.label?.map((lbl, i) => (
-                                                                                    <span
-                                                                                        key={i}
-                                                                                        className={`px-1.5 py-0.5 text-[10px] font-medium rounded ${getLabelStyles(lbl)}`}
-                                                                                    >
-                                                                                        {lbl}
-                                                                                    </span>
-                                                                                ))}
-                                                                            </div>
-                                                                        )}
+                                                                            {/* Labels */}
+                                                                            {(task.label?.length || 0) > 0 && (
+                                                                                <div className="flex flex-wrap gap-1 mb-3">
+                                                                                    {task.label?.map((lbl, i) => (
+                                                                                        <span
+                                                                                            key={i}
+                                                                                            className={`px-1.5 py-0.5 text-[10px] font-medium rounded ${getLabelStyles(lbl)}`}
+                                                                                        >
+                                                                                            {lbl}
+                                                                                        </span>
+                                                                                    ))}
+                                                                                </div>
+                                                                            )}
 
-                                                                        {/* Footer */}
-                                                                        <div className="flex items-center justify-between mt-2 pt-2 border-t border-gray-50 dark:border-gray-800">
-                                                                            <div className="flex items-center gap-2">
-                                                                                {task.assignedTo && (
-                                                                                    <div className="flex items-center gap-1.5">
-                                                                                        <img src={task.assignedTo.avatar || "https://ui-avatars.com/api/?name=" + task.assignedTo.name} alt={task.assignedTo.name} className="w-5 h-5 rounded-full" />
-                                                                                        <span className="text-xs text-gray-500 dark:text-gray-400">{task.assignedTo.name}</span>
-                                                                                    </div>
-                                                                                )}
-                                                                            </div>
+                                                                            {/* Footer */}
+                                                                            <div className="flex items-center justify-between mt-2 pt-2 border-t border-gray-50 dark:border-gray-800">
+                                                                                <div className="flex items-center gap-2">
+                                                                                    {task.assignedTo && (
+                                                                                        <div className="flex items-center gap-1.5">
+                                                                                            <img src={task.assignedTo.avatar || "https://ui-avatars.com/api/?name=" + task.assignedTo.name} alt={task.assignedTo.name} className="w-5 h-5 rounded-full" />
+                                                                                            <span className="text-xs text-gray-500 dark:text-gray-400">{task.assignedTo.name}</span>
+                                                                                        </div>
+                                                                                    )}
+                                                                                </div>
 
-                                                                            <div className="flex items-center gap-3 text-gray-400 dark:text-gray-500">
-                                                                                {task.comments && (
-                                                                                    <div className="flex items-center gap-1 text-xs">
-                                                                                        <MdChatBubbleOutline size={14} /> {task.comments}
-                                                                                    </div>
-                                                                                )}
-                                                                                {task.attachments && (
-                                                                                    <div className="flex items-center gap-1 text-xs">
-                                                                                        <FaPaperclip size={10} /> {task.attachments}
-                                                                                    </div>
-                                                                                )}
-                                                                                {task.dueDate && (
-                                                                                    <div className="text-[10px] text-gray-400 dark:text-gray-500">
-                                                                                        {new Date(task.dueDate).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}
-                                                                                    </div>
-                                                                                )}
+                                                                                <div className="flex items-center gap-3 text-gray-400 dark:text-gray-500">
+                                                                                    {task.comments && (
+                                                                                        <div className="flex items-center gap-1 text-xs">
+                                                                                            <MdChatBubbleOutline size={14} /> {task.comments}
+                                                                                        </div>
+                                                                                    )}
+                                                                                    {task.attachments && (
+                                                                                        <div className="flex items-center gap-1 text-xs">
+                                                                                            <FaPaperclip size={10} /> {task.attachments}
+                                                                                        </div>
+                                                                                    )}
+                                                                                    {task.dueDate && (
+                                                                                        <div className="text-[10px] text-gray-400 dark:text-gray-500">
+                                                                                            {new Date(task.dueDate).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}
+                                                                                        </div>
+                                                                                    )}
+                                                                                </div>
                                                                             </div>
                                                                         </div>
-                                                                    </div>
-                                                                )}
-                                                            </Draggable>
-                                                        ))}
+                                                                    )}
+                                                                </Draggable>
+                                                            );
+                                                        })}
                                                         {provided.placeholder}
                                                         {/* Add Task Button */}
                                                         {user?.role === 'MANAGER' && (

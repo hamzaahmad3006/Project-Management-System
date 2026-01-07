@@ -1,5 +1,6 @@
 import React from 'react';
 import CreateGlobalTaskModal from '../../../components/modals/createTask/CreateGlobalTaskModal';
+import TaskDetailPanel from '../../../components/dashboard/TaskDetailPanel';
 import { useTasks } from './useTasks';
 import { useAppSelector } from 'store/hooks';
 import { RootState } from 'store/store';
@@ -9,7 +10,7 @@ import { Loader } from 'components/loader/Loader';
 
 
 const Tasks: React.FC = () => {
-    const { tasks, loading, viewMode, isCreateModalOpen, searchTerm, filteredTasks, columns, handleDragEnd, setViewMode, setIsCreateModalOpen, setSearchTerm, DragDropContext, Droppable, Draggable } = useTasks();
+    const { tasks, loading, viewMode, isCreateModalOpen, searchTerm, filteredTasks, columns, handleDragEnd, setViewMode, setIsCreateModalOpen, setSearchTerm, selectedTask, setSelectedTask, DragDropContext, Droppable, Draggable } = useTasks();
     const { user } = useAppSelector((state: RootState) => state.auth);
 
     if (loading && tasks.length === 0) {
@@ -102,93 +103,93 @@ const Tasks: React.FC = () => {
                                         </div>
 
                                         <div className="flex-1 overflow-y-auto space-y-1 pr-1 custom-scrollbar scroll-smooth">
-                                            {col.items.map((task, index) => (
-                                                <Draggable key={task.id} draggableId={task.id} index={index}>
-                                                    {(provided, snapshot) => (
-                                                        <div
-                                                            ref={provided.innerRef}
-                                                            {...provided.draggableProps}
-                                                            {...provided.dragHandleProps}
-                                                            className={`bg-white dark:bg-[#1a1c23] p-5 rounded-2xl border shadow-sm transition-all cursor-pointer group mb-3
+                                            {col.items.map((task, index) => {
+                                                const isDragDisabled = user?.role !== 'MANAGER' && task.assignedTo?.id !== user?.id;
+                                                return (
+                                                    <Draggable key={task.id} draggableId={task.id} index={index} isDragDisabled={isDragDisabled}>
+                                                        {(provided, snapshot) => (
+                                                            <div
+                                                                ref={provided.innerRef}
+                                                                {...provided.draggableProps}
+                                                                {...provided.dragHandleProps}
+                                                                className={`bg-white dark:bg-[#1a1c23] p-5 rounded-2xl border shadow-sm transition-all cursor-pointer group mb-3
                                                                 ${snapshot.isDragging ? 'shadow-2xl border-blue-500 scale-105 z-50 ring-2 ring-blue-500/20' : 'border-gray-100 dark:border-gray-800 hover:shadow-md'}`}
-                                                        >
-                                                            {/* Card Top: Project Badge & Menu */}
-                                                            <div className="flex justify-between items-center mb-4">
-                                                                <span className="px-3 py-1 text-[11px] font-semibold text-blue-600 dark:text-blue-400 bg-blue-50/80 dark:bg-blue-900/40 rounded-md border border-blue-100/50 dark:border-blue-900/30">
-                                                                    {task.project?.name || 'Internal'}
-                                                                </span>
-                                                                <button className="text-gray-400 dark:text-gray-600 hover:text-gray-500 dark:hover:text-gray-400 transition-colors">
-                                                                    <FaEllipsisH size={14} />
-                                                                </button>
-                                                            </div>
-
-                                                            {/* Middle Content Row: Text */}
-                                                            <div className="mb-4">
-                                                                <h4 className="text-lg font-bold text-gray-900 dark:text-gray-100 mb-1 leading-tight tracking-tight">
-                                                                    {task.name}
-                                                                </h4>
-                                                                <p className="text-sm text-[#74798B] dark:text-[#74798B] line-clamp-2 leading-normal">
-                                                                    {task.description || "No description provided."}
-                                                                </p>
-                                                            </div>
-
-                                                            {/* Assignee Info & Priority Row */}
-                                                            <div className="space-y-2 mb-5">
-                                                                <div className="flex items-center justify-between gap-3">
-                                                                    <div className="text-[10px] text-gray-400 dark:text-gray-500  tracking-wider font-semibold">Assignee:</div>
-                                                                    {/* Assignee Avatar (Aligned with Label) */}
-                                                                    <div className="flex-shrink-0 ">
-                                                                        {task.assignedTo ? (
-                                                                            <img
-                                                                                src={task.assignedTo.avatar}
-                                                                                alt={task.assignedTo.name}
-                                                                                className="w-7 h-7 rounded-full border-2 border-white dark:border-gray-800 shadow-sm object-cover"
-                                                                            />
-                                                                        ) : (
-                                                                            <div className="w-7 h-7 rounded-full bg-blue-50 dark:bg-blue-900/20 border-2 border-white dark:border-gray-800 flex items-center justify-center text-[10px] font-bold text-blue-600 dark:text-blue-400">?</div>
-                                                                        )}
-                                                                    </div>
+                                                                onClick={() => setSelectedTask(task)}
+                                                            >
+                                                                {/* Card Top: Project Badge & Menu */}
+                                                                <div className="flex justify-between items-center mb-4">
+                                                                    <span className="px-3 py-1 text-[11px] font-semibold text-blue-600 dark:text-blue-400 bg-blue-50/80 dark:bg-blue-900/40 rounded-md border border-blue-100/50 dark:border-blue-900/30">
+                                                                        {task.project?.name || 'Internal'}
+                                                                    </span>
+                                                                    <button className="text-gray-400 dark:text-gray-600 hover:text-gray-500 dark:hover:text-gray-400 transition-colors">
+                                                                        <FaEllipsisH size={14} />
+                                                                    </button>
                                                                 </div>
-                                                                <div className="flex items-center justify-between">
-                                                                    {/* Date with Flag */}
-                                                                    <div className="flex items-center gap-2 text-gray-400 dark:text-gray-500 text-sm font-medium">
-                                                                        <FaFlag size={14} className="text-gray-600 dark:text-gray-400" />
-                                                                        <span className='text-[#74798B] font-normal'>{task.dueDate ? new Date(task.dueDate).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' }) : 'No Deadline'}</span>
-                                                                    </div>
 
-                                                                    {/* Priority with Dot */}
-                                                                    <div className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold border uppercase tracking-wider
+                                                                {/* Middle Content Row: Text */}
+                                                                <div className="mb-4">
+                                                                    <h4 className="text-lg font-bold text-gray-900 dark:text-gray-100 mb-1 leading-tight tracking-tight">
+                                                                        {task.name}
+                                                                    </h4>
+                                                                    <p className="text-sm text-[#74798B] dark:text-[#74798B] line-clamp-2 leading-normal">
+                                                                        {task.description || "No description provided."}
+                                                                    </p>
+                                                                </div>
+
+                                                                {/* Assignee Info & Priority Row */}
+                                                                <div className="space-y-2 mb-5">
+                                                                    <div className="flex items-center justify-between gap-3">
+                                                                        <div className="text-[10px] text-gray-400 dark:text-gray-500  tracking-wider font-semibold">Assignee:</div>
+                                                                        {/* Assignee Avatar (Aligned with Label) */}
+                                                                        <div className="flex-shrink-0 ">
+                                                                            {task.assignedTo ? (
+                                                                                <img src={task.assignedTo.avatar || "https://ui-avatars.com/api/?name=" + task.assignedTo.name} alt={task.assignedTo.name} className="w-5 h-5 rounded-full" />
+                                                                            ) : (
+                                                                                <div className="w-7 h-7 rounded-full bg-blue-50 dark:bg-blue-900/20 border-2 border-white dark:border-gray-800 flex items-center justify-center text-[10px] font-bold text-blue-600 dark:text-blue-400"></div>
+                                                                            )}
+                                                                        </div>
+                                                                    </div>
+                                                                    <div className="flex items-center justify-between">
+                                                                        {/* Date with Flag */}
+                                                                        <div className="flex items-center gap-2 text-gray-400 dark:text-gray-500 text-sm font-medium">
+                                                                            <FaFlag size={14} className="text-gray-600 dark:text-gray-400" />
+                                                                            <span className='text-[#74798B] font-normal'>{task.dueDate ? new Date(task.dueDate).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' }) : 'No Deadline'}</span>
+                                                                        </div>
+
+                                                                        {/* Priority with Dot */}
+                                                                        <div className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold border uppercase tracking-wider
                                                                         ${task.priority === 'HIGH' ? 'bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 border-red-100/50 dark:border-red-900/30' :
-                                                                            task.priority === 'LOW' ? 'bg-green-50 dark:bg-green-900/20 text-green-600 dark:text-green-400 border-green-100/50 dark:border-green-900/30' :
-                                                                                'bg-yellow-50 dark:bg-yellow-900/20 text-yellow-600 dark:text-yellow-400 border-yellow-100/50 dark:border-yellow-900/30'}`}>
-                                                                        <div className={`w-1.5 h-1.5 rounded-full ${task.priority === 'HIGH' ? 'bg-red-600' : task.priority === 'LOW' ? 'bg-green-600' : 'bg-yellow-600'}`} />
-                                                                        {task.priority || 'Medium'}
+                                                                                task.priority === 'LOW' ? 'bg-green-50 dark:bg-green-900/20 text-green-600 dark:text-green-400 border-green-100/50 dark:border-green-900/30' :
+                                                                                    'bg-yellow-50 dark:bg-yellow-900/20 text-yellow-600 dark:text-yellow-400 border-yellow-100/50 dark:border-yellow-900/30'}`}>
+                                                                            <div className={`w-1.5 h-1.5 rounded-full ${task.priority === 'HIGH' ? 'bg-red-600' : task.priority === 'LOW' ? 'bg-green-600' : 'bg-yellow-600'}`} />
+                                                                            {task.priority || 'Medium'}
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+
+                                                                {/* Horizontal Separator */}
+                                                                <div className="h-px bg-gray-100 dark:bg-gray-800 -mx-5 mb-4" />
+
+                                                                {/* Meta Info Bottom Row */}
+                                                                <div className="flex items-center gap-5 text-gray-400 dark:text-gray-500">
+                                                                    <div className="flex items-center gap-2 text-sm font-medium">
+                                                                        <FaRegFileAlt size={16} className='text-gray-600' />
+                                                                        <span className="text-sm font-semibold text-[#74798B]">3/4</span>
+                                                                    </div>
+                                                                    <div className="flex items-center gap-2 text-sm font-medium">
+                                                                        <FaRegCommentDots size={16} className='text-gray-600' />
+                                                                        <span className="text-sm font-semibold text-[#74798B]">{task.comments || 0}</span>
+                                                                    </div>
+                                                                    <div className="flex items-center gap-2 text-sm font-medium">
+                                                                        <FaPaperclip size={16} className='text-gray-600 -rotate-45' />
+                                                                        <span className="text-sm font-semibold text-[#74798B]">{task.attachments || 7}</span>
                                                                     </div>
                                                                 </div>
                                                             </div>
-
-                                                            {/* Horizontal Separator */}
-                                                            <div className="h-px bg-gray-100 dark:bg-gray-800 -mx-5 mb-4" />
-
-                                                            {/* Meta Info Bottom Row */}
-                                                            <div className="flex items-center gap-5 text-gray-400 dark:text-gray-500">
-                                                                <div className="flex items-center gap-2 text-sm font-medium">
-                                                                    <FaRegFileAlt size={16} className='text-gray-600' />
-                                                                    <span className="text-sm font-semibold text-[#74798B]">3/4</span>
-                                                                </div>
-                                                                <div className="flex items-center gap-2 text-sm font-medium">
-                                                                    <FaRegCommentDots size={16} className='text-gray-600' />
-                                                                    <span className="text-sm font-semibold text-[#74798B]">{task.comments || 0}</span>
-                                                                </div>
-                                                                <div className="flex items-center gap-2 text-sm font-medium">
-                                                                    <FaPaperclip size={16} className='text-gray-600 -rotate-45' />
-                                                                    <span className="text-sm font-semibold text-[#74798B]">{task.attachments || 7}</span>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    )}
-                                                </Draggable>
-                                            ))}
+                                                        )}
+                                                    </Draggable>
+                                                );
+                                            })}
                                             {provided.placeholder}
 
                                             {/* Add Card Ghost Button */}
@@ -214,6 +215,14 @@ const Tasks: React.FC = () => {
                 isOpen={isCreateModalOpen}
                 onClose={() => setIsCreateModalOpen(false)}
             />
+
+            {/* Task Detail Panel */}
+            {selectedTask && (
+                <TaskDetailPanel
+                    task={selectedTask}
+                    onClose={() => setSelectedTask(null)}
+                />
+            )}
         </div>
     );
 };
