@@ -22,7 +22,8 @@ const SettingsModal: React.FC<CreateModalProps> = ({ isOpen, onClose }) => {
         onRemoveImage,
         handleChange,
         handleSaveProfile,
-        handleClose
+        handleClose,
+        handleDeleteAccount
     } = useSettings(user, onClose);
 
     if (!isOpen) return null;
@@ -101,6 +102,7 @@ const SettingsModal: React.FC<CreateModalProps> = ({ isOpen, onClose }) => {
                                 handleChange={handleChange}
                                 handleSave={handleSaveProfile}
                                 onCancel={handleClose}
+                                onDeleteAccount={handleDeleteAccount}
                                 preview={preview}
                                 loading={loading}
                             />

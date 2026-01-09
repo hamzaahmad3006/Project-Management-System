@@ -120,9 +120,7 @@ export interface UserProfile {
     team?: string;
 }
 
-export interface ProfileSettingsProps {
-    profile: UserProfile;
-}
+
 
 
 //===== TemplateGalleryModal.tsx Interface ======
@@ -334,6 +332,7 @@ export interface ProfileSettingsProps {
     onCancel: () => void;
     preview: string | null;
     loading: boolean;
+    onDeleteAccount: () => void;
 }
 
 //===== Notification.tsx Interface ======

@@ -1,6 +1,9 @@
 import { useState } from "react";
 import axios, { AxiosError } from "axios";
 import api from "../../../api/axios";
+import { useDispatch } from "react-redux";
+import { AppDispatch } from "../../../store/store";
+import { deleteAccount } from "../../../store/slices/authSlice";
 import { UserProfile, User } from "types";
 
 export const useSettings = (user: User | null, onClose: () => void) => {
@@ -87,6 +90,28 @@ export const useSettings = (user: User | null, onClose: () => void) => {
         onClose();
     };
 
+    const dispatch = useDispatch<AppDispatch>();
+
+    const handleDeleteAccount = async () => {
+        const confirmDelete = window.confirm(
+            "Are you sure you want to delete your account? This action is permanent and will delete all your projects and data."
+        );
+
+        if (confirmDelete) {
+            try {
+                setLoading(true);
+                await dispatch(deleteAccount()).unwrap();
+                window.toastify("Account deleted successfully", "success");
+                onClose(); // This might be redundant if the app redirects on logOut
+            } catch (err) {
+                const error = err as string;
+                window.toastify(error || "Account deletion failed", "error");
+            } finally {
+                setLoading(false);
+            }
+        }
+    };
+
     return {
         activeTab,
         setActiveTab,
@@ -102,6 +127,7 @@ export const useSettings = (user: User | null, onClose: () => void) => {
         onRemoveImage,
         handleChange,
         handleSaveProfile,
-        handleClose
+        handleClose,
+        handleDeleteAccount
     };
 };

@@ -131,6 +131,19 @@ export const resetPassword = createAsyncThunk<void, { token: string; newPassword
     }
 );
 
+export const deleteAccount = createAsyncThunk<void, void>(
+    'auth/deleteAccount',
+    async (_, { rejectWithValue, dispatch }) => {
+        try {
+            await api.delete('/auth/account');
+            dispatch(logout());
+        } catch (err: unknown) {
+            const error = err as AxiosError<{ message: string }>;
+            return rejectWithValue(error.response?.data?.message || 'Failed to delete account');
+        }
+    }
+);
+
 const authSlice = createSlice({
     name: 'auth',
     initialState,

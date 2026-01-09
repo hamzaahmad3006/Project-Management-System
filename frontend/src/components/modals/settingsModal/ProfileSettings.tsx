@@ -9,7 +9,7 @@ import FileInputForm from 'components/ui/inputFields/FileInputForm';
 
 
 const ProfileSettings: React.FC<ProfileSettingsProps> = ({
-    profile, onImageSelect, onRemoveImage, handleChange, handleSave, onCancel, preview, loading
+    profile, onImageSelect, onRemoveImage, handleChange, handleSave, onCancel, onDeleteAccount, preview, loading
 }) => {
     return (
         <div className="w-full max-w-2xl bg-white dark:bg-[#1a1c23] rounded-xl shadow-sm overflow-hidden">
@@ -107,7 +107,11 @@ const ProfileSettings: React.FC<ProfileSettingsProps> = ({
                     </button>
                 </div>
 
-                <button className="text-red-500 border border-red-200 px-6 py-2.5 rounded-lg font-medium hover:bg-red-50 transition-colors">
+                <button
+                    onClick={onDeleteAccount}
+                    disabled={loading}
+                    className="text-red-500 border border-red-200 px-6 py-2.5 rounded-lg font-medium hover:bg-red-50 transition-colors disabled:opacity-50"
+                >
                     Delete account
                 </button>
             </div>
