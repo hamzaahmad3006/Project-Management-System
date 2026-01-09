@@ -10,15 +10,7 @@ export const useTheme = () => {
         const root = window.document.documentElement;
 
         const applyTheme = (targetTheme: ThemeType) => {
-            let actualTheme: 'light' | 'dark';
-
-            if (targetTheme === 'system') {
-                actualTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-            } else {
-                actualTheme = targetTheme as 'light' | 'dark';
-            }
-
-            if (actualTheme === 'dark') {
+            if (targetTheme === 'dark') {
                 root.classList.add('dark');
             } else {
                 root.classList.remove('dark');
@@ -26,14 +18,5 @@ export const useTheme = () => {
         };
 
         applyTheme(theme);
-
-
-        if (theme === 'system') {
-            const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-            const handleChange = () => applyTheme('system');
-
-            mediaQuery.addEventListener('change', handleChange);
-            return () => mediaQuery.removeEventListener('change', handleChange);
-        }
     }, [theme]);
 };

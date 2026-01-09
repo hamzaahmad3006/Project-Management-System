@@ -32,7 +32,7 @@ export const useHomeHook = () => {
     }, []);
 
     const isDark = useMemo(() => {
-        return theme === 'dark' || (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+        return theme === 'dark';
     }, [theme]);
 
     useEffect(() => {

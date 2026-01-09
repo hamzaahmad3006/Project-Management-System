@@ -118,7 +118,7 @@ export const useDashboardTabHook = () => {
     const { events, loading: calendarLoading } = useSelector((state: RootState) => state.calendar);
     const [selectedYear, setSelectedYear] = useState('2026');
     const theme = useSelector((state: RootState) => state.theme.theme);
-    const isDark = theme === 'dark' || (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+    const isDark = theme === 'dark';
 
     const { teamId: contextTeamId } = useOutletContext<{ teamId?: string }>();
 
