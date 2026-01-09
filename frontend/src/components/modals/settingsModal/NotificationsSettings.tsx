@@ -27,7 +27,7 @@ const NotificationsSettings = () => {
     };
 
     return (
-        <div className="w-full max-w-2xl bg-white dark:bg-[#1a1c23] rounded-lg space-y-8 animate-in fade-in duration-300">
+        <div className="w-full max-w-2xl bg-white dark:bg-surface-card rounded-lg space-y-8 animate-in fade-in duration-300">
             <h2 className="text-lg font-bold text-gray-900 dark:text-gray-100 uppercase tracking-tight">Notifications</h2>
 
             <div className="space-y-6">

@@ -5,7 +5,7 @@ export default function Team() {
     const { team, isCreateTeamOpen, setIsCreateTeamOpen, allTeams } = useTeamHook();
 
     return (
-        <div className="flex w-full h-screen bg-white dark:bg-[#12141c]">
+        <div className="flex w-full h-screen bg-white dark:bg-surface-dark">
             <main className="flex-1 p-8 overflow-auto custom-scrollbar">
                 <div className="flex items-center justify-between mb-6">
                     <div>

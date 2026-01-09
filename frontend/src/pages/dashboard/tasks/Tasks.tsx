@@ -18,8 +18,8 @@ const Tasks: React.FC = () => {
     }
 
     return (
-        <div className="h-full flex flex-col bg-white dark:bg-[#12141c] overflow-hidden">
-            <header className="px-8 py-6 border-b border-gray-200 dark:border-gray-800 bg-white dark:bg-[#12141c]">
+        <div className="h-full flex flex-col bg-white dark:bg-surface-dark overflow-hidden">
+            <header className="px-8 py-6 border-b border-gray-200 dark:border-gray-800 bg-white dark:bg-surface-dark">
                 <div className="flex flex-col gap-6">
                     <h1 className="text-3xl font-extrabold text-gray-900 dark:text-gray-100 tracking-tight">Tasks</h1>
 
@@ -112,7 +112,7 @@ const Tasks: React.FC = () => {
                                                                 ref={provided.innerRef}
                                                                 {...provided.draggableProps}
                                                                 {...provided.dragHandleProps}
-                                                                className={`bg-white dark:bg-[#1a1c23] p-5 rounded-2xl border shadow-sm transition-all cursor-pointer group mb-3
+                                                                className={`bg-white dark:bg-surface-card p-5 rounded-2xl border shadow-sm transition-all cursor-pointer group mb-3
                                                                 ${snapshot.isDragging ? 'shadow-2xl border-blue-500 scale-105 z-50 ring-2 ring-blue-500/20' : 'border-gray-100 dark:border-gray-800 hover:shadow-md'}`}
                                                                 onClick={() => setSelectedTask(task)}
                                                             >
@@ -129,7 +129,7 @@ const Tasks: React.FC = () => {
                                                                     <h4 className="text-lg font-bold text-gray-900 dark:text-gray-100 mb-1 leading-tight tracking-tight">
                                                                         {task.name}
                                                                     </h4>
-                                                                    <p className="text-sm text-[#74798B] dark:text-[#74798B] line-clamp-2 leading-normal">
+                                                                    <p className="text-sm text-content-muted-alt dark:text-content-muted-alt line-clamp-2 leading-normal">
                                                                         {task.description || "No description provided."}
                                                                     </p>
                                                                 </div>
@@ -166,17 +166,17 @@ const Tasks: React.FC = () => {
                                                                 <div className="flex items-center gap-5 text-gray-400 dark:text-gray-500">
                                                                     <div className="flex items-center gap-2 text-sm font-medium">
                                                                         <FaRegFileAlt size={16} className='text-gray-600' />
-                                                                        <span className="text-sm font-semibold text-[#74798B]">
+                                                                        <span className="text-sm font-semibold text-content-muted-alt">
                                                                             {task.subtasks ? `${task.subtasks.filter(s => s.completed).length}/${task.subtasks.length}` : '0/0'}
                                                                         </span>
                                                                     </div>
                                                                     <div className="flex items-center gap-2 text-sm font-medium">
                                                                         <FaRegCommentDots size={16} className='text-gray-600' />
-                                                                        <span className="text-sm font-semibold text-[#74798B]">{task.comments || 0}</span>
+                                                                        <span className="text-sm font-semibold text-content-muted-alt">{task.comments || 0}</span>
                                                                     </div>
                                                                     <div className="flex items-center gap-2 text-sm font-medium">
                                                                         <FaPaperclip size={16} className='text-gray-600 -rotate-45' />
-                                                                        <span className="text-sm font-semibold text-[#74798B]">{task.attachments || 0}</span>
+                                                                        <span className="text-sm font-semibold text-content-muted-alt">{task.attachments || 0}</span>
                                                                     </div>
                                                                 </div>
                                                             </div>

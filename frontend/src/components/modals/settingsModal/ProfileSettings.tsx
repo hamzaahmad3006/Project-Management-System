@@ -12,7 +12,7 @@ const ProfileSettings: React.FC<ProfileSettingsProps> = ({
     profile, onImageSelect, onRemoveImage, handleChange, handleSave, onCancel, onDeleteAccount, preview, loading
 }) => {
     return (
-        <div className="w-full max-w-2xl bg-white dark:bg-[#1a1c23] rounded-xl shadow-sm overflow-hidden">
+        <div className="w-full max-w-2xl bg-white dark:bg-surface-card rounded-xl shadow-sm overflow-hidden">
 
             <div className=" space-y-4">
                 <div className="space-y-3">
@@ -90,12 +90,12 @@ const ProfileSettings: React.FC<ProfileSettingsProps> = ({
                 </div>
             </div>
 
-            <div className="p-6 bg-gray-50 dark:bg-[#15171c] flex justify-between items-center">
+            <div className="p-6 bg-gray-50 dark:bg-surface-sidebar flex justify-between items-center">
                 <div className="flex gap-3">
                     <button
                         onClick={handleSave}
                         disabled={loading}
-                        className="bg-[#0084ff] text-white px-8 py-2.5 rounded-lg font-medium hover:bg-blue-600 transition-colors"
+                        className="bg-brand-primary text-white px-8 py-2.5 rounded-lg font-medium hover:bg-blue-600 transition-colors"
                     >
                         {loading ? <ButtonLoader /> : 'Save'}
                     </button>

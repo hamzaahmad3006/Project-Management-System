@@ -69,8 +69,7 @@ const ProjectBoard: React.FC = () => {
     };
 
     return (
-        <div className="flex flex-col h-full bg-white dark:bg-[#12141c]">
-
+        <div className="flex flex-col h-full bg-white dark:bg-surface-dark">
             <header className="px-4 md:px-6 py-4 border-b border-gray-200 dark:border-gray-800">
                 <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-4 gap-4">
                     <div className="flex items-center gap-3 w-full md:w-auto justify-between md:justify-start">
@@ -91,7 +90,7 @@ const ProjectBoard: React.FC = () => {
                                             className="fixed inset-0 z-10"
                                             onClick={() => setIsProjectSelectorOpen(false)}
                                         ></div>
-                                        <div className="absolute left-0 mt-2 w-56 rounded-md shadow-lg bg-white dark:bg-[#1a1c23] ring-1 ring-black ring-opacity-5 z-20 overflow-hidden border border-gray-100 dark:border-gray-800">
+                                        <div className="absolute left-0 mt-2 w-56 rounded-md shadow-lg bg-white dark:bg-surface-card ring-1 ring-black ring-opacity-5 z-20 overflow-hidden border border-gray-100 dark:border-gray-800">
                                             <div className="py-1" role="menu" aria-orientation="vertical">
                                                 <div className="px-4 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wider bg-gray-50 dark:bg-gray-800/50">
                                                     Switch Project
@@ -264,7 +263,7 @@ const ProjectBoard: React.FC = () => {
 
 
             {/* Content Switcher */}
-            <div className="flex-1 overflow-auto bg-white dark:bg-[#12141c] p-6">
+            <div className="flex-1 overflow-auto bg-white dark:bg-surface-dark p-6">
                 {activeView === 'Board' ? (
                     <DragDropContext onDragEnd={handleDragEnd}>
                         <div className="flex items-start h-full gap-6 min-w-max">
@@ -276,7 +275,7 @@ const ProjectBoard: React.FC = () => {
                                             ref={provided.innerRef}
                                             className={`flex flex-col h-full transition-colors duration-200 
                                                 ${section.id === 'postpone' ? 'w-10 items-center rounded-lg pt-4' : 'w-72'}
-                                                ${snapshot.isDraggingOver ? (section.id === 'postpone' ? 'bg-red-50 dark:bg-red-900/20' : 'bg-blue-50/50 dark:bg-blue-900/10') : (section.id === 'postpone' ? 'bg-gray-50 dark:bg-[#1a1c23]' : '')}`}
+                                                ${snapshot.isDraggingOver ? (section.id === 'postpone' ? 'bg-red-50 dark:bg-red-900/20' : 'bg-blue-50/50 dark:bg-blue-900/10') : (section.id === 'postpone' ? 'bg-gray-50 dark:bg-surface-card' : '')}`}
                                         >
                                             {section.id === 'postpone' ? (
                                                 <div className="flex-1 flex flex-col items-center pointer-events-none">
@@ -324,8 +323,8 @@ const ProjectBoard: React.FC = () => {
                                                                             {...provided.draggableProps}
                                                                             {...provided.dragHandleProps}
                                                                             onClick={() => setSelectedTask(task)}
-                                                                            className={`bg-white dark:bg-[#1a1c23] border rounded-lg p-3 hover:shadow-md transition-all cursor-pointer group
-                                                                            ${snapshot.isDragging ? 'shadow-2xl border-blue-500 scale-105 z-50' : 'border-gray-200 dark:border-gray-800'}`}
+                                                                            className={`bg-white dark:bg-surface-card p-5 rounded-2xl border shadow-sm transition-all cursor-pointer group mb-3
+                                                                ${snapshot.isDragging ? 'shadow-2xl border-blue-500 scale-105 z-50 ring-2 ring-blue-500/20' : 'border-gray-100 dark:border-gray-800 hover:shadow-md'}`}
                                                                         >
                                                                             <h4 className="text-sm font-medium text-gray-800 dark:text-gray-100 mb-2 leading-tight">{task.name}</h4>
 
@@ -446,7 +445,7 @@ const ProjectBoard: React.FC = () => {
                         </div>
 
                         {/* Calendar Grid */}
-                        <div className="flex-1 border border-gray-100 dark:border-gray-800/10 rounded-xl overflow-hidden flex flex-col bg-white dark:bg-[#0f1117] shadow-sm">
+                        <div className="flex-1 border border-gray-100 dark:border-gray-800/10 rounded-xl overflow-hidden flex flex-col bg-white dark:bg-surface-dark shadow-sm">
                             {/* Days Header */}
                             <div className="grid grid-cols-7 border-b border-gray-50 dark:border-gray-800/10 py-3 bg-gray-50/50 dark:bg-gray-900/10">
                                 {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map(day => (
@@ -465,7 +464,7 @@ const ProjectBoard: React.FC = () => {
                                     return (
                                         <div
                                             key={i}
-                                            className={`border-b border-r border-gray-50 dark:border-gray-800/10 p-2.5 relative min-h-[180px] hover:bg-gray-50/20 dark:hover:bg-gray-800/5 transition-colors flex flex-col ${!isCurrentMonth ? 'bg-gray-50/20 dark:bg-gray-900/5' : 'bg-white dark:bg-[#0f1117]'}`}
+                                            className={`border-b border-r border-gray-50 dark:border-gray-800/10 p-2.5 relative min-h-[180px] hover:bg-gray-50/20 dark:hover:bg-gray-800/5 transition-colors flex flex-col ${!isCurrentMonth ? 'bg-gray-50/20 dark:bg-gray-900/5' : 'bg-white dark:bg-surface-dark'}`}
                                         >
                                             <div className="flex justify-end mb-2.5">
                                                 <span className={`text-[11px] font-bold w-6 h-6 flex items-center justify-center rounded-full transition-all
@@ -553,7 +552,7 @@ const ProjectBoard: React.FC = () => {
                                 {!collapsedSections.includes(section.id) && (
                                     <>
                                         {/* Table Header inside Section */}
-                                        <div className="flex items-center border-b border-gray-200 dark:border-gray-800 bg-gray-50/50 dark:bg-[#15171f] text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1">
+                                        <div className="flex items-center border-b border-gray-200 dark:border-gray-800 bg-gray-50/50 dark:bg-surface-sidebar text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1">
                                             <div className="flex-1 min-w-[300px] pl-8 py-2 border-r border-gray-200 dark:border-gray-800">Name</div>
                                             <div className="w-40 py-2 pl-4 border-r border-gray-200 dark:border-gray-800">Assignee</div>
                                             <div className="w-32 py-2 pl-4 border-r border-gray-200 dark:border-gray-800">Due date</div>
@@ -670,7 +669,7 @@ const ProjectBoard: React.FC = () => {
                     </div>
                 ) : (
 
-                    <div className="flex flex-col h-full overflow-hidden bg-white dark:bg-[#12141c]">
+                    <div className="flex flex-col h-full overflow-hidden bg-white dark:bg-surface-dark">
                         {/* Timeline Header Section */}
                         <div className="flex items-center justify-between mb-6">
                             <div className="flex items-center gap-4">
@@ -724,7 +723,7 @@ const ProjectBoard: React.FC = () => {
 
                         {/* Hourly Timeline Grid Wrapper - Clean & Responsive */}
                         <div className="flex-1 mt-2">
-                            <div className="flex flex-col w-full bg-white dark:bg-[#12141c] rounded-2xl border border-gray-100 dark:border-gray-800/50 shadow-sm overflow-hidden">
+                            <div className="flex flex-col w-full bg-white dark:bg-surface-dark rounded-2xl border border-gray-100 dark:border-gray-800/50 shadow-sm overflow-hidden">
                                 {/* Hours Label Bar */}
                                 <div className="flex bg-gray-50/50 dark:bg-gray-800/30 border-b border-gray-100 dark:border-gray-800/50">
                                     {Array.from({ length: 10 }).map((_, i) => {
@@ -740,7 +739,7 @@ const ProjectBoard: React.FC = () => {
                                 </div>
 
                                 {/* Timeline Body Area */}
-                                <div className="relative flex-1 bg-white dark:bg-[#12141c]">
+                                <div className="relative flex-1 bg-white dark:bg-surface-dark">
                                     {/* Horizontal Grid Lines - Removed for minimalism */}
                                     <div className="absolute inset-0 flex opacity-0">
                                         {Array.from({ length: 10 }).map((_, i) => (

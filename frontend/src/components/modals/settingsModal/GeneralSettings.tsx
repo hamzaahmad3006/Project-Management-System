@@ -18,7 +18,7 @@ const GeneralSettings = () => {
     };
 
     return (
-        <div className="w-full max-w-xl bg-white dark:bg-[#1a1c23] rounded-lg p-2 ">
+        <div className="w-full max-w-xl bg-white dark:bg-surface-card rounded-lg p-2 ">
 
             <div className="space-y-3">
                 <div>

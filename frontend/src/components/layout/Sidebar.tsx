@@ -58,7 +58,7 @@ const Sidebar: React.FC = () => {
 
             <aside
                 className={`
-                    fixed md:sticky top-0 h-screen bg-[#FAFAFA] dark:bg-[#1a1c23] border-r border-gray-200 dark:border-gray-800
+                    fixed md:sticky top-0 h-screen bg-gray-50 dark:bg-surface-card border-r border-gray-200 dark:border-gray-800
                     transition-all duration-300 z-40 flex flex-col
                     ${isOpen ? 'w-64' : 'w-20'}
                     ${isMobileOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}
@@ -70,7 +70,7 @@ const Sidebar: React.FC = () => {
                             <div className="w-6 h-6 bg-yellow-400 rounded flex items-center justify-center text-sm">
                                 ❖
                             </div>
-                            <span className="font-semibold text-gray-800 dark:text-gray-100">Defcon systems</span>
+                            <span className="font-semibold text-content-primary dark:text-gray-100">Defcon systems</span>
                         </div>
                     )}
                     <button
@@ -180,7 +180,7 @@ const Sidebar: React.FC = () => {
                                                             to={`/team/${team.id}`}
                                                             className={({ isActive }) =>
                                                                 `block pl-4 py-1.5 text-xs rounded transition-colors ${isActive
-                                                                    ? 'text-blue-600 font-medium'
+                                                                    ? 'text-brand-primary font-medium'
                                                                     : 'text-gray-500 hover:text-gray-900 dark:hover:text-gray-200'
                                                                 }`
                                                             }
@@ -230,7 +230,7 @@ const Sidebar: React.FC = () => {
                                                             onClick={() => dispatch(setSelectedProjectId(project.id))}
                                                             className={({ isActive }) =>
                                                                 `block pl-4 py-1.5 text-xs rounded transition-colors ${selectedProjectId === project.id
-                                                                    ? 'text-blue-600 font-medium'
+                                                                    ? 'text-brand-primary font-medium'
                                                                     : 'text-gray-500 hover:text-gray-900 dark:hover:text-gray-200'
                                                                 }`
                                                             }
@@ -251,7 +251,7 @@ const Sidebar: React.FC = () => {
                 </nav>
 
 
-                <div className="mt-auto w-full border-t border-gray-200 dark:border-gray-800 p-3 space-y-1 bg-[#FAFAFA] dark:bg-[#1a1c23]">
+                <div className="mt-auto w-full border-t border-gray-200 dark:border-gray-800 p-3 space-y-1 bg-gray-50 dark:bg-surface-card">
                     {isOpen && isManager && (
                         <div
                             onClick={() => setIsInviteOpen(true)}

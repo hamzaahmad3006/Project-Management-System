@@ -17,7 +17,7 @@ const Budget: React.FC = () => {
                 <div className="text-center py-10 dark:text-gray-400">Loading budget...</div>
             ) : (
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                    <div className="lg:col-span-1 bg-white dark:bg-[#1a1c23] p-6 rounded-lg shadow dark:shadow-none border border-transparent dark:border-gray-800">
+                    <div className="lg:col-span-1 bg-white dark:bg-surface-card p-6 rounded-lg shadow dark:shadow-none border border-transparent dark:border-gray-800">
                         <h3 className="text-lg font-semibold mb-4 text-center text-gray-900 dark:text-gray-100">Total Budget Utilization</h3>
                         <div className="h-64 flex justify-center">
                             <Doughnut data={chartData} />
@@ -28,7 +28,7 @@ const Budget: React.FC = () => {
                         </div>
                     </div>
 
-                    <div className="lg:col-span-2 bg-white dark:bg-[#1a1c23] p-6 rounded-lg shadow dark:shadow-none border border-transparent dark:border-gray-800">
+                    <div className="lg:col-span-2 bg-white dark:bg-surface-card p-6 rounded-lg shadow dark:shadow-none border border-transparent dark:border-gray-800">
                         <h3 className="text-lg font-semibold mb-4 text-gray-900 dark:text-gray-100">Project Budgets</h3>
                         <div className="overflow-x-auto">
                             <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-800">
@@ -40,7 +40,7 @@ const Budget: React.FC = () => {
                                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Status</th>
                                     </tr>
                                 </thead>
-                                <tbody className="bg-white dark:bg-[#1a1c23] divide-y divide-gray-200 dark:divide-gray-800">
+                                <tbody className="bg-white dark:bg-surface-card divide-y divide-gray-200 dark:divide-gray-800">
                                     {projects.map((project: BudgetProject) => (
                                         <tr key={project.id}>
                                             <td className="px-6 py-4 whitespace-nowrap font-medium text-gray-900 dark:text-gray-100">{project.name}</td>
