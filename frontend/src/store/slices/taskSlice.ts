@@ -124,6 +124,44 @@ const taskSlice = createSlice({
                 state.tasks[index].status = status;
             }
         },
+        receiveSubtask: (state, action: { payload: Subtask }) => {
+            const subtask = action.payload;
+            // Update currentTask if it matches
+            if (state.currentTask && state.currentTask.id === subtask.taskId) {
+                if (!state.currentTask.subtasks) state.currentTask.subtasks = [];
+                const exists = state.currentTask.subtasks.some(s => s.id === subtask.id);
+                if (!exists) {
+                    state.currentTask.subtasks.push(subtask);
+                }
+            }
+            // Update task in list if it exists
+            const taskInList = state.tasks.find(t => t.id === subtask.taskId);
+            if (taskInList) {
+                if (!taskInList.subtasks) taskInList.subtasks = [];
+                const exists = taskInList.subtasks.some(s => s.id === subtask.id);
+                if (!exists) {
+                    taskInList.subtasks.push(subtask);
+                }
+            }
+        },
+        updateSubtaskStatus: (state, action: { payload: Subtask }) => {
+            const subtask = action.payload;
+            // Update currentTask if it matches
+            if (state.currentTask && state.currentTask.id === subtask.taskId) {
+                const existing = state.currentTask.subtasks?.find(s => s.id === subtask.id);
+                if (existing) {
+                    existing.completed = subtask.completed;
+                }
+            }
+            // Update task in list if it exists
+            const taskInList = state.tasks.find(t => t.id === subtask.taskId);
+            if (taskInList) {
+                const existing = taskInList.subtasks?.find(s => s.id === subtask.id);
+                if (existing) {
+                    existing.completed = subtask.completed;
+                }
+            }
+        },
     },
     extraReducers: (builder) => {
         builder
@@ -193,5 +231,5 @@ const taskSlice = createSlice({
     },
 });
 
-export const { clearCurrentTask, updateTaskStatusOptimistic, setSelectedTask } = taskSlice.actions;
+export const { clearCurrentTask, updateTaskStatusOptimistic, setSelectedTask, receiveSubtask, updateSubtaskStatus } = taskSlice.actions;
 export default taskSlice.reducer;

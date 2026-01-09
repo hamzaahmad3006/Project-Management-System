@@ -2,8 +2,9 @@ import { Middleware } from '@reduxjs/toolkit';
 import { io, Socket } from 'socket.io-client';
 import { addNotification } from '../slices/notificationSlice';
 import { receiveComment } from '../slices/commentSlice';
+import { receiveSubtask, updateSubtaskStatus, setSelectedTask } from '../slices/taskSlice';
 import { toast } from 'react-toastify';
-import { Notification, Comment } from 'types';
+import { Notification, Comment, Subtask } from 'types';
 
 interface MiddlewareState {
     auth: {
@@ -59,12 +60,35 @@ export const socketMiddleware: Middleware<{}, MiddlewareState> = (store) => (nex
                     dispatch(receiveComment(data.comment));
                 }
             });
+
+            socket.on('subtask_added', (subtask: Subtask) => {
+                dispatch(receiveSubtask(subtask));
+            });
+
+            socket.on('subtask_updated', (subtask: Subtask) => {
+                dispatch(updateSubtaskStatus(subtask));
+            });
         }
     } else {
         if (socket) {
             console.log('🔌 Redux Middleware: Disconnecting socket');
             socket.disconnect();
             socket = null;
+        }
+    }
+
+    // Handle joining/leaving task rooms
+    if (setSelectedTask.match(action)) {
+        const previousTask = state.tasks.currentTask;
+        const newTask = action.payload;
+
+        if (socket) {
+            if (previousTask) {
+                socket.emit('leave_task', previousTask.id);
+            }
+            if (newTask && newTask.id) {
+                socket.emit('join_task', newTask.id);
+            }
         }
     }
 
