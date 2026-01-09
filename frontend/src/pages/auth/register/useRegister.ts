@@ -27,19 +27,29 @@ export const useRegister = () => {
         try {
             const result = await signInWithPopup(auth, provider);
             const user = result.user;
+            const email =
+                user.email ||
+                user.providerData?.find((p: any) => p.email)?.email ||
+                null;
+
+            if (!email) {
+                console.error("Firebase User Object without email:", user);
+                window.toastify("Could not retrieve email from Google. Please ensure your Google account has a shared email.", "error");
+                return;
+            }
 
             const payload = await dispatch(loginwithgoogle({
-                email: user.email,
+                email,
                 name: user.displayName,
                 photoURL: user.photoURL
             })).unwrap();
-
+            console.log('payload', payload);
+            console.log('user', user);
 
             navigate('/');
         } catch (err: unknown) {
             const error = err as AxiosError<{ message: string }>;
             window.toastify(error.response?.data?.message || "Google sign in failed", "error");
-
         }
     };
     const handleSigninWithGithub = async (e: React.FormEvent) => {
@@ -52,7 +62,7 @@ export const useRegister = () => {
                 user.providerData?.find(p => p.email)?.email ||
                 null;
 
-            const payload = await dispatch(loginwithgithub({
+            await dispatch(loginwithgithub({
                 email,
                 name: user.displayName,
                 photoURL: user.photoURL
@@ -75,7 +85,7 @@ export const useRegister = () => {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         try {
-            const result = await dispatch(register({
+            await dispatch(register({
                 email: formData.email,
                 name: formData.name || formData.email.split('@')[0],
                 role: formData.role

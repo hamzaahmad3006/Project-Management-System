@@ -28,9 +28,16 @@ export const useLoginHook = () => {
         try {
             const result = await signInWithPopup(auth, provider);
             const user = result.user;
+            const email = user.email || (user.providerData && user.providerData.find((p: any) => p.email)?.email) || null;
+
+            if (!email) {
+                console.error("Firebase User Object without email (Login):", user);
+                window.toastify("Could not retrieve email from Google. Please ensure your Google account has a shared email.", "error");
+                return;
+            }
 
             const payload = await dispatch(loginwithgoogle({
-                email: user.email,
+                email,
                 name: user.displayName,
                 photoURL: user.photoURL
             })).unwrap();
