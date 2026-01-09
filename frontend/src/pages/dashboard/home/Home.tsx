@@ -9,7 +9,7 @@ import { MdSettingsInputComponent } from 'react-icons/md';
 
 ChartJS.register(ArcElement, CategoryScale, LinearScale, PointElement, LineElement, BarElement, Filler, Tooltip, Legend);
 
-// Custom plugin for vertical dotted line on hover
+
 const verticalLinePlugin = {
     id: 'verticalLine',
     afterDraw: (chart: Chart) => {

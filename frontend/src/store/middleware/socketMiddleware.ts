@@ -77,7 +77,7 @@ export const socketMiddleware: Middleware<{}, MiddlewareState> = (store) => (nex
         }
     }
 
-    // Handle joining/leaving task rooms
+
     if (setSelectedTask.match(action)) {
         const previousTask = state.tasks.currentTask;
         const newTask = action.payload;
