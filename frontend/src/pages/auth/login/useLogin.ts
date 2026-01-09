@@ -1,4 +1,4 @@
-import { signInWithPopup } from 'firebase/auth';
+import { signInWithPopup, UserInfo } from 'firebase/auth';
 import { auth, provider } from '../../../config/firebase';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '../../../store/store';
@@ -28,7 +28,7 @@ export const useLoginHook = () => {
         try {
             const result = await signInWithPopup(auth, provider);
             const user = result.user;
-            const email = user.email || (user.providerData && user.providerData.find((p: any) => p.email)?.email) || null;
+            const email = user.email || (user.providerData && user.providerData.find((p: UserInfo) => p.email)?.email) || null;
 
             if (!email) {
                 console.error("Firebase User Object without email (Login):", user);

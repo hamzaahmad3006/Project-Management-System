@@ -1,6 +1,6 @@
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../../store/store";
-import { signInWithPopup } from "firebase/auth";
+import { signInWithPopup, UserInfo } from "firebase/auth";
 import { auth, githubProvider, provider } from "config/firebase";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
@@ -29,7 +29,7 @@ export const useRegister = () => {
             const user = result.user;
             const email =
                 user.email ||
-                user.providerData?.find((p: any) => p.email)?.email ||
+                user.providerData?.find((p: UserInfo) => p.email)?.email ||
                 null;
 
             if (!email) {
