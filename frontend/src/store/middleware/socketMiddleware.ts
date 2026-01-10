@@ -38,7 +38,6 @@ export const socketMiddleware: Middleware<{}, MiddlewareState> = (store) => (nex
             });
 
             socket.on('connect', () => {
-                console.log(' Socket connected via Middleware:', socket?.id);
             });
 
             socket.on('connect_error', (err) => {

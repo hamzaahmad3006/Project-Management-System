@@ -5,6 +5,7 @@ import { useDispatch } from "react-redux";
 import { AppDispatch } from "../../../store/store";
 import { deleteAccount } from "../../../store/slices/authSlice";
 import { UserProfile, User } from "types";
+import { uploadToCloudinary } from "../../../services/uploadCloudinary";
 
 export const useSettings = (user: User | null, onClose: () => void) => {
     const [activeTab, setActiveTab] = useState('profile');
@@ -44,18 +45,7 @@ export const useSettings = (user: User | null, onClose: () => void) => {
             let avatarUrl = profile.avatar;
 
             if (file) {
-                const formData = new FormData();
-                formData.append("file", file);
-                formData.append("upload_preset", "ml_default");
-
-                const cloudinaryUrl = process.env.REACT_APP_CLOUDINARY_URL;
-
-                if (!cloudinaryUrl) {
-                    throw new Error("REACT_APP_CLOUDINARY_URL is not defined");
-                }
-
-                const res = await axios.post(cloudinaryUrl, formData);
-                avatarUrl = res.data.secure_url;
+                avatarUrl = await uploadToCloudinary(file);
             }
 
             const saveRes = await api.put("/auth/profile",
