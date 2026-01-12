@@ -21,6 +21,7 @@ export const useCreateTaskHook = (isOpen: boolean, onClose: () => void, initialS
     const [budget, setBudget] = useState('');
     const [labels, setLabels] = useState<string[]>([]);
     const [loading, setLoading] = useState(false);
+    const [dateError, setDateError] = useState('');
 
     useEffect(() => {
         if (isOpen) {
@@ -66,6 +67,19 @@ export const useCreateTaskHook = (isOpen: boolean, onClose: () => void, initialS
             return;
         }
 
+        // Validate due date is not in the past
+        if (dueDate) {
+            const selectedDate = new Date(dueDate);
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+
+            if (selectedDate < today) {
+                setDateError('Please select a present or future date');
+                window.toastify("Due date cannot be in the past", "error");
+                return;
+            }
+        }
+
         setLoading(true);
         try {
             await dispatch(createTask({
@@ -91,6 +105,21 @@ export const useCreateTaskHook = (isOpen: boolean, onClose: () => void, initialS
         }
     };
 
+    const handleDateChange = (value: string) => {
+        setDueDate(value);
+        setDateError('');
+
+        if (value) {
+            const selectedDate = new Date(value);
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+
+            if (selectedDate < today) {
+                setDateError('Please select a present or future date');
+            }
+        }
+    };
+
     return {
         projects,
         name,
@@ -102,7 +131,7 @@ export const useCreateTaskHook = (isOpen: boolean, onClose: () => void, initialS
         priority,
         setPriority,
         dueDate,
-        setDueDate,
+        setDueDate: handleDateChange,
         assigneeId,
         setAssigneeId,
         projectId,
@@ -115,6 +144,7 @@ export const useCreateTaskHook = (isOpen: boolean, onClose: () => void, initialS
         setLabels,
         loading,
         handleSubmit,
-        resetForm
+        resetForm,
+        dateError
     };
 };

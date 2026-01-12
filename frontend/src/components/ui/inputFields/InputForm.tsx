@@ -15,6 +15,8 @@ const InputForm: React.FC<InputFieldProps> = ({
   icon,
   className = "",
   labelClassName = "",
+  min,
+  max,
 }) => {
   const inputId = id || name;
 
@@ -45,6 +47,8 @@ const InputForm: React.FC<InputFieldProps> = ({
           disabled={disabled}
           onChange={onChange}
           placeholder={placeholder}
+          min={min}
+          max={max}
           className={`outline-none w-full border dark:border-gray-700 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500
             ${icon ? "pl-10" : "px-3"}
             py-2

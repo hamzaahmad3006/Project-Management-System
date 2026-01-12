@@ -29,6 +29,8 @@ export interface InputFieldProps {
     className?: string;
     icon?: React.ReactNode;
     labelClassName?: string;
+    min?: string;
+    max?: string;
 }
 
 // ===== All Modals Props ====== 
@@ -336,13 +338,27 @@ export interface ProfileSettingsProps {
 }
 
 //===== Notification.tsx Interface ======
+export interface NotificationData {
+    teamId?: string;
+    teamName?: string;
+    token?: string;
+    invitedBy?: string;
+    addedBy?: string;
+    senderAvatar?: string;
+    taskId?: string;
+    commentId?: string;
+    commenterName?: string;
+    commenterAvatar?: string;
+    timestamp?: Date | string;
+}
+
 export interface Notification {
     id: string;
     userId: string;
     type: string;
     title: string;
     message: string;
-    data: Record<string, any> | null;
+    data: NotificationData | null;
     isRead: boolean;
     createdAt: string;
 }

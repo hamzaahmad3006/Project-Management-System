@@ -30,7 +30,8 @@ const CreateGlobalTaskModal: React.FC<CreateModalProps> = ({ isOpen, onClose, in
         labels,
         setLabels,
         loading,
-        handleSubmit
+        handleSubmit,
+        dateError
     } = useCreateTaskHook(isOpen, onClose, initialStatus, initialProjectId);
 
     if (!isOpen) return null;
@@ -159,9 +160,15 @@ const CreateGlobalTaskModal: React.FC<CreateModalProps> = ({ isOpen, onClose, in
                                     value={dueDate}
                                     onChange={(e: React.ChangeEvent<HTMLInputElement>) => setDueDate(e.target.value)}
                                     icon={<FaCalendarAlt size={12} />}
-                                    className="border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 [color-scheme:light] dark:[color-scheme:dark]"
+                                    className={`border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 [color-scheme:light] dark:[color-scheme:dark] ${dateError ? 'border-red-500 dark:border-red-500' : ''}`}
                                     labelClassName="block text-xs font-semibold text-gray-500 dark:text-gray-400"
+                                    min={new Date().toISOString().split('T')[0]}
                                 />
+                                {dateError && (
+                                    <p className="text-xs text-red-500 dark:text-red-400 mt-1 flex items-center gap-1">
+                                        <span>⚠️</span> {dateError}
+                                    </p>
+                                )}
                             </div>
 
                             <div className="space-y-1.5">
