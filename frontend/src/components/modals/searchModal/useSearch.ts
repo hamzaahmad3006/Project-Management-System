@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { useAppSelector, useAppDispatch } from '../../../store/hooks';
 import { useNavigate } from 'react-router-dom';
 import { setCurrentProject, fetchProjects } from '../../../store/slices/projectSlice';
-import { fetchTasks } from '../../../store/slices/taskSlice';
+import { fetchTasks, setSelectedTask } from '../../../store/slices/taskSlice';
 import { Project, Task, SearchResultItem } from 'types';
 
 
@@ -74,17 +74,14 @@ export const useSearch = (isOpen: boolean, onClose: () => void) => {
 
     const handleSelect = (item: SearchResultItem) => {
         if (item.type === 'project') {
+            // Navigate to project board
             dispatch(setCurrentProject(item.original as Project));
-            navigate('/dashboard/board');
+            navigate('/board');
         } else {
+            // Navigate to tasks page and open task detail panel
             const task = item.original as Task;
-            const project = projects.find(p => p.id === task.projectId);
-            if (project) {
-                dispatch(setCurrentProject(project));
-                navigate('/dashboard/board');
-            } else if (task.id) {
-                navigate('/dashboard/tasks');
-            }
+            dispatch(setSelectedTask(task));
+            navigate('/tasks');
         }
         onClose();
     };

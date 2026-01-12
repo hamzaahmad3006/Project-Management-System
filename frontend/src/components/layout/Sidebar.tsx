@@ -47,6 +47,11 @@ const Sidebar: React.FC = () => {
 
     }, [isCreateTeamOpen]);
 
+    // Check if user is a member of any team
+    const hasTeamMembership = () => {
+        return user?.teamMemberships && user.teamMemberships.length > 0;
+    };
+
     return (
         <>
             <button
@@ -166,7 +171,13 @@ const Sidebar: React.FC = () => {
                                         {/* Nested Team Folder */}
                                         <div>
                                             <div
-                                                onClick={() => setIsTeamSubExpanded(!isTeamSubExpanded)}
+                                                onClick={() => {
+                                                    if (!hasTeamMembership()) {
+                                                        window.toastify("You are not a member of any team yet. Please wait for a manager to add you to a team.", "warning");
+                                                        return;
+                                                    }
+                                                    setIsTeamSubExpanded(!isTeamSubExpanded);
+                                                }}
                                                 className="flex items-center gap-2 px-3 py-1.5 text-sm text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 rounded cursor-pointer"
                                             >
                                                 {isTeamSubExpanded ? <img src="/assets/chevronDown.svg" alt="" className="w-6 h-6" /> : <img src="/assets/collapseRight.svg" alt="" className="w-5 h-5" />}
@@ -215,7 +226,13 @@ const Sidebar: React.FC = () => {
 
                                         <div>
                                             <div
-                                                onClick={() => setIsProjectSubExpanded(!isProjectSubExpanded)}
+                                                onClick={() => {
+                                                    if (!hasTeamMembership()) {
+                                                        window.toastify("You need to be part of a team to access projects. Please wait for a manager to add you to a team.", "warning");
+                                                        return;
+                                                    }
+                                                    setIsProjectSubExpanded(!isProjectSubExpanded);
+                                                }}
                                                 className="flex items-center gap-2 px-3 py-1.5 text-sm text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 rounded cursor-pointer"
                                             >
                                                 {isProjectSubExpanded ? <img src="/assets/chevronDown.svg" alt="" className="w-6 h-6" /> : <img src="/assets/collapseRight.svg" alt="" className="w-5 h-5" />}
