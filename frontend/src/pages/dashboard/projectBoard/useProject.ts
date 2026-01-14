@@ -32,6 +32,20 @@ export const useProjectBoard = () => {
   const [collapsedSections, setCollapsedSections] = useState<string[]>(['postpone', 'qa']);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const [visibleSectionIds, setVisibleSectionIds] = useState<string[]>(() => {
+    const saved = localStorage.getItem('projectBoard_visibleSections');
+    return saved ? JSON.parse(saved) : ['backlog', 'inprogress', 'qa'];
+  });
+
+  useEffect(() => {
+    localStorage.setItem('projectBoard_visibleSections', JSON.stringify(visibleSectionIds));
+  }, [visibleSectionIds]);
+
+  const toggleSectionVisibility = (sectionId: string) => {
+    setVisibleSectionIds((prev) =>
+      prev.includes(sectionId) ? prev.filter((id) => id !== sectionId) : [...prev, sectionId]
+    );
+  };
 
   const setSelectedTask = (task: Task | null) => {
     dispatch(setSelectedTaskAction(task));
@@ -139,6 +153,13 @@ export const useProjectBoard = () => {
     );
   };
 
+  const ALL_SECTIONS = [
+    { id: 'backlog', title: 'Backlog', color: 'gray', status: 'TODO' },
+    { id: 'postpone', title: 'Postpone', color: 'red', status: 'CANCELED' },
+    { id: 'inprogress', title: 'In progress', color: 'green', status: 'IN_PROGRESS' },
+    { id: 'qa', title: 'QA', color: 'orange', status: 'COMPLETED' },
+  ];
+
   const dynamicSections = useMemo((): Section[] => {
     const filteredTasks = tasks.filter(
       (t: Task) =>
@@ -146,42 +167,16 @@ export const useProjectBoard = () => {
         (t.project?.name || '').toLowerCase().includes(searchQuery.toLowerCase())
     );
 
-    const backlogTasks = filteredTasks.filter((t: Task) => t.status === 'TODO');
-    const inProgressTasks = filteredTasks.filter((t: Task) => t.status === 'IN_PROGRESS');
-    const qaTasks = filteredTasks.filter((t: Task) => t.status === 'COMPLETED');
-    const canceledTasks = filteredTasks.filter((t: Task) => t.status === 'CANCELED');
-
-    return [
-      {
-        id: 'backlog',
-        title: 'Backlog',
-        count: backlogTasks.length,
-        color: 'gray',
-        tasks: backlogTasks,
-      },
-      {
-        id: 'postpone',
-        title: 'Postpone',
-        count: canceledTasks.length,
-        color: 'red',
-        tasks: canceledTasks,
-      },
-      {
-        id: 'inprogress',
-        title: 'In progress',
-        count: inProgressTasks.length,
-        color: 'green',
-        tasks: inProgressTasks,
-      },
-      {
-        id: 'qa',
-        title: 'QA',
-        count: qaTasks.length,
-        color: 'orange',
-        tasks: qaTasks,
-      },
-    ];
-  }, [tasks, searchQuery]);
+    return ALL_SECTIONS.filter((section) => visibleSectionIds.includes(section.id)).map(
+      (section) => ({
+        id: section.id,
+        title: section.title,
+        color: section.color,
+        count: filteredTasks.filter((t: Task) => t.status === section.status).length,
+        tasks: filteredTasks.filter((t: Task) => t.status === section.status),
+      })
+    );
+  }, [tasks, searchQuery, visibleSectionIds]);
 
   const [currentDate, setCurrentDate] = useState(new Date());
 
@@ -310,5 +305,13 @@ export const useProjectBoard = () => {
     ),
     searchQuery,
     setSearchQuery,
+    visibleSectionIds,
+    toggleSectionVisibility,
+    ALL_SECTIONS: [
+      { id: 'backlog', title: 'Backlog', color: 'gray' },
+      { id: 'postpone', title: 'Postpone', color: 'red' },
+      { id: 'inprogress', title: 'In progress', color: 'green' },
+      { id: 'qa', title: 'QA', color: 'orange' },
+    ],
   };
 };

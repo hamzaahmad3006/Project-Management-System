@@ -47,7 +47,7 @@ export const useHomeHook = () => {
   useEffect(() => {
     const projectId = selectedProjectId === 'all' ? undefined : selectedProjectId;
     const dateStr = selectedDate.toISOString();
-    dispatch(fetchKPIs({ projectId }));
+    dispatch(fetchKPIs({ projectId, date: dateStr }));
     dispatch(fetchRecentActivity({ projectId, date: dateStr }));
     dispatch(fetchEvents({ projectId }));
   }, [dispatch, selectedProjectId, selectedDate]);

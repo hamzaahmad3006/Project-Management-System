@@ -62,10 +62,14 @@ const ProjectBoard: React.FC = () => {
     meetings,
     searchQuery,
     setSearchQuery,
+    visibleSectionIds,
+    toggleSectionVisibility,
+    ALL_SECTIONS,
   } = useProjectBoard();
 
   const { user } = useAppSelector((state) => state.auth);
   const [isProjectSelectorOpen, setIsProjectSelectorOpen] = useState(false);
+  const [isAddSectionOpen, setIsAddSectionOpen] = useState(false);
   const [isEventModalOpen, setIsEventModalOpen] = useState(false);
   const [isTaskModalOpen, setIsTaskModalOpen] = useState(false);
   const [isSearchExpanded, setIsSearchExpanded] = useState(false);
@@ -122,11 +126,10 @@ const ProjectBoard: React.FC = () => {
                             handleProjectChange('all');
                             setIsProjectSelectorOpen(false);
                           }}
-                          className={`w-full text-left px-4 py-2 text-sm flex items-center justify-between ${
-                            selectedProjectId === 'all'
-                              ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 font-medium'
-                              : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors'
-                          }`}
+                          className={`w-full text-left px-4 py-2 text-sm flex items-center justify-between ${selectedProjectId === 'all'
+                            ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 font-medium'
+                            : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors'
+                            }`}
                         >
                           All Projects
                           {selectedProjectId === 'all' && (
@@ -140,11 +143,10 @@ const ProjectBoard: React.FC = () => {
                               handleProjectChange(project.id);
                               setIsProjectSelectorOpen(false);
                             }}
-                            className={`w-full text-left px-4 py-2 text-sm flex items-center justify-between ${
-                              selectedProjectId === project.id
-                                ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 font-medium'
-                                : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors'
-                            }`}
+                            className={`w-full text-left px-4 py-2 text-sm flex items-center justify-between ${selectedProjectId === project.id
+                              ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 font-medium'
+                              : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors'
+                              }`}
                           >
                             <span className="truncate">{project.name}</span>
                             {selectedProjectId === project.id && (
@@ -399,7 +401,7 @@ const ProjectBoard: React.FC = () => {
                                                 src={
                                                   task.assignedTo.avatar ||
                                                   'https://ui-avatars.com/api/?name=' +
-                                                    task.assignedTo.name
+                                                  task.assignedTo.name
                                                 }
                                                 alt={task.assignedTo.name}
                                                 className="w-5 h-5 rounded-full"
@@ -467,9 +469,45 @@ const ProjectBoard: React.FC = () => {
 
               {/* Add Section Button */}
               {user?.role === 'MANAGER' && (
-                <button className="flex items-center gap-2 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 text-sm font-medium pt-1 whitespace-nowrap transition-colors">
-                  <FaPlus size={12} /> Add section
-                </button>
+                <div className="relative">
+                  <button
+                    onClick={() => setIsAddSectionOpen(!isAddSectionOpen)}
+                    className="flex items-center gap-2 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 text-sm font-medium pt-1 whitespace-nowrap transition-colors"
+                  >
+                    <FaPlus size={12} /> Add section
+                  </button>
+
+                  {isAddSectionOpen && (
+                    <>
+                      <div
+                        className="fixed inset-0 z-10"
+                        onClick={() => setIsAddSectionOpen(false)}
+                      ></div>
+                      <div className="absolute left-0 mt-2 w-48 rounded-md shadow-xl bg-white dark:bg-surface-card ring-1 ring-black ring-opacity-5 z-20 overflow-hidden border border-gray-200 dark:border-gray-800 animate-in fade-in zoom-in duration-200">
+                        <div className="px-3 py-2 text-xs font-bold text-gray-500 uppercase tracking-wider bg-gray-50 dark:bg-gray-800/50 flex items-center justify-between">
+                          Manage Sections
+                        </div>
+                        <div className="py-1">
+                          {ALL_SECTIONS.map((section) => (
+                            <button
+                              key={section.id}
+                              onClick={() => toggleSectionVisibility(section.id)}
+                              className="w-full flex items-center justify-between px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+                            >
+                              <div className="flex items-center gap-2">
+                                <div className={`w-2 h-2 rounded-full bg-${section.color}-500`}></div>
+                                {section.title}
+                              </div>
+                              {visibleSectionIds.includes(section.id) && (
+                                <FaRegCheckCircle className="text-blue-500" size={14} />
+                              )}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    </>
+                  )}
+                </div>
               )}
             </div>
           </DragDropContext>
@@ -599,15 +637,14 @@ const ProjectBoard: React.FC = () => {
                   </button>
 
                   <div
-                    className={`w-2 h-2 rounded-full ${
-                      section.id === 'postpone'
-                        ? 'bg-red-400'
-                        : section.id === 'qa'
-                          ? 'bg-green-400'
-                          : section.id === 'inprogress'
-                            ? 'bg-blue-400'
-                            : 'bg-gray-400'
-                    }`}
+                    className={`w-2 h-2 rounded-full ${section.id === 'postpone'
+                      ? 'bg-red-400'
+                      : section.id === 'qa'
+                        ? 'bg-green-400'
+                        : section.id === 'inprogress'
+                          ? 'bg-blue-400'
+                          : 'bg-gray-400'
+                      }`}
                   ></div>
 
                   <h3 className="text-sm font-medium text-gray-900 dark:text-gray-100">
@@ -713,9 +750,9 @@ const ProjectBoard: React.FC = () => {
                         <div className="w-32 text-xs text-gray-500 dark:text-gray-400 py-2 pl-4 border-r border-gray-100 dark:border-gray-800/50">
                           {task.dueDate
                             ? new Date(task.dueDate).toLocaleDateString('en-GB', {
-                                day: 'numeric',
-                                month: 'short',
-                              })
+                              day: 'numeric',
+                              month: 'short',
+                            })
                             : '-'}
                         </div>
 
