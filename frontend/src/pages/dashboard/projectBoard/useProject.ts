@@ -127,9 +127,9 @@ export const useProjectBoard = () => {
       ).unwrap();
       window.toastify(`Task moved to ${destination.droppableId}`, 'success');
     } catch (err) {
-      const error = err as AxiosError<{ message: string }>;
       dispatch(fetchTasks(currentProject ? { projectId: currentProject.id } : {}));
-      window.toastify(error.response?.data?.message || 'Failed to move task', 'error');
+      const errorMessage = typeof err === 'string' ? err : 'Failed to move task';
+      window.toastify(errorMessage, 'error');
     }
   };
 

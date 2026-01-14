@@ -15,10 +15,16 @@ const sizeClasses = {
 };
 
 const variantClasses = {
-  primary: 'bg-blue-600 hover:bg-blue-700 text-white',
+  primary: 'bg-blue-600 text-white',
   secondary:
-    'border border-gray-300 dark:border-gray-700 rounded-md text-sm text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700',
-  danger: 'bg-red-600 hover:bg-red-700 text-white',
+    'border border-gray-300 dark:border-gray-700 rounded-md text-sm text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800',
+  danger: 'bg-red-600 text-white',
+};
+
+const hoverClasses = {
+  primary: 'hover:bg-blue-700',
+  secondary: 'hover:bg-gray-50 dark:hover:bg-gray-700',
+  danger: 'hover:bg-red-700',
 };
 
 const ButtonForm: React.FC<ButtonFormProps> = ({
@@ -37,6 +43,7 @@ const ButtonForm: React.FC<ButtonFormProps> = ({
         rounded-md font-medium transition flex items-center justify-center gap-2
         ${sizeClasses[size]}
         ${variantClasses[variant]}
+        ${!disabled && !loading ? hoverClasses[variant] : ''}
         ${disabled || loading ? 'opacity-60 cursor-not-allowed' : ''}
         ${textColor}
         ${className}

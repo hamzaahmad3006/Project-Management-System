@@ -11,8 +11,9 @@ const WelcomePage: React.FC = () => {
     try {
       await dispatch(completeWelcome()).unwrap();
       navigate('/');
-    } catch (error) {
-      console.error('Failed to complete welcome:', error);
+    } catch (error: unknown) {
+      const errorMessage = typeof error === 'string' ? error : 'Failed to complete welcome';
+      window.toastify(errorMessage, 'error');
       navigate('/');
     }
   };

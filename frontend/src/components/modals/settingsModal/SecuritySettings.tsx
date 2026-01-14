@@ -55,8 +55,7 @@ const SecuritySettings = () => {
         confirmPassword: '',
       });
     } catch (err: unknown) {
-      const error = err as AxiosError<{ message: string }>;
-      const errorMessage = error.response?.data?.message || 'Failed to update password';
+      const errorMessage = typeof err === 'string' ? err : 'Failed to update password';
       toast.error(errorMessage);
     } finally {
       setLoading(false);

@@ -52,9 +52,9 @@ export const useTasks = () => {
       await dispatch(updateTask({ id: draggableId, data: { status: newStatus } })).unwrap();
       window.toastify(`Task moved to ${newStatus.toLowerCase().replace('_', ' ')}`, 'success');
     } catch (err: unknown) {
-      const error = err as AxiosError<{ message: string }>;
       dispatch(fetchTasks({}));
-      window.toastify(error.response?.data?.message || 'Failed to move task', 'error');
+      const errorMessage = typeof err === 'string' ? err : 'Failed to move task';
+      window.toastify(errorMessage, 'error');
     }
   };
 

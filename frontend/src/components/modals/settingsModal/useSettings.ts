@@ -89,9 +89,9 @@ export const useSettings = (user: User | null, onClose: () => void) => {
         await dispatch(deleteAccount()).unwrap();
         window.toastify('Account deleted successfully', 'success');
         onClose(); // This might be redundant if the app redirects on logOut
-      } catch (err) {
-        const error = err as string;
-        window.toastify(error || 'Account deletion failed', 'error');
+      } catch (err: unknown) {
+        const errorMessage = typeof err === 'string' ? err : 'Account deletion failed';
+        window.toastify(errorMessage, 'error');
       } finally {
         setLoading(false);
       }

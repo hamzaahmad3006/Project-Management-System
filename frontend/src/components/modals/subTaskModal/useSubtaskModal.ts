@@ -16,8 +16,9 @@ export const useSubtaskModal = (onClose: () => void, taskId: string) => {
       await dispatch(addSubtask({ taskId, title })).unwrap();
       setTitle('');
       onClose();
-    } catch (error) {
-      console.error('Failed to add subtask:', error);
+    } catch (err: unknown) {
+      const errorMessage = typeof err === 'string' ? err : 'Failed to add subtask';
+      window.toastify(errorMessage, 'error');
     } finally {
       setLoading(false);
     }

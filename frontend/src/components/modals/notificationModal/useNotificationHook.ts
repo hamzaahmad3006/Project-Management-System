@@ -28,8 +28,8 @@ export const useNotificationHook = (isOpen: boolean, onClose: () => void) => {
       await dispatch(markNotificationAsRead(notificationId));
       toast.success('Invitation accepted successfully!');
     } catch (err: unknown) {
-      const error = err as AxiosError<{ message: string }>;
-      toast.error(error.response?.data?.message || 'Failed to accept invitation');
+      const errorMessage = typeof err === 'string' ? err : 'Failed to accept invitation';
+      toast.error(errorMessage);
     }
   };
 
@@ -39,8 +39,8 @@ export const useNotificationHook = (isOpen: boolean, onClose: () => void) => {
       await dispatch(markNotificationAsRead(notificationId));
       toast.success('Invitation declined.');
     } catch (err: unknown) {
-      const error = err as AxiosError<{ message: string }>;
-      toast.error(error.response?.data?.message || 'Failed to decline invitation');
+      const errorMessage = typeof err === 'string' ? err : 'Failed to decline invitation';
+      toast.error(errorMessage);
     }
   };
 

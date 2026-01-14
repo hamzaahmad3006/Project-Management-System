@@ -76,6 +76,7 @@ const CreateGlobalTaskModal: React.FC<CreateModalProps> = ({
                   options={[...projects.map((p) => ({ label: p.name, value: p.id }))]}
                   icon={<FaLayerGroup size={12} />}
                   required
+                  disabled={loading}
                   className="border-blue-200 dark:border-blue-800/50 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100"
                   labelClassName="text-xs uppercase tracking-wider font-bold text-blue-800 dark:text-blue-300 flex items-center gap-2"
                 />
@@ -89,16 +90,16 @@ const CreateGlobalTaskModal: React.FC<CreateModalProps> = ({
                   onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
                     setAssigneeId(e.target.value)
                   }
-                  disabled={!projectId}
+                  disabled={!projectId || loading}
                   options={[
                     { label: !projectId ? 'Select a project first...' : 'Unassigned', value: '' },
                     ...(projectId
                       ? (projects.find((p) => p.id === projectId)?.team?.members || []).map(
-                          (m: { user: { id: string; name: string } }) => ({
-                            label: m.user.name,
-                            value: m.user.id,
-                          })
-                        )
+                        (m: { user: { id: string; name: string } }) => ({
+                          label: m.user.name,
+                          value: m.user.id,
+                        })
+                      )
                       : []),
                   ]}
                   icon={<FaUser size={12} />}
@@ -116,6 +117,7 @@ const CreateGlobalTaskModal: React.FC<CreateModalProps> = ({
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) => setName(e.target.value)}
                 placeholder="What needs to be done?"
                 required
+                disabled={loading}
                 className="border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-medium placeholder-gray-400 dark:placeholder-gray-500"
                 labelClassName="block text-sm font-semibold text-gray-700 dark:text-gray-300"
               />
@@ -131,6 +133,7 @@ const CreateGlobalTaskModal: React.FC<CreateModalProps> = ({
                 }
                 rows={4}
                 placeholder="Add more details..."
+                disabled={loading}
                 className="border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500"
                 labelClassName="block text-sm font-medium text-gray-700 dark:text-gray-300"
               />
@@ -151,6 +154,7 @@ const CreateGlobalTaskModal: React.FC<CreateModalProps> = ({
                     { label: 'QA (Completed)', value: 'COMPLETED' },
                     { label: 'Postpone (Canceled)', value: 'CANCELED' },
                   ]}
+                  disabled={loading}
                   className="border-blue-100 dark:border-blue-900/30 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100"
                   labelClassName="block text-xs font-semibold text-blue-600 dark:text-blue-400"
                 />
@@ -175,6 +179,7 @@ const CreateGlobalTaskModal: React.FC<CreateModalProps> = ({
                       className={`${priority === 'HIGH' ? 'text-red-500' : priority === 'MEDIUM' ? 'text-yellow-500' : 'text-blue-500'}`}
                     />
                   }
+                  disabled={loading}
                   className="border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100"
                   labelClassName="block text-xs font-semibold text-gray-500 dark:text-gray-400"
                 />
@@ -188,6 +193,7 @@ const CreateGlobalTaskModal: React.FC<CreateModalProps> = ({
                   value={dueDate}
                   onChange={(e: React.ChangeEvent<HTMLInputElement>) => setDueDate(e.target.value)}
                   icon={<FaCalendarAlt size={12} />}
+                  disabled={loading}
                   className={`border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 [color-scheme:light] dark:[color-scheme:dark] ${dateError ? 'border-red-500 dark:border-red-500' : ''}`}
                   labelClassName="block text-xs font-semibold text-gray-500 dark:text-gray-400"
                   min={new Date().toISOString().split('T')[0]}
@@ -208,6 +214,7 @@ const CreateGlobalTaskModal: React.FC<CreateModalProps> = ({
                   onChange={(e: React.ChangeEvent<HTMLInputElement>) => setBudget(e.target.value)}
                   placeholder="0.00"
                   icon={<FaDollarSign size={12} />}
+                  disabled={loading}
                   className="border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100"
                   labelClassName="block text-xs font-semibold text-gray-500 dark:text-gray-400"
                 />
@@ -223,16 +230,16 @@ const CreateGlobalTaskModal: React.FC<CreateModalProps> = ({
                   <button
                     key={tag}
                     type="button"
+                    disabled={loading}
                     onClick={() => {
                       setLabels((prev) =>
                         prev.includes(tag) ? prev.filter((t) => t !== tag) : [...prev, tag]
                       );
                     }}
-                    className={`px-3 py-1.5 text-xs rounded-full border transition-all ${
-                      labels.includes(tag)
-                        ? 'bg-blue-100 text-blue-700 border-blue-300 dark:bg-blue-900/40 dark:text-blue-200 dark:border-blue-700 font-semibold'
-                        : 'bg-gray-50 text-gray-600 border-gray-200 dark:bg-gray-800/50 dark:text-gray-400 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'
-                    }`}
+                    className={`px-3 py-1.5 text-xs rounded-full border ${labels.includes(tag)
+                      ? 'bg-blue-100 text-blue-700 border-blue-300 dark:bg-blue-900/40 dark:text-blue-200 dark:border-blue-700 font-semibold'
+                      : 'bg-gray-50 text-gray-600 border-gray-200 dark:bg-gray-800/50 dark:text-gray-400 dark:border-gray-700'
+                      } ${loading ? 'opacity-50 cursor-not-allowed' : 'hover:border-gray-300 dark:hover:border-gray-600'}`}
                   >
                     {tag}
                   </button>
@@ -246,6 +253,7 @@ const CreateGlobalTaskModal: React.FC<CreateModalProps> = ({
           <ButtonForm
             label="Cancel"
             onClick={onClose}
+            disabled={loading}
             variant="secondary"
             size="md"
             className="px-5 py-2 font-medium"
@@ -257,6 +265,7 @@ const CreateGlobalTaskModal: React.FC<CreateModalProps> = ({
                 .getElementById('create-task-form')
                 ?.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }))
             }
+            disabled={loading}
             variant="primary"
             size="md"
             className="px-6 py-2 font-bold shadow-sm"

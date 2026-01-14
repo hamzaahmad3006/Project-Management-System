@@ -104,8 +104,8 @@ export const useCreateTaskHook = (
       onClose();
       resetForm();
     } catch (err: unknown) {
-      const error = err as AxiosError<{ message: string }>;
-      window.toastify(error.response?.data?.message || 'Failed to create task', 'error');
+      const errorMessage = typeof err === 'string' ? err : 'Failed to create task';
+      window.toastify(errorMessage, 'error');
     } finally {
       setLoading(false);
     }

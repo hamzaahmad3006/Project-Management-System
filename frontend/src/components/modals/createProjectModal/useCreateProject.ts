@@ -50,12 +50,12 @@ export const useCreateProject = (onClose: () => void) => {
       setTeamId('');
       setBudget(0);
       onClose();
-    } catch (error) {
-      const err = error as AxiosError<{ message: string }>;
-      window.toastify(err.response?.data?.message || 'Failed to create project', 'error');
+      window.toastify('Project created successfully', 'success');
+    } catch (err: unknown) {
+      const errorMessage = typeof err === 'string' ? err : 'Failed to create project';
+      window.toastify(errorMessage, 'error');
     } finally {
       setIsLoading(false);
-      window.toastify('Project created successfully', 'success');
     }
   };
 

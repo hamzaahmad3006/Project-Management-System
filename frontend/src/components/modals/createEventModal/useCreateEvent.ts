@@ -58,8 +58,8 @@ export const useCreateEvent = (onClose: () => void) => {
       setProjectId('');
       setAttendees([]);
     } catch (err: unknown) {
-      const error = err as AxiosError<{ message: string }>;
-      window.toastify(error.response?.data?.message || 'Failed to create event', 'error');
+      const errorMessage = typeof err === 'string' ? err : 'Failed to create event';
+      window.toastify(errorMessage, 'error');
     } finally {
       setIsLoading(false);
     }

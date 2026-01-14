@@ -86,8 +86,9 @@ const TaskDetailPanel: React.FC<TaskDetailPanelProps> = ({ task: initialTask, on
 
       setCommentText('');
       setSelectedFiles([]);
-    } catch (error) {
-      window.toastify('Failed to post comment', 'error');
+    } catch (err: unknown) {
+      const errorMessage = typeof err === 'string' ? err : 'Failed to post comment';
+      window.toastify(errorMessage, 'error');
     } finally {
       setIsUploading(false);
     }
@@ -173,13 +174,12 @@ const TaskDetailPanel: React.FC<TaskDetailPanelProps> = ({ task: initialTask, on
             <div className="text-gray-500 dark:text-gray-400 pt-1">Priority</div>
             <div>
               <span
-                className={`inline-block px-2 py-0.5 text-xs rounded font-medium border ${
-                  task.priority === 'HIGH'
+                className={`inline-block px-2 py-0.5 text-xs rounded font-medium border ${task.priority === 'HIGH'
                     ? 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 border-red-200 dark:border-red-800'
                     : task.priority === 'MEDIUM'
                       ? 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-400 border-yellow-200 dark:border-yellow-800'
                       : 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 border-green-200 dark:border-green-800'
-                }`}
+                  }`}
               >
                 {task.priority || 'MEDIUM'}
               </span>
@@ -282,13 +282,12 @@ const TaskDetailPanel: React.FC<TaskDetailPanelProps> = ({ task: initialTask, on
                                 className="flex items-center gap-3 p-3 border border-gray-200 dark:border-gray-800 rounded-lg min-w-[200px] hover:bg-gray-50 dark:hover:bg-gray-800/50 cursor-pointer transition-colors"
                               >
                                 <div
-                                  className={`w-10 h-10 rounded flex items-center justify-center ${
-                                    isPdf
+                                  className={`w-10 h-10 rounded flex items-center justify-center ${isPdf
                                       ? 'bg-red-100 dark:bg-red-900/30 text-red-500'
                                       : isWord
                                         ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-500'
                                         : 'bg-gray-100 dark:bg-gray-800 text-gray-500'
-                                  }`}
+                                    }`}
                                 >
                                   {isPdf ? (
                                     <FaRegFilePdf size={20} />
@@ -348,11 +347,10 @@ const TaskDetailPanel: React.FC<TaskDetailPanelProps> = ({ task: initialTask, on
                   >
                     <button
                       onClick={() => dispatch(toggleSubtask({ subtaskId: subtask.id }))}
-                      className={`w-5 h-5 rounded-full border flex items-center justify-center transition-all ${
-                        subtask.completed
+                      className={`w-5 h-5 rounded-full border flex items-center justify-center transition-all ${subtask.completed
                           ? 'bg-green-500 border-green-500 text-white'
                           : 'border-gray-300 dark:border-gray-600 text-transparent hover:border-green-500'
-                      }`}
+                        }`}
                     >
                       <FaCheckCircle size={10} />
                     </button>

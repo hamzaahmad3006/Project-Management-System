@@ -38,8 +38,8 @@ export const useResetPasswordHook = () => {
       toast.success('Password reset successfully! Please log in with your new password.');
       navigate('/auth/login');
     } catch (err: unknown) {
-      const error = err as AxiosError<{ message: string }>;
-      toast.error(error.response?.data?.message || 'Failed to reset password');
+      const errorMessage = typeof err === 'string' ? err : 'Failed to reset password';
+      toast.error(errorMessage);
     } finally {
       setLoading(false);
     }
