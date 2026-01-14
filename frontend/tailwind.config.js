@@ -1,6 +1,6 @@
 module.exports = {
   darkMode: 'class',
-  content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
+  content: ['./index.html', './src/**/*.{js,ts,jsx,tsx}'],
   theme: {
     extend: {
       colors: {
@@ -24,12 +24,12 @@ module.exports = {
           muted: '#A6AEB4',
           'muted-alt': '#74798B',
           secondary: '#7E8184',
-        }
+        },
       },
       fontFamily: {
         inter: ['Inter', 'sans-serif'],
       },
-    }
+    },
   },
   plugins: [],
 };

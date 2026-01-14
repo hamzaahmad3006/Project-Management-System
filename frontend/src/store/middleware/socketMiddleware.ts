@@ -7,89 +7,84 @@ import { toast } from 'react-toastify';
 import { Notification, Comment, Subtask } from 'types';
 
 interface MiddlewareState {
-    auth: {
-        token: string | null;
-        isAuthenticated: boolean;
-    };
-    tasks: {
-        currentTask: { id: string } | null;
-    };
+  auth: {
+    token: string | null;
+    isAuthenticated: boolean;
+  };
+  tasks: {
+    currentTask: { id: string } | null;
+  };
 }
 
 let socket: Socket | null = null;
 
 export const socketMiddleware: Middleware<{}, MiddlewareState> = (store) => (next) => (action) => {
-    const { dispatch, getState } = store;
-    const state = getState();
-    const auth = state.auth;
-    const { token, isAuthenticated } = auth || {};
+  const { dispatch, getState } = store;
+  const state = getState();
+  const auth = state.auth;
+  const { token, isAuthenticated } = auth || {};
 
+  if (isAuthenticated && token) {
+    if (!socket) {
+      const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:5000';
+      const socketUrl = new URL(apiUrl).origin;
 
-    if (isAuthenticated && token) {
-        if (!socket) {
+      socket = io(socketUrl, {
+        auth: { token },
+        transports: ['websocket'],
+      });
 
+      socket.on('connect', () => {});
 
-            const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:5000';
-            const socketUrl = new URL(apiUrl).origin;
+      socket.on('connect_error', (err) => {
+        console.error(' Socket connection error (Middleware):', err.message);
+      });
 
-            socket = io(socketUrl, {
-                auth: { token },
-                transports: ['websocket'],
-            });
+      socket.on('disconnect', (reason) => {
+        console.log(' Socket disconnected (Middleware):', reason);
+      });
 
-            socket.on('connect', () => {
-            });
+      socket.on('new_notification', (notification: Notification) => {
+        dispatch(addNotification(notification));
+        toast.info(notification.message);
+      });
 
-            socket.on('connect_error', (err) => {
-                console.error(' Socket connection error (Middleware):', err.message);
-            });
-
-            socket.on('disconnect', (reason) => {
-                console.log(' Socket disconnected (Middleware):', reason);
-            });
-
-            socket.on('new_notification', (notification: Notification) => {
-                dispatch(addNotification(notification));
-                toast.info(notification.message);
-            });
-
-            socket.on('new_comment', (data: { taskId: string; comment: Comment }) => {
-                const { tasks } = store.getState();
-                if (tasks.currentTask && tasks.currentTask.id === data.taskId) {
-                    dispatch(receiveComment(data.comment));
-                }
-            });
-
-            socket.on('subtask_added', (subtask: Subtask) => {
-                dispatch(receiveSubtask(subtask));
-            });
-
-            socket.on('subtask_updated', (subtask: Subtask) => {
-                dispatch(updateSubtaskStatus(subtask));
-            });
+      socket.on('new_comment', (data: { taskId: string; comment: Comment }) => {
+        const { tasks } = store.getState();
+        if (tasks.currentTask && tasks.currentTask.id === data.taskId) {
+          dispatch(receiveComment(data.comment));
         }
-    } else {
-        if (socket) {
-            console.log('🔌 Redux Middleware: Disconnecting socket');
-            socket.disconnect();
-            socket = null;
-        }
+      });
+
+      socket.on('subtask_added', (subtask: Subtask) => {
+        dispatch(receiveSubtask(subtask));
+      });
+
+      socket.on('subtask_updated', (subtask: Subtask) => {
+        dispatch(updateSubtaskStatus(subtask));
+      });
     }
-
-
-    if (setSelectedTask.match(action)) {
-        const previousTask = state.tasks.currentTask;
-        const newTask = action.payload;
-
-        if (socket) {
-            if (previousTask) {
-                socket.emit('leave_task', previousTask.id);
-            }
-            if (newTask && newTask.id) {
-                socket.emit('join_task', newTask.id);
-            }
-        }
+  } else {
+    if (socket) {
+      console.log('🔌 Redux Middleware: Disconnecting socket');
+      socket.disconnect();
+      socket = null;
     }
+  }
 
-    return next(action);
+  if (setSelectedTask.match(action)) {
+    const previousTask = state.tasks.currentTask;
+    const newTask = action.payload;
+
+    if (socket) {
+      if (previousTask) {
+        socket.emit('leave_task', previousTask.id);
+      }
+      if (newTask && newTask.id) {
+        socket.emit('join_task', newTask.id);
+      }
+    }
+  }
+
+  return next(action);
 };

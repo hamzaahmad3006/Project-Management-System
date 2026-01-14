@@ -1,110 +1,118 @@
-import { Loader } from "components/loader/Loader";
-import { useProjectTabHook } from "./useTeam";
+import { Loader } from 'components/loader/Loader';
+import { useProjectTabHook } from './useTeam';
 
 export default function ProjectTab() {
-    const { loading, filteredProjects, calculateProgress, getStatusColor, getPriorityColor } = useProjectTabHook();
+  const { loading, filteredProjects, calculateProgress, getStatusColor, getPriorityColor } =
+    useProjectTabHook();
 
-    if (loading) return <Loader fullscreen={false} />;
+  if (loading) return <Loader fullscreen={false} />;
 
-    return (
-        <div className="flex w-full h-screen bg-white dark:bg-[#12141c]">
-            <main className="flex-1 p-0 animate-in fade-in slide-in-from-bottom-2 duration-500 overflow-auto custom-scrollbar">
-                <div className="border border-gray-200 dark:border-gray-800 rounded-xl overflow-hidden shadow-sm bg-white dark:bg-[#1a1c23]">
-                    <table className="w-full text-sm">
-                        <thead className="bg-gray-50 dark:bg-gray-800/50 text-gray-500 dark:text-gray-400">
-                            <tr>
-                                <th className="text-left p-4 font-semibold">Name</th>
-                                <th className="text-left p-4 font-semibold">Status</th>
-                                <th className="text-left p-4 font-semibold">Task progress</th>
-                                <th className="text-left p-4 font-semibold">Due date</th>
-                                <th className="text-left p-4 font-semibold">Priority</th>
-                                <th className="text-left p-4 font-semibold">Members</th>
-                            </tr>
-                        </thead>
+  return (
+    <div className="flex w-full h-screen bg-white dark:bg-[#12141c]">
+      <main className="flex-1 p-0 animate-in fade-in slide-in-from-bottom-2 duration-500 overflow-auto custom-scrollbar">
+        <div className="border border-gray-200 dark:border-gray-800 rounded-xl overflow-hidden shadow-sm bg-white dark:bg-[#1a1c23]">
+          <table className="w-full text-sm">
+            <thead className="bg-gray-50 dark:bg-gray-800/50 text-gray-500 dark:text-gray-400">
+              <tr>
+                <th className="text-left p-4 font-semibold">Name</th>
+                <th className="text-left p-4 font-semibold">Status</th>
+                <th className="text-left p-4 font-semibold">Task progress</th>
+                <th className="text-left p-4 font-semibold">Due date</th>
+                <th className="text-left p-4 font-semibold">Priority</th>
+                <th className="text-left p-4 font-semibold">Members</th>
+              </tr>
+            </thead>
 
-                        <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
-                            {filteredProjects.length > 0 ? (
-                                filteredProjects.map((item, index) => {
-                                    const progress = calculateProgress(item.tasks);
-                                    return (
-                                        <tr key={index} className="hover:bg-gray-50 dark:hover:bg-gray-800/30 transition-colors">
-                                            <td className="p-4 font-semibold text-gray-900 dark:text-gray-100">{item.name}</td>
+            <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
+              {filteredProjects.length > 0 ? (
+                filteredProjects.map((item, index) => {
+                  const progress = calculateProgress(item.tasks);
+                  return (
+                    <tr
+                      key={index}
+                      className="hover:bg-gray-50 dark:hover:bg-gray-800/30 transition-colors"
+                    >
+                      <td className="p-4 font-semibold text-gray-900 dark:text-gray-100">
+                        {item.name}
+                      </td>
 
-                                            <td className="p-4">
-                                                <span
-                                                    className={`px-2.5 py-1 text-xs font-medium rounded-full ${getStatusColor(item.status)}`}
-                                                >
-                                                    {item.status}
-                                                </span>
-                                            </td>
+                      <td className="p-4">
+                        <span
+                          className={`px-2.5 py-1 text-xs font-medium rounded-full ${getStatusColor(item.status)}`}
+                        >
+                          {item.status}
+                        </span>
+                      </td>
 
-                                            <td className="p-4">
-                                                <div className="flex items-center gap-3">
-                                                    <div className="w-32 bg-gray-200 dark:bg-gray-700 h-2 rounded-full overflow-hidden">
-                                                        <div
-                                                            className="h-2 bg-blue-600 dark:bg-blue-500 rounded-full transition-all duration-500"
-                                                            style={{ width: `${progress}%` }}
-                                                        ></div>
-                                                    </div>
-                                                    <span className="text-xs font-medium text-gray-500 dark:text-gray-400">{progress}%</span>
-                                                </div>
-                                            </td>
+                      <td className="p-4">
+                        <div className="flex items-center gap-3">
+                          <div className="w-32 bg-gray-200 dark:bg-gray-700 h-2 rounded-full overflow-hidden">
+                            <div
+                              className="h-2 bg-blue-600 dark:bg-blue-500 rounded-full transition-all duration-500"
+                              style={{ width: `${progress}%` }}
+                            ></div>
+                          </div>
+                          <span className="text-xs font-medium text-gray-500 dark:text-gray-400">
+                            {progress}%
+                          </span>
+                        </div>
+                      </td>
 
-                                            <td className="p-4 text-gray-600 dark:text-gray-400">
-                                                {new Date(item.endDate).toLocaleDateString()}
-                                            </td>
+                      <td className="p-4 text-gray-600 dark:text-gray-400">
+                        {new Date(item.endDate).toLocaleDateString()}
+                      </td>
 
-                                            <td className="p-4">
-                                                <span
-                                                    className={`px-2.5 py-1 text-xs font-medium rounded-full ${getPriorityColor(item.priority)}`}
-                                                >
-                                                    {item.priority || 'MEDIUM'}
-                                                </span>
-                                            </td>
+                      <td className="p-4">
+                        <span
+                          className={`px-2.5 py-1 text-xs font-medium rounded-full ${getPriorityColor(item.priority)}`}
+                        >
+                          {item.priority || 'MEDIUM'}
+                        </span>
+                      </td>
 
-                                            <td className="p-4">
-                                                <div className="flex items-center -space-x-2">
-                                                    {item.team?.members?.slice(0, 4).map((m, i) => (
-                                                        m.user.avatar ? (
-                                                            <img
-                                                                key={i}
-                                                                src={m.user.avatar}
-                                                                alt={m.user.name}
-                                                                className="w-8 h-8 rounded-full border-2 border-white dark:border-gray-800 object-cover"
-                                                            />
-                                                        ) : (
-                                                            <div
-                                                                key={i}
-                                                                className="w-8 h-8 rounded-full bg-blue-100 dark:bg-blue-900/30 border-2 border-white dark:border-gray-800 flex items-center justify-center text-[10px] font-bold text-blue-600 dark:text-blue-400"
-                                                            >
-                                                                {m.user.name.charAt(0)}
-                                                            </div>
-                                                        )
-                                                    ))}
-                                                    {(item.team?.members?.length || 0) > 4 && (
-                                                        <div className="w-8 h-8 rounded-full bg-gray-100 dark:bg-gray-800 border-2 border-white dark:border-gray-800 flex items-center justify-center text-[10px] font-bold text-gray-500 dark:text-gray-400">
-                                                            +{(item.team?.members?.length || 0) - 4}
-                                                        </div>
-                                                    )}
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    );
-                                })
+                      <td className="p-4">
+                        <div className="flex items-center -space-x-2">
+                          {item.team?.members?.slice(0, 4).map((m, i) =>
+                            m.user.avatar ? (
+                              <img
+                                key={i}
+                                src={m.user.avatar}
+                                alt={m.user.name}
+                                className="w-8 h-8 rounded-full border-2 border-white dark:border-gray-800 object-cover"
+                              />
                             ) : (
-                                <tr>
-                                    <td colSpan={6} className="p-10 text-center text-gray-500 dark:text-gray-400">
-                                        <div className="flex flex-col items-center gap-2">
-                                            <span className="text-2xl">📁</span>
-                                            <span>No projects found for this team</span>
-                                        </div>
-                                    </td>
-                                </tr>
-                            )}
-                        </tbody>
-                    </table>
-                </div>
-            </main>
+                              <div
+                                key={i}
+                                className="w-8 h-8 rounded-full bg-blue-100 dark:bg-blue-900/30 border-2 border-white dark:border-gray-800 flex items-center justify-center text-[10px] font-bold text-blue-600 dark:text-blue-400"
+                              >
+                                {m.user.name.charAt(0)}
+                              </div>
+                            )
+                          )}
+                          {(item.team?.members?.length || 0) > 4 && (
+                            <div className="w-8 h-8 rounded-full bg-gray-100 dark:bg-gray-800 border-2 border-white dark:border-gray-800 flex items-center justify-center text-[10px] font-bold text-gray-500 dark:text-gray-400">
+                              +{(item.team?.members?.length || 0) - 4}
+                            </div>
+                          )}
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })
+              ) : (
+                <tr>
+                  <td colSpan={6} className="p-10 text-center text-gray-500 dark:text-gray-400">
+                    <div className="flex flex-col items-center gap-2">
+                      <span className="text-2xl">📁</span>
+                      <span>No projects found for this team</span>
+                    </div>
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
         </div>
-    );
+      </main>
+    </div>
+  );
 }

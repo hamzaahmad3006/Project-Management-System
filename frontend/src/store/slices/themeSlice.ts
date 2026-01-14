@@ -3,29 +3,27 @@ import { ThemeState } from 'types';
 
 export type ThemeType = 'light' | 'dark';
 
-
-
 const getInitialTheme = (): ThemeType => {
-    const savedTheme = localStorage.getItem('theme') as ThemeType;
-    if (savedTheme === 'light' || savedTheme === 'dark') {
-        return savedTheme;
-    }
-    return 'light';
+  const savedTheme = localStorage.getItem('theme') as ThemeType;
+  if (savedTheme === 'light' || savedTheme === 'dark') {
+    return savedTheme;
+  }
+  return 'light';
 };
 
 const initialState: ThemeState = {
-    theme: getInitialTheme(),
+  theme: getInitialTheme(),
 };
 
 const themeSlice = createSlice({
-    name: 'theme',
-    initialState,
-    reducers: {
-        setTheme: (state, action: PayloadAction<ThemeType>) => {
-            state.theme = action.payload;
-            localStorage.setItem('theme', action.payload);
-        },
+  name: 'theme',
+  initialState,
+  reducers: {
+    setTheme: (state, action: PayloadAction<ThemeType>) => {
+      state.theme = action.payload;
+      localStorage.setItem('theme', action.payload);
     },
+  },
 });
 
 export const { setTheme } = themeSlice.actions;

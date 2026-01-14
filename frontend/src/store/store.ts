@@ -14,21 +14,20 @@ import commentReducer from './slices/commentSlice';
 import { socketMiddleware } from './middleware/socketMiddleware';
 
 export const store = configureStore({
-    reducer: {
-        auth: authReducer,
-        tasks: taskReducer,
-        projects: projectReducer,
-        calendar: calendarReducer,
-        team: teamReducer,
-        budget: budgetReducer,
-        reports: reportReducer,
-        dashboard: dashboardReducer,
-        notifications: notificationReducer,
-        theme: themeReducer,
-        comments: commentReducer,
-    },
-    middleware: (getDefaultMiddleware) =>
-        getDefaultMiddleware().concat(socketMiddleware),
+  reducer: {
+    auth: authReducer,
+    tasks: taskReducer,
+    projects: projectReducer,
+    calendar: calendarReducer,
+    team: teamReducer,
+    budget: budgetReducer,
+    reports: reportReducer,
+    dashboard: dashboardReducer,
+    notifications: notificationReducer,
+    theme: themeReducer,
+    comments: commentReducer,
+  },
+  middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(socketMiddleware),
 });
 
 export type RootState = ReturnType<typeof store.getState>;

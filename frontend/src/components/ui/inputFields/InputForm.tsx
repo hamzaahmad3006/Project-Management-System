@@ -1,9 +1,9 @@
-import React from "react";
-import { InputFieldProps } from "types";
+import React from 'react';
+import { InputFieldProps } from 'types';
 
 const InputForm: React.FC<InputFieldProps> = ({
   label,
-  type = "text",
+  type = 'text',
   name,
   value,
   onChange,
@@ -13,8 +13,8 @@ const InputForm: React.FC<InputFieldProps> = ({
   disabled = false,
   id,
   icon,
-  className = "",
-  labelClassName = "",
+  className = '',
+  labelClassName = '',
   min,
   max,
 }) => {
@@ -23,10 +23,7 @@ const InputForm: React.FC<InputFieldProps> = ({
   return (
     <div className="flex flex-col gap-1 w-full">
       {label && (
-        <label
-          htmlFor={inputId}
-          className={`text-sm font-medium ${labelClassName}`}
-        >
+        <label htmlFor={inputId} className={`text-sm font-medium ${labelClassName}`}>
           {label} {required && <span className="text-red-500">*</span>}
         </label>
       )}
@@ -34,9 +31,7 @@ const InputForm: React.FC<InputFieldProps> = ({
       {/* Input Wrapper */}
       <div className="relative w-full">
         {icon && (
-          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
-            {icon}
-          </span>
+          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">{icon}</span>
         )}
 
         <input
@@ -50,9 +45,9 @@ const InputForm: React.FC<InputFieldProps> = ({
           min={min}
           max={max}
           className={`outline-none w-full border dark:border-gray-700 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500
-            ${icon ? "pl-10" : "px-3"}
+            ${icon ? 'pl-10' : 'px-3'}
             py-2
-            ${error ? "border-red-500" : "border-gray-300"}
+            ${error ? 'border-red-500' : 'border-gray-300'}
             focus:ring-2 focus:ring-blue-400
             ${className}`}
         />
