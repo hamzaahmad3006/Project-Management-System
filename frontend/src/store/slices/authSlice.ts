@@ -144,6 +144,18 @@ export const deleteAccount = createAsyncThunk<void, void>(
     }
 );
 
+export const completeWelcome = createAsyncThunk<void, void>(
+    'auth/completeWelcome',
+    async (_, { rejectWithValue }) => {
+        try {
+            await api.post('/auth/complete-welcome');
+        } catch (err: unknown) {
+            const error = err as AxiosError<{ message: string }>;
+            return rejectWithValue(error.response?.data?.message || 'Failed to complete welcome');
+        }
+    }
+);
+
 const authSlice = createSlice({
     name: 'auth',
     initialState,
@@ -252,6 +264,12 @@ const authSlice = createSlice({
             })
             .addCase(fetchAllUsers.rejected, (state, action) => {
                 state.error = action.payload as string;
+            })
+            // Complete Welcome
+            .addCase(completeWelcome.fulfilled, (state) => {
+                if (state.user) {
+                    state.user.hasSeenWelcome = true;
+                }
             });
     },
 });

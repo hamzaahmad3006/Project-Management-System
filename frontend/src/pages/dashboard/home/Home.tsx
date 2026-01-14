@@ -69,7 +69,7 @@ const Dashboard: React.FC = () => {
     return (
         <div className="p-4 md:p-6 bg-surface-light dark:bg-surface-dark min-h-screen">
             <div className="mb-6 space-y-4">
-                <div className="flex items-center justify-between">
+                <div className="flex items-center justify-center md:justify-between">
                     <h1 className="text-2xl font-bold text-content-heading dark:text-gray-100 ">Dashboard</h1>
                 </div>
 

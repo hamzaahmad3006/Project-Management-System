@@ -141,6 +141,7 @@ export interface User {
     avatar?: string;
     teamMemberships?: { team: { name: string } }[];
     hasPassword?: boolean;
+    hasSeenWelcome: boolean;
 }
 
 export interface AuthState {
@@ -171,7 +172,7 @@ export interface GoogleAuthData {
 }
 
 export interface AuthResponse {
-    user: User;
+    user: User & { hasSeenWelcome: boolean };
     token: string;
     message?: string;
 }

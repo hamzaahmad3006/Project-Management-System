@@ -20,8 +20,8 @@ const Tasks: React.FC = () => {
     return (
         <div className="h-full flex flex-col bg-white dark:bg-surface-dark overflow-hidden">
             <header className="px-8 py-6 border-b border-gray-200 dark:border-gray-800 bg-white dark:bg-surface-dark">
-                <div className="flex flex-col gap-6">
-                    <h1 className="text-3xl font-extrabold text-gray-900 dark:text-gray-100 tracking-tight">Tasks</h1>
+                <div className="flex flex-col items-center lg:items-start gap-6">
+                    <h1 className="text-3xl font-extrabold text-gray-900 dark:text-gray-100 tracking-tight text-center lg:text-left">Tasks</h1>
 
                     <div className="flex flex-wrap items-center justify-between gap-4">
                         <div className="flex bg-gray-100 dark:bg-gray-800 p-1 rounded-lg">
