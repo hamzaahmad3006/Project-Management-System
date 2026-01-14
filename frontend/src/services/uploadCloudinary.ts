@@ -1,10 +1,18 @@
-import axios from 'axios';
+import axios, { AxiosError } from 'axios';
 import api from '../api/axios';
+
+interface CloudinarySignResponse {
+  signature: string;
+  timestamp: string;
+  api_key: string;
+  upload_preset: string;
+  cloud_name: string;
+}
 
 export const uploadToCloudinary = async (file: File): Promise<string> => {
   try {
     // 1. Get signature from backend
-    const { data: signData } = await api.get('/cloudinary/sign');
+    const { data: signData } = await api.get<CloudinarySignResponse>('/cloudinary/sign');
 
     const formData = new FormData();
     formData.append('file', file);
@@ -19,7 +27,7 @@ export const uploadToCloudinary = async (file: File): Promise<string> => {
     const response = await axios.post(cloudinaryUrl, formData);
     return response.data.secure_url;
   } catch (error: unknown) {
-    const axiosError = error as any;
+    const axiosError = error as AxiosError<{ error?: { message: string } }>;
     if (axiosError.response?.data?.error?.message) {
       console.error('Cloudinary Error:', axiosError.response.data.error.message);
       throw new Error(axiosError.response.data.error.message);
