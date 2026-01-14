@@ -8,6 +8,7 @@ const initialState: AuthState = {
     token: localStorage.getItem('token'),
     isAuthenticated: !!localStorage.getItem('token'),
     loading: false,
+    isInitialLoading: false,
     error: null,
     allUsers: [],
 };
@@ -238,15 +239,15 @@ const authSlice = createSlice({
             })
             // Fetch Profile
             .addCase(fetchProfile.pending, (state) => {
-                state.loading = true;
+                state.isInitialLoading = true;
                 state.error = null;
             })
             .addCase(fetchProfile.fulfilled, (state, action) => {
-                state.loading = false;
+                state.isInitialLoading = false;
                 state.user = action.payload;
             })
             .addCase(fetchProfile.rejected, (state, action) => {
-                state.loading = false;
+                state.isInitialLoading = false;
                 state.user = null;
                 state.token = null;
                 localStorage.removeItem('token'); // agar fetch fail ho jaye

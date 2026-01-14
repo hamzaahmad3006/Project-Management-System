@@ -14,7 +14,7 @@ const Tasks: React.FC = () => {
     const { user } = useAppSelector((state: RootState) => state.auth);
 
     if (loading && tasks.length === 0) {
-        <Loader />
+        return <Loader fullscreen={false} />;
     }
 
     return (

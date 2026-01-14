@@ -6,7 +6,7 @@ import ButtonForm from 'components/ui/buttons/ButtonForm';
 import SocialAuthButton from 'components/ui/buttons/SocialAuthButton';
 
 const Login: React.FC = () => {
-    const { email, setEmail, password, setPassword, handleSubmit, handleSigninWithGoogle, handleMicrosoft, handleForgotPassword, forgotLoading, navigate } = useLoginHook();
+    const { email, setEmail, password, setPassword, handleSubmit, handleSigninWithGoogle, handleMicrosoft, handleForgotPassword, forgotLoading, loading, navigate } = useLoginHook();
 
     return (
         <div className="min-h-screen w-full flex items-center justify-center flex-col bg-gray-50 dark:bg-[#12141c] p-4 font-inter transition-colors duration-300">
@@ -97,6 +97,7 @@ const Login: React.FC = () => {
                     <ButtonForm
                         label="Log in"
                         onClick={handleSubmit}
+                        loading={loading}
                         className="w-full bg-[#6696F5] dark:bg-blue-600 text-white py-2 rounded-md font-semibold hover:bg-blue-600 dark:hover:bg-blue-700 transition-all shadow-sm"
                     />
 

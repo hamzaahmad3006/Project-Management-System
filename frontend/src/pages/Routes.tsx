@@ -9,9 +9,7 @@ import { RootState } from "../store/store";
 import WelcomePage from "./welcome/WelcomePage";
 
 export default function Index() {
-    const { isAuthenticated, loading, user } = useSelector((state: RootState) => state.auth);
-
-    if (loading) return <div>Loading...</div>;
+    const { isAuthenticated, user } = useSelector((state: RootState) => state.auth);
 
     return (
         <>

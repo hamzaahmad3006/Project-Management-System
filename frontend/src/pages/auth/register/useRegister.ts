@@ -48,8 +48,8 @@ export const useRegister = () => {
 
             navigate('/');
         } catch (err: unknown) {
-            const error = err as AxiosError<{ message: string }>;
-            window.toastify(error.response?.data?.message || "Google sign in failed", "error");
+            const errorMessage = typeof err === 'string' ? err : "Google sign in failed";
+            window.toastify(errorMessage, "error");
         }
     };
     const handleSigninWithGithub = async (e: React.FormEvent) => {
@@ -73,9 +73,8 @@ export const useRegister = () => {
 
 
         } catch (err: unknown) {
-            const error = err as AxiosError<{ message: string }>;
-            window.toastify(error.response?.data?.message || "GitHub sign in failed", "error");
-
+            const errorMessage = typeof err === 'string' ? err : "GitHub sign in failed";
+            window.toastify(errorMessage, "error");
         }
     };
     const handleSinginWithFigma = async (e: React.FormEvent) => {
@@ -94,8 +93,8 @@ export const useRegister = () => {
             window.toastify("Account created successfully! Check your email for password.");
             navigate('/auth/login');
         } catch (err: unknown) {
-            const error = err as AxiosError<{ message: string }>;
-            toast.error(error.response?.data?.message || "Registration failed");
+            const errorMessage = typeof err === 'string' ? err : "Registration failed";
+            window.toastify(errorMessage, "error");
         }
     };
 

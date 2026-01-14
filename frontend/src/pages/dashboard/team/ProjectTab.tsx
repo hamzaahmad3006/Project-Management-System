@@ -4,7 +4,7 @@ import { useProjectTabHook } from "./useTeam";
 export default function ProjectTab() {
     const { loading, filteredProjects, calculateProgress, getStatusColor, getPriorityColor } = useProjectTabHook();
 
-    if (loading) return <Loader />;
+    if (loading) return <Loader fullscreen={false} />;
 
     return (
         <div className="flex w-full h-screen bg-white dark:bg-[#12141c]">

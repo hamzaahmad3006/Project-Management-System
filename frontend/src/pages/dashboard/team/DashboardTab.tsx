@@ -19,7 +19,7 @@ export default function DashboardPage() {
     } = useDashboardTabHook()
 
     if (loading || !displayStats) {
-        return <Loader />;
+        return <Loader fullscreen={false} />;
     }
 
     return (

@@ -4,7 +4,7 @@ import { MemberListItem, TeamMember, User } from "types";
 
 export default function MembersTab() {
     const { loading, allTeams, teamId, displayMembers } = useMemberTabHook();
-    if (loading) return <Loader />;
+    if (loading) return <Loader fullscreen={false} />;
 
     return (
         <div className="flex-1 animate-in fade-in slide-in-from-bottom-2 duration-500 overflow-auto custom-scrollbar">

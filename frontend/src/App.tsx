@@ -12,7 +12,7 @@ import { useAppDispatch, useAppSelector } from './store/hooks';
 function App() {
   useTheme();
   const dispatch = useAppDispatch();
-  const { loading, user } = useAppSelector((state) => state.auth);
+  const { isInitialLoading, user } = useAppSelector((state) => state.auth);
   const token = localStorage.getItem('token');
 
   useEffect(() => {
@@ -21,7 +21,7 @@ function App() {
     }
   }, [dispatch, token, user]);
 
-  if (loading) return <Loader />;
+  if (isInitialLoading) return <Loader />;
 
   return (
     <>

@@ -62,7 +62,7 @@ const Dashboard: React.FC = () => {
 
     if (loading && !kpis) {
         return (
-            <Loader />
+            <Loader fullscreen={false} />
         );
     }
 
@@ -227,7 +227,7 @@ const Dashboard: React.FC = () => {
                         })}
                     </div>
                     <div className="space-y-2">
-                        <div className="flex gap-2 text-xs">
+                        <div className="flex flex-wrap gap-2 text-xs">
                             <button
                                 onClick={() => setScheduleTab('Events')}
                                 className={`px-3 py-1 rounded transition-colors ${scheduleTab === 'Events' ? 'bg-brand-deep text-white' : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300'}`}
@@ -258,11 +258,11 @@ const Dashboard: React.FC = () => {
                                 </div>
                             ) : filteredEvents.length > 0 ? (
                                 filteredEvents.map((event: CalendarEvent) => (
-                                    <div key={event.id} className={`flex items-center justify-between p-2 rounded ${event.type === 'MEETING' ? 'bg-blue-50 dark:bg-blue-900/10' : 'bg-purple-50 dark:bg-purple-900/10'}`}>
-                                        <span className={`text-sm ${event.type === 'MEETING' ? 'text-blue-700 dark:text-blue-400' : 'text-purple-700 dark:text-purple-400'}`}>
+                                    <div key={event.id} className={`flex items-center justify-between p-2 rounded min-w-0 ${event.type === 'MEETING' ? 'bg-blue-50 dark:bg-blue-900/10' : 'bg-purple-50 dark:bg-purple-900/10'}`}>
+                                        <span className={`text-sm truncate mr-2 ${event.type === 'MEETING' ? 'text-blue-700 dark:text-blue-400' : 'text-purple-700 dark:text-purple-400'}`} title={event.title}>
                                             {event.title}
                                         </span>
-                                        <span className="text-xs text-gray-600 dark:text-gray-400">
+                                        <span className="text-xs text-gray-600 dark:text-gray-400 whitespace-nowrap flex-shrink-0">
                                             {new Date(event.startTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} - {new Date(event.endTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                                         </span>
                                     </div>

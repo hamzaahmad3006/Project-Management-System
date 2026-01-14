@@ -18,9 +18,12 @@ export const useLoginHook = () => {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        const result = await dispatch(login({ email, password }));
-        if (login.fulfilled.match(result)) {
+        try {
+            await dispatch(login({ email, password })).unwrap();
             navigate('/');
+        } catch (err: unknown) {
+            const errorMessage = typeof err === 'string' ? err : "Login failed";
+            window.toastify(errorMessage, "error");
         }
     };
 
@@ -46,9 +49,8 @@ export const useLoginHook = () => {
             navigate('/');
             window.toastify("Signin successful", "success");
         } catch (err: unknown) {
-            const error = err as AxiosError<{ message: string }>;
-            window.toastify(error.response?.data?.message || "Google sign in failed", "error");
-            console.error("Google sign in error:", error);
+            const errorMessage = typeof err === 'string' ? err : "Google sign in failed";
+            window.toastify(errorMessage, "error");
         }
 
 
