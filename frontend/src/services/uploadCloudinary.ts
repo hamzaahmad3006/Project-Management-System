@@ -18,10 +18,11 @@ export const uploadToCloudinary = async (file: File): Promise<string> => {
 
         const response = await axios.post(cloudinaryUrl, formData);
         return response.data.secure_url;
-    } catch (error: any) {
-        if (error.response?.data?.error?.message) {
-            console.error("Cloudinary Error:", error.response.data.error.message);
-            throw new Error(error.response.data.error.message);
+    } catch (error: unknown) {
+        const axiosError = error as any;
+        if (axiosError.response?.data?.error?.message) {
+            console.error("Cloudinary Error:", axiosError.response.data.error.message);
+            throw new Error(axiosError.response.data.error.message);
         }
         console.error("Upload failed:", error);
         throw error;

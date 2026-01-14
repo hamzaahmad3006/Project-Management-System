@@ -49,6 +49,7 @@ const Sidebar: React.FC = () => {
 
     // Check if user is a member of any team
     const hasTeamMembership = () => {
+        if (user?.role === 'MANAGER') return true;
         return user?.teamMemberships && user.teamMemberships.length > 0;
     };
 
@@ -99,7 +100,7 @@ const Sidebar: React.FC = () => {
 
                     <div
                         onClick={() => setIsNotificationOpen(!isNotificationOpen)}
-                        className={`flex items-center gap-3 px-3 py-2 text-gray-600 hover:bg-gray-200 rounded cursor-pointer relative ${!isOpen && 'justify-center'} ${isNotificationOpen ? 'bg-gray-200 text-gray-900' : ''}`}
+                        className={`flex items-center gap-3 px-3 py-2 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-800 rounded cursor-pointer relative ${!isOpen && 'justify-center'}`}
                     >
                         <div className="relative">
                             <FaBell size={16} />

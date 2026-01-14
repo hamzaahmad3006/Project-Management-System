@@ -75,7 +75,7 @@ const TaskDetailPanel: React.FC<TaskDetailPanelProps> = ({ task: initialTask, on
             setCommentText('');
             setSelectedFiles([]);
         } catch (error) {
-            window.toastify("Failed to post comment");
+            window.toastify("Failed to post comment", "error");
         } finally {
             setIsUploading(false);
         }
@@ -150,7 +150,7 @@ const TaskDetailPanel: React.FC<TaskDetailPanelProps> = ({ task: initialTask, on
                             </span>
                         </div>
 
-                        {/* Due Date */}
+                        <div className="text-gray-500 dark:text-gray-400 pt-1">Due Date</div>
                         <div className="text-gray-900 dark:text-gray-100">
                             {task.dueDate ? new Date(task.dueDate).toLocaleDateString() : "No due date"}
                         </div>
@@ -317,7 +317,7 @@ const TaskDetailPanel: React.FC<TaskDetailPanelProps> = ({ task: initialTask, on
                                             <div className="flex items-center justify-between">
                                                 <span className="text-sm font-bold text-gray-900 dark:text-gray-100">{c.author.name}</span>
                                                 <span className="text-[10px] text-gray-400 uppercase tracking-tighter">
-                                                    {new Date(c.createdAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                                                    {new Date(c.createdAt).toLocaleString(undefined, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
                                                 </span>
                                             </div>
                                             <div className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed bg-gray-50/50 dark:bg-gray-800/20 p-3 rounded-xl rounded-tl-none border border-gray-100 dark:border-gray-800/50">
