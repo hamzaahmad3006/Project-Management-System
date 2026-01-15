@@ -21,6 +21,7 @@ const CreateEventModal: React.FC<CreateModalProps> = ({ isOpen, onClose }) => {
     setProjectId,
     isLoading,
     handleSubmit,
+    dateError,
   } = useCreateEvent(onClose);
 
   if (!isOpen) return null;
@@ -66,7 +67,7 @@ const CreateEventModal: React.FC<CreateModalProps> = ({ isOpen, onClose }) => {
                     setStartTime(e.target.value)
                   }
                   min={new Date().toISOString().slice(0, 16)}
-                  className="w-full pl-8 pr-3 py-2.5 border border-gray-300 dark:border-gray-700 rounded-lg focus:outline-none focus:border-blue-500 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 text-sm [color-scheme:light] dark:[color-scheme:dark]"
+                  className={`w-full pl-8 pr-3 py-2.5 border rounded-lg focus:outline-none focus:border-blue-500 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 text-sm [color-scheme:light] dark:[color-scheme:dark] ${dateError ? 'border-red-500 dark:border-red-500' : 'border-gray-300 dark:border-gray-700'}`}
                   required
                 />
                 <FaClock
@@ -74,6 +75,11 @@ const CreateEventModal: React.FC<CreateModalProps> = ({ isOpen, onClose }) => {
                   size={14}
                 />
               </div>
+              {dateError && (
+                <p className="text-xs text-red-500 dark:text-red-400 mt-1 flex items-center gap-1">
+                  <span>⚠️</span> {dateError}
+                </p>
+              )}
             </div>
             <div className="space-y-1.5">
               <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300">

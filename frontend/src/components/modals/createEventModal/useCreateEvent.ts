@@ -18,6 +18,21 @@ export const useCreateEvent = (onClose: () => void) => {
   const [projectId, setProjectId] = useState('');
   const [attendees, setAttendees] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [dateError, setDateError] = useState('');
+
+  useEffect(() => {
+    if (startTime) {
+      const selectedDate = new Date(startTime);
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+
+      if (selectedDate < today) {
+        setDateError('Start time cannot be in the past');
+      } else {
+        setDateError('');
+      }
+    }
+  }, [startTime]);
 
   useEffect(() => {
     if (projects.length === 0) {
@@ -84,5 +99,6 @@ export const useCreateEvent = (onClose: () => void) => {
     setAttendees,
     isLoading,
     handleSubmit,
+    dateError,
   };
 };
