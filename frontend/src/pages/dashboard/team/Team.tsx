@@ -6,11 +6,11 @@ export default function Team() {
 
   return (
     <div className="flex w-full h-screen bg-white dark:bg-surface-dark">
-      <main className="flex-1 p-8 overflow-auto custom-scrollbar">
-        <div className="flex items-center justify-between mb-6">
-          <div>
-            <div className="flex items-center gap-3">
-              <h1 className="text-2xl font-semibold text-gray-900 dark:text-gray-100">
+      <main className="flex-1 p-4 sm:p-6 md:p-8 overflow-auto custom-scrollbar">
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-8">
+          <div className="w-full sm:w-auto text-center sm:text-left">
+            <div className="flex items-center justify-center sm:justify-start gap-3">
+              <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-gray-100 uppercase tracking-tight">
                 {team?.name || 'Loading...'}
               </h1>
             </div>
@@ -33,8 +33,8 @@ export default function Team() {
           </div>
         </div>
 
-        <div className="mb-6 border-b border-gray-100 dark:border-gray-800">
-          <nav className="flex gap-6 text-sm">
+        <div className="mb-6 border-b border-gray-100 dark:border-gray-800 overflow-x-auto no-scrollbar">
+          <nav className="flex gap-4 sm:gap-6 text-sm min-w-max">
             <NavLink
               to="."
               end

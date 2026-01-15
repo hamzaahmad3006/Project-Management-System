@@ -37,7 +37,7 @@ export default function DashboardPage() {
 
   return (
     <div className="space-y-6 animate-in fade-in duration-500 pb-10">
-      <div className="flex items-center justify-between mb-2">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-2">
         <div className="text-xl font-bold text-gray-900 dark:text-gray-100">Teamspace overview</div>
         <select
           value={selectedProjectId}
@@ -74,8 +74,8 @@ export default function DashboardPage() {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2 space-y-6">
-          <div className="bg-white dark:bg-[#1a1c23] border border-gray-100 dark:border-gray-800 rounded-xl p-8 shadow-sm">
-            <div className="flex justify-between items-start mb-8">
+          <div className="bg-white dark:bg-[#1a1c23] border border-gray-100 dark:border-gray-800 rounded-xl p-4 sm:p-8 shadow-sm">
+            <div className="flex flex-col sm:flex-row justify-between items-start gap-6 mb-8">
               <div>
                 <div className="text-sm font-medium text-gray-500 dark:text-gray-400">Overview</div>
                 <div className="text-4xl font-bold mt-2 text-gray-900 dark:text-gray-100 tracking-tight">
@@ -95,7 +95,7 @@ export default function DashboardPage() {
                 <select
                   value={selectedYear}
                   onChange={(e) => setSelectedYear(e.target.value)}
-                  className="bg-transparent border border-gray-200 dark:border-gray-800 rounded-lg px-3 py-1.5 text-xs font-bold text-gray-600 dark:text-gray-400 outline-none hover:border-gray-300 dark:hover:border-gray-700 transition-colors"
+                  className="bg-transparent border border-gray-200 dark:border-gray-800 rounded-lg px-3 py-1.5 text-xs font-bold text-gray-600 dark:text-gray-400 outline-none hover:border-gray-300 dark:hover:border-gray-700 transition-colors w-full sm:w-auto"
                 >
                   <option value="2025">2025</option>
                   <option value="2026">2026</option>

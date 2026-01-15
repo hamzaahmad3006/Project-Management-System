@@ -97,13 +97,13 @@ const ProjectBoard: React.FC = () => {
   return (
     <div className="flex flex-col h-full bg-white dark:bg-surface-dark">
       <header className="px-4 md:px-6 py-4 border-b border-gray-200 dark:border-gray-800">
-        <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-4 gap-4">
-          <div className="flex items-center gap-3 w-full md:w-auto justify-between md:justify-start">
+        <div className="flex flex-col sm:flex-row items-center justify-between mb-4 gap-4">
+          <div className="flex items-center gap-3 w-full sm:w-auto justify-center sm:justify-start">
             <div className="flex items-center gap-3">
-              <h1 className="text-xl md:text-2xl font-bold text-gray-800 dark:text-gray-100">
+              <h1 className="text-xl md:text-2xl font-bold text-gray-800 dark:text-gray-100 text-center sm:text-left">
                 {currentProject?.name || 'Project Board'}
               </h1>
-              <FaStar className="text-yellow-400 cursor-pointer" />
+              <FaStar className="text-yellow-400 cursor-pointer flex-shrink-0" />
               <div className="relative">
                 <FaEllipsisH
                   className="text-gray-400 dark:text-gray-500 cursor-pointer hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
@@ -160,18 +160,13 @@ const ProjectBoard: React.FC = () => {
                 )}
               </div>
             </div>
-            <span className="md:hidden px-2 py-0.5 text-xs font-medium text-green-700 dark:text-green-400 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center gap-1">
+            <span className="hidden sm:inline-flex px-2 py-0.5 text-xs font-medium text-green-700 dark:text-green-400 bg-green-100 dark:bg-green-900/30 rounded-full items-center gap-1">
               <span className="w-1.5 h-1.5 bg-green-500 rounded-full"></span>
               On track
             </span>
           </div>
 
-          <div className="hidden md:flex px-2 py-0.5 text-xs font-medium text-green-700 dark:text-green-400 bg-green-100 dark:bg-green-900/30 rounded-full items-center gap-1">
-            <span className="w-1.5 h-1.5 bg-green-500 rounded-full"></span>
-            On track
-          </div>
-
-          <div className="flex w-full md:w-auto items-center justify-between md:justify-end gap-3">
+          <div className="flex w-full sm:w-auto items-center justify-center sm:justify-end gap-3 flex-wrap">
             <div className="flex -space-x-2">
               {(currentProject?.team?.members || []).slice(0, 2).map((member) => (
                 <img
@@ -217,7 +212,7 @@ const ProjectBoard: React.FC = () => {
           </div>
         </div>
 
-        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 overflow-x-auto no-scrollbar">
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 overflow-x-auto no-scrollbar pb-1">
           <div className="flex items-center gap-6 text-sm text-gray-600 dark:text-gray-400 min-w-max">
             {['Board', 'Table', 'Calendar', 'Timeline'].map((view) => (
               <button
@@ -229,7 +224,7 @@ const ProjectBoard: React.FC = () => {
                 {view === 'Table' && <FaTable size={14} />}
                 {view === 'Calendar' && <FaCalendarAlt size={14} />}
                 {view === 'Timeline' && <FaStream size={14} />}
-                {view}
+                <span className="hidden sm:inline">{view}</span>
               </button>
             ))}
             {user?.role === 'MANAGER' && (
@@ -297,10 +292,10 @@ const ProjectBoard: React.FC = () => {
       </header>
 
       {/* Content Switcher */}
-      <div className="flex-1 overflow-auto bg-white dark:bg-surface-dark p-6">
+      <div className="flex-1 overflow-auto bg-white dark:bg-surface-dark p-4 sm:p-6">
         {activeView === 'Board' ? (
           <DragDropContext onDragEnd={handleDragEnd}>
-            <div className="flex items-start h-full gap-6 min-w-max">
+            <div className="flex items-start h-full gap-4 sm:gap-6 min-w-max pb-4">
               {sections.map((section) => (
                 <Droppable key={section.id} droppableId={section.id}>
                   {(provided, snapshot) => (
@@ -513,312 +508,316 @@ const ProjectBoard: React.FC = () => {
           </DragDropContext>
         ) : activeView === 'Calendar' ? (
           // Calendar View Content
-          <div className="flex flex-col min-w-[800px] p-2 pb-12">
-            {/* Calendar Controls */}
-            <div className="flex items-center justify-between mb-4">
-              <div className="flex items-center gap-2">
-                <h2 className="text-lg font-semibold text-gray-800 dark:text-gray-100 capitalize">
-                  {currentDate.toLocaleString('default', { month: 'long', year: 'numeric' })}
-                </h2>
-                <FaChevronDown size={12} className="text-gray-500 dark:text-gray-400" />
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="flex items-center border border-gray-300 dark:border-gray-700 rounded overflow-hidden">
-                  <button className="px-3 py-1 text-sm text-gray-600 dark:text-gray-300 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-750 border-r border-gray-300 dark:border-gray-700">
-                    Month
-                  </button>
-                  <button
-                    onClick={handleGoToToday}
-                    className="px-3 py-1 text-sm text-gray-600 dark:text-gray-300 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-750"
-                  >
-                    Today
-                  </button>
+          <div className="flex-1 overflow-x-auto no-scrollbar">
+            <div className="flex flex-col min-w-[800px] p-2 pb-12">
+              {/* Calendar Controls */}
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-2">
+                  <h2 className="text-lg font-semibold text-gray-800 dark:text-gray-100 capitalize">
+                    {currentDate.toLocaleString('default', { month: 'long', year: 'numeric' })}
+                  </h2>
+                  <FaChevronDown size={12} className="text-gray-500 dark:text-gray-400" />
                 </div>
-                <div className="flex items-center gap-1 text-gray-400 dark:text-gray-500 ml-2">
-                  <button
-                    onClick={handlePrevMonth}
-                    className="p-1 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
-                  >
-                    <FaChevronLeft size={14} />
-                  </button>
-                  <button
-                    onClick={handleNextMonth}
-                    className="p-1 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
-                  >
-                    <FaChevronRight size={14} />
-                  </button>
-                </div>
-              </div>
-            </div>
-
-            {/* Calendar Grid */}
-            <div className="flex-1 border border-gray-100 dark:border-gray-800/10 rounded-xl overflow-hidden flex flex-col bg-white dark:bg-surface-dark shadow-sm">
-              {/* Days Header */}
-              <div className="grid grid-cols-7 border-b border-gray-50 dark:border-gray-800/10 py-3 bg-gray-50/50 dark:bg-gray-900/10">
-                {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map((day) => (
-                  <div
-                    key={day}
-                    className="text-[10px] font-bold text-gray-400 dark:text-gray-600 uppercase tracking-widest text-center"
-                  >
-                    {day}
-                  </div>
-                ))}
-              </div>
-
-              {/* Calendar Days */}
-              <div className="flex-1 grid grid-cols-7">
-                {calendarDays.map((cell, i) => {
-                  const dayNum = cell.day;
-                  const isCurrentMonth = cell.isCurrentMonth;
-                  const isToday =
-                    dayNum === today.getDate() &&
-                    cell.month === today.getMonth() &&
-                    cell.year === today.getFullYear();
-                  const events = calendarEvents.filter(
-                    (e) => e.date === dayNum && e.month === cell.month && e.year === cell.year
-                  );
-
-                  return (
-                    <div
-                      key={i}
-                      className={`border-b border-r border-gray-50 dark:border-gray-800/10 p-2.5 relative min-h-[180px] hover:bg-gray-50/20 dark:hover:bg-gray-800/5 transition-colors flex flex-col ${!isCurrentMonth ? 'bg-gray-50/20 dark:bg-gray-900/5' : 'bg-white dark:bg-surface-dark'}`}
+                <div className="flex items-center gap-2">
+                  <div className="flex items-center border border-gray-300 dark:border-gray-700 rounded overflow-hidden">
+                    <button className="px-3 py-1 text-sm text-gray-600 dark:text-gray-300 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-750 border-r border-gray-300 dark:border-gray-700">
+                      Month
+                    </button>
+                    <button
+                      onClick={handleGoToToday}
+                      className="px-3 py-1 text-sm text-gray-600 dark:text-gray-300 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-750"
                     >
-                      <div className="flex justify-end mb-2.5">
-                        <span
-                          className={`text-[11px] font-bold w-6 h-6 flex items-center justify-center rounded-full transition-all
-                                                                ${!isCurrentMonth ? 'text-gray-200 dark:text-gray-800' : isToday ? 'bg-blue-500 text-white shadow-lg shadow-blue-500/20' : 'text-gray-400 dark:text-gray-600'}`}
-                        >
-                          {dayNum}
-                        </span>
-                      </div>
+                      Today
+                    </button>
+                  </div>
+                  <div className="flex items-center gap-1 text-gray-400 dark:text-gray-500 ml-2">
+                    <button
+                      onClick={handlePrevMonth}
+                      className="p-1 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
+                    >
+                      <FaChevronLeft size={14} />
+                    </button>
+                    <button
+                      onClick={handleNextMonth}
+                      className="p-1 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
+                    >
+                      <FaChevronRight size={14} />
+                    </button>
+                  </div>
+                </div>
+              </div>
 
-                      <div className="space-y-1.5 overflow-y-auto no-scrollbar pb-1">
-                        {events.map((event, idx) => (
-                          <div
-                            key={`${event.id}-${idx}`}
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              setSelectedTask(event.task);
-                            }}
-                            className={`px-2 py-1 rounded shadow-sm cursor-pointer hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 ${event.color} flex flex-col min-w-0`}
-                          >
-                            <div className="text-[10px] font-bold leading-tight truncate">
-                              {event.title}
-                            </div>
-                            <div className="text-[8px] opacity-90 font-medium tracking-tight">
-                              {event.type === 'assign' ? 'Assigned' : 'Due Date'}
-                            </div>
-                          </div>
-                        ))}
-                      </div>
+              {/* Calendar Grid */}
+              <div className="flex-1 border border-gray-100 dark:border-gray-800/10 rounded-xl overflow-hidden flex flex-col bg-white dark:bg-surface-dark shadow-sm">
+                {/* Days Header */}
+                <div className="grid grid-cols-7 border-b border-gray-50 dark:border-gray-800/10 py-3 bg-gray-50/50 dark:bg-gray-900/10">
+                  {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map((day) => (
+                    <div
+                      key={day}
+                      className="text-[10px] font-bold text-gray-400 dark:text-gray-600 uppercase tracking-widest text-center"
+                    >
+                      {day}
                     </div>
-                  );
-                })}
+                  ))}
+                </div>
+
+                {/* Calendar Days */}
+                <div className="flex-1 grid grid-cols-7">
+                  {calendarDays.map((cell, i) => {
+                    const dayNum = cell.day;
+                    const isCurrentMonth = cell.isCurrentMonth;
+                    const isToday =
+                      dayNum === today.getDate() &&
+                      cell.month === today.getMonth() &&
+                      cell.year === today.getFullYear();
+                    const events = calendarEvents.filter(
+                      (e) => e.date === dayNum && e.month === cell.month && e.year === cell.year
+                    );
+
+                    return (
+                      <div
+                        key={i}
+                        className={`border-b border-r border-gray-50 dark:border-gray-800/10 p-2.5 relative min-h-[180px] hover:bg-gray-50/20 dark:hover:bg-gray-800/5 transition-colors flex flex-col ${!isCurrentMonth ? 'bg-gray-50/20 dark:bg-gray-900/5' : 'bg-white dark:bg-surface-dark'}`}
+                      >
+                        <div className="flex justify-end mb-2.5">
+                          <span
+                            className={`text-[11px] font-bold w-6 h-6 flex items-center justify-center rounded-full transition-all
+                                                                ${!isCurrentMonth ? 'text-gray-200 dark:text-gray-800' : isToday ? 'bg-blue-500 text-white shadow-lg shadow-blue-500/20' : 'text-gray-400 dark:text-gray-600'}`}
+                          >
+                            {dayNum}
+                          </span>
+                        </div>
+
+                        <div className="space-y-1.5 overflow-y-auto no-scrollbar pb-1">
+                          {events.map((event, idx) => (
+                            <div
+                              key={`${event.id}-${idx}`}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setSelectedTask(event.task);
+                              }}
+                              className={`px-2 py-1 rounded shadow-sm cursor-pointer hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 ${event.color} flex flex-col min-w-0`}
+                            >
+                              <div className="text-[10px] font-bold leading-tight truncate">
+                                {event.title}
+                              </div>
+                              <div className="text-[8px] opacity-90 font-medium tracking-tight">
+                                {event.type === 'assign' ? 'Assigned' : 'Due Date'}
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
               </div>
             </div>
           </div>
         ) : activeView === 'Table' ? (
           // Table View Content
-          <div className="min-w-[900px] overflow-x-auto pb-20">
-            {/* Sections */}
-            {sections.map((section) => (
-              <div key={section.id} className="group/section">
-                {/* Section Header */}
-                <div className="flex items-center gap-2 py-3 px-4 hover:bg-gray-50 dark:hover:bg-gray-800/30 transition-colors">
-                  <button
-                    onClick={() => toggleSection(section.id)}
-                    className="p-1 rounded hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-400 transition-colors"
-                  >
-                    {collapsedSections.includes(section.id) ? (
-                      <FaChevronRight size={10} />
-                    ) : (
-                      <FaChevronDown size={10} />
-                    )}
-                  </button>
-
-                  <div
-                    className={`w-2 h-2 rounded-full ${section.id === 'postpone'
-                      ? 'bg-red-400'
-                      : section.id === 'qa'
-                        ? 'bg-green-400'
-                        : section.id === 'inprogress'
-                          ? 'bg-blue-400'
-                          : 'bg-gray-400'
-                      }`}
-                  ></div>
-
-                  <h3 className="text-sm font-medium text-gray-900 dark:text-gray-100">
-                    {section.title}
-                  </h3>
-                  <span className="text-xs text-gray-400">{section.count}</span>
-
-                  <div className="flex items-center gap-2 ml-2 opacity-0 group-hover/section:opacity-100 transition-opacity">
-                    <button className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
-                      <FaEllipsisH size={10} />
+          <div className="flex-1 overflow-x-auto no-scrollbar">
+            <div className="min-w-[900px] pb-20">
+              {/* Sections */}
+              {sections.map((section) => (
+                <div key={section.id} className="group/section">
+                  {/* Section Header */}
+                  <div className="flex items-center gap-2 py-3 px-4 hover:bg-gray-50 dark:hover:bg-gray-800/30 transition-colors">
+                    <button
+                      onClick={() => toggleSection(section.id)}
+                      className="p-1 rounded hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-400 transition-colors"
+                    >
+                      {collapsedSections.includes(section.id) ? (
+                        <FaChevronRight size={10} />
+                      ) : (
+                        <FaChevronDown size={10} />
+                      )}
                     </button>
-                    {user?.role === 'MANAGER' && (
-                      <button
-                        onClick={() => {
-                          const statusMap: Record<string, TaskStatus> = {
-                            backlog: 'TODO',
-                            inprogress: 'IN_PROGRESS',
-                            qa: 'COMPLETED',
-                            postpone: 'CANCELED',
-                          };
-                          setInitialTaskStatus(statusMap[section.id] || 'TODO');
-                          setIsTaskModalOpen(true);
-                        }}
-                        className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
-                      >
-                        <FaPlus size={10} />
+
+                    <div
+                      className={`w-2 h-2 rounded-full ${section.id === 'postpone'
+                        ? 'bg-red-400'
+                        : section.id === 'qa'
+                          ? 'bg-green-400'
+                          : section.id === 'inprogress'
+                            ? 'bg-blue-400'
+                            : 'bg-gray-400'
+                        }`}
+                    ></div>
+
+                    <h3 className="text-sm font-medium text-gray-900 dark:text-gray-100">
+                      {section.title}
+                    </h3>
+                    <span className="text-xs text-gray-400">{section.count}</span>
+
+                    <div className="flex items-center gap-2 ml-2 opacity-0 group-hover/section:opacity-100 transition-opacity">
+                      <button className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
+                        <FaEllipsisH size={10} />
                       </button>
-                    )}
-                  </div>
-                </div>
-
-                {/* Tasks */}
-                {!collapsedSections.includes(section.id) && (
-                  <>
-                    {/* Table Header inside Section */}
-                    <div className="flex items-center border-b border-gray-200 dark:border-gray-800 bg-gray-50/50 dark:bg-surface-sidebar text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1">
-                      <div className="flex-1 min-w-[300px] pl-8 py-2 border-r border-gray-200 dark:border-gray-800">
-                        Name
-                      </div>
-                      <div className="w-40 py-2 pl-4 border-r border-gray-200 dark:border-gray-800">
-                        Assignee
-                      </div>
-                      <div className="w-32 py-2 pl-4 border-r border-gray-200 dark:border-gray-800">
-                        Due date
-                      </div>
-                      <div className="w-40 py-2 pl-4 border-r border-gray-200 dark:border-gray-800">
-                        Label
-                      </div>
-                      <div className="w-10 text-center py-2">+</div>
+                      {user?.role === 'MANAGER' && (
+                        <button
+                          onClick={() => {
+                            const statusMap: Record<string, TaskStatus> = {
+                              backlog: 'TODO',
+                              inprogress: 'IN_PROGRESS',
+                              qa: 'COMPLETED',
+                              postpone: 'CANCELED',
+                            };
+                            setInitialTaskStatus(statusMap[section.id] || 'TODO');
+                            setIsTaskModalOpen(true);
+                          }}
+                          className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+                        >
+                          <FaPlus size={10} />
+                        </button>
+                      )}
                     </div>
-                    {section.tasks.map((task) => (
-                      <div
-                        key={task.id}
-                        onClick={() => setSelectedTask(task)}
-                        className="flex items-center px-4 py-2 border-b border-gray-100 dark:border-gray-800/50 hover:bg-gray-50 dark:hover:bg-gray-800/20 group/row cursor-pointer text-sm"
-                      >
-                        {/* Name Column */}
-                        <div className="flex-1 min-w-[300px] flex items-center gap-3 pl-4 pr-4 py-2 border-r border-gray-100 dark:border-gray-800/50">
-                          <div className="text-gray-300 dark:text-gray-600 hover:text-blue-500 dark:hover:text-blue-400 transition-colors">
-                            <FaRegCheckCircle size={16} />
-                          </div>
-                          <span className="text-gray-700 dark:text-gray-200 truncate">
-                            {task.name}
-                          </span>
+                  </div>
 
-                          {/* Icons inline with name */}
-                          <div className="flex items-center gap-2 text-gray-400 dark:text-gray-500">
-                            {task.comments && (
-                              <div className="flex items-center gap-1 text-xs bg-gray-100 dark:bg-gray-800 px-1.5 py-0.5 rounded">
-                                <FaRegComment size={10} /> {task.comments}
-                              </div>
-                            )}
-                            {task.attachments && (
-                              <div className="flex items-center gap-1 text-xs">
-                                <FaPaperclip size={10} /> {task.attachments}
-                              </div>
-                            )}
-                          </div>
+                  {/* Tasks */}
+                  {!collapsedSections.includes(section.id) && (
+                    <>
+                      {/* Table Header inside Section */}
+                      <div className="flex items-center border-b border-gray-200 dark:border-gray-800 bg-gray-50/50 dark:bg-surface-sidebar text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1">
+                        <div className="flex-1 min-w-[300px] pl-8 py-2 border-r border-gray-200 dark:border-gray-800">
+                          Name
                         </div>
-
-                        {/* Assignee Column */}
-                        <div className="w-40 flex items-center text-sm py-2 pl-4 border-r border-gray-100 dark:border-gray-800/50">
-                          {task.assignedTo ? (
-                            <div className="flex items-center gap-2">
-                              <img
-                                src={
-                                  task.assignedTo.avatar ||
-                                  'https://ui-avatars.com/api/?name=' + task.assignedTo.name
-                                }
-                                alt={task.assignedTo.name}
-                                className="w-5 h-5 rounded-full object-cover"
-                              />
-                              <span className="text-gray-600 dark:text-gray-400 text-xs truncate max-w-[100px]">
-                                {task.assignedTo.name}
-                              </span>
+                        <div className="w-40 py-2 pl-4 border-r border-gray-200 dark:border-gray-800">
+                          Assignee
+                        </div>
+                        <div className="w-32 py-2 pl-4 border-r border-gray-200 dark:border-gray-800">
+                          Due date
+                        </div>
+                        <div className="w-40 py-2 pl-4 border-r border-gray-200 dark:border-gray-800">
+                          Label
+                        </div>
+                        <div className="w-10 text-center py-2">+</div>
+                      </div>
+                      {section.tasks.map((task) => (
+                        <div
+                          key={task.id}
+                          onClick={() => setSelectedTask(task)}
+                          className="flex items-center px-4 py-2 border-b border-gray-100 dark:border-gray-800/50 hover:bg-gray-50 dark:hover:bg-gray-800/20 group/row cursor-pointer text-sm"
+                        >
+                          {/* Name Column */}
+                          <div className="flex-1 min-w-[300px] flex items-center gap-3 pl-4 pr-4 py-2 border-r border-gray-100 dark:border-gray-800/50">
+                            <div className="text-gray-300 dark:text-gray-600 hover:text-blue-500 dark:hover:text-blue-400 transition-colors">
+                              <FaRegCheckCircle size={16} />
                             </div>
-                          ) : (
-                            <span className="text-gray-300 dark:text-gray-600 text-xs">-</span>
-                          )}
-                        </div>
-
-                        {/* Due Date Column */}
-                        <div className="w-32 text-xs text-gray-500 dark:text-gray-400 py-2 pl-4 border-r border-gray-100 dark:border-gray-800/50">
-                          {task.dueDate
-                            ? new Date(task.dueDate).toLocaleDateString('en-GB', {
-                              day: 'numeric',
-                              month: 'short',
-                            })
-                            : '-'}
-                        </div>
-
-                        {/* Labels Column */}
-                        <div className="w-40 flex flex-wrap gap-1.5 py-2 pl-4 border-r border-gray-100 dark:border-gray-800/50">
-                          {task.label?.map((lbl, idx) => (
-                            <span
-                              key={idx}
-                              className={`px-2 py-0.5 text-[11px] rounded ${getLabelStyles(lbl)}`}
-                            >
-                              {lbl}
+                            <span className="text-gray-700 dark:text-gray-200 truncate">
+                              {task.name}
                             </span>
-                          ))}
-                        </div>
 
-                        {/* Action Column */}
-                        <div className="w-10 flex justify-center opacity-0 group-hover/row:opacity-100 transition-opacity py-2">
-                          {user?.role === 'MANAGER' && (
-                            <FaPlus
-                              className="text-gray-400 hover:text-gray-600 cursor-pointer"
-                              size={10}
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                const statusMap: Record<string, TaskStatus> = {
-                                  backlog: 'TODO',
-                                  inprogress: 'IN_PROGRESS',
-                                  qa: 'COMPLETED',
-                                  postpone: 'CANCELED',
-                                };
-                                setInitialTaskStatus(statusMap[section.id] || 'TODO');
-                                setIsTaskModalOpen(true);
-                              }}
-                            />
-                          )}
-                        </div>
-                      </div>
-                    ))}
+                            {/* Icons inline with name */}
+                            <div className="flex items-center gap-2 text-gray-400 dark:text-gray-500">
+                              {task.comments && (
+                                <div className="flex items-center gap-1 text-xs bg-gray-100 dark:bg-gray-800 px-1.5 py-0.5 rounded">
+                                  <FaRegComment size={10} /> {task.comments}
+                                </div>
+                              )}
+                              {task.attachments && (
+                                <div className="flex items-center gap-1 text-xs">
+                                  <FaPaperclip size={10} /> {task.attachments}
+                                </div>
+                              )}
+                            </div>
+                          </div>
 
-                    {/* New Task Input Placeholder */}
-                    {user?.role === 'MANAGER' && (
-                      <div
-                        className="flex items-center gap-3 px-4 py-2 opacity-0 group-hover/section:opacity-100 hover:bg-gray-50 dark:hover:bg-gray-800/30 transition-all cursor-pointer text-gray-400 hover:text-gray-600"
-                        onClick={() => {
-                          const statusMap: Record<string, TaskStatus> = {
-                            backlog: 'TODO',
-                            inprogress: 'IN_PROGRESS',
-                            qa: 'COMPLETED',
-                            postpone: 'CANCELED',
-                          };
-                          setInitialTaskStatus(statusMap[section.id] || 'TODO');
-                          setIsTaskModalOpen(true);
-                        }}
-                      >
-                        <FaPlus size={12} />
-                        <span className="text-sm">New</span>
-                      </div>
-                    )}
-                  </>
-                )}
-              </div>
-            ))}
+                          {/* Assignee Column */}
+                          <div className="w-40 flex items-center text-sm py-2 pl-4 border-r border-gray-100 dark:border-gray-800/50">
+                            {task.assignedTo ? (
+                              <div className="flex items-center gap-2">
+                                <img
+                                  src={
+                                    task.assignedTo.avatar ||
+                                    'https://ui-avatars.com/api/?name=' + task.assignedTo.name
+                                  }
+                                  alt={task.assignedTo.name}
+                                  className="w-5 h-5 rounded-full object-cover"
+                                />
+                                <span className="text-gray-600 dark:text-gray-400 text-xs truncate max-w-[100px]">
+                                  {task.assignedTo.name}
+                                </span>
+                              </div>
+                            ) : (
+                              <span className="text-gray-300 dark:text-gray-600 text-xs">-</span>
+                            )}
+                          </div>
+
+                          {/* Due Date Column */}
+                          <div className="w-32 text-xs text-gray-500 dark:text-gray-400 py-2 pl-4 border-r border-gray-100 dark:border-gray-800/50">
+                            {task.dueDate
+                              ? new Date(task.dueDate).toLocaleDateString('en-GB', {
+                                day: 'numeric',
+                                month: 'short',
+                              })
+                              : '-'}
+                          </div>
+
+                          {/* Labels Column */}
+                          <div className="w-40 flex flex-wrap gap-1.5 py-2 pl-4 border-r border-gray-100 dark:border-gray-800/50">
+                            {task.label?.map((lbl, idx) => (
+                              <span
+                                key={idx}
+                                className={`px-2 py-0.5 text-[11px] rounded ${getLabelStyles(lbl)}`}
+                              >
+                                {lbl}
+                              </span>
+                            ))}
+                          </div>
+
+                          {/* Action Column */}
+                          <div className="w-10 flex justify-center opacity-0 group-hover/row:opacity-100 transition-opacity py-2">
+                            {user?.role === 'MANAGER' && (
+                              <FaPlus
+                                className="text-gray-400 hover:text-gray-600 cursor-pointer"
+                                size={10}
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  const statusMap: Record<string, TaskStatus> = {
+                                    backlog: 'TODO',
+                                    inprogress: 'IN_PROGRESS',
+                                    qa: 'COMPLETED',
+                                    postpone: 'CANCELED',
+                                  };
+                                  setInitialTaskStatus(statusMap[section.id] || 'TODO');
+                                  setIsTaskModalOpen(true);
+                                }}
+                              />
+                            )}
+                          </div>
+                        </div>
+                      ))}
+
+                      {/* New Task Input Placeholder */}
+                      {user?.role === 'MANAGER' && (
+                        <div
+                          className="flex items-center gap-3 px-4 py-2 opacity-0 group-hover/section:opacity-100 hover:bg-gray-50 dark:hover:bg-gray-800/30 transition-all cursor-pointer text-gray-400 hover:text-gray-600"
+                          onClick={() => {
+                            const statusMap: Record<string, TaskStatus> = {
+                              backlog: 'TODO',
+                              inprogress: 'IN_PROGRESS',
+                              qa: 'COMPLETED',
+                              postpone: 'CANCELED',
+                            };
+                            setInitialTaskStatus(statusMap[section.id] || 'TODO');
+                            setIsTaskModalOpen(true);
+                          }}
+                        >
+                          <FaPlus size={12} />
+                          <span className="text-sm">New</span>
+                        </div>
+                      )}
+                    </>
+                  )}
+                </div>
+              ))}
+            </div>
           </div>
         ) : (
           <div className="flex flex-col h-full overflow-hidden bg-white dark:bg-surface-dark">
             {/* Timeline Header Section */}
-            <div className="flex items-center justify-between mb-6">
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-6">
               <div className="flex items-center gap-4">
                 <h2 className="text-xl font-bold text-gray-800 dark:text-gray-100">
                   {currentDate.toLocaleDateString('en-GB', { day: 'numeric', month: 'long' })}
@@ -854,14 +853,14 @@ const ProjectBoard: React.FC = () => {
                 </div>
               </div>
 
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-3 w-full sm:w-auto justify-center sm:justify-end">
                 <button
                   onClick={handleGoToToday}
                   className="px-4 py-1.5 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg text-sm font-semibold text-gray-700 dark:text-gray-200 hover:shadow-md transition-all active:scale-95 shadow-sm"
                 >
                   Today
                 </button>
-                <div className="px-4 py-1.5 bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-lg text-sm font-medium text-gray-600 dark:text-gray-400 shadow-sm">
+                <div className="px-4 py-1.5 bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-lg text-sm font-medium text-gray-600 dark:text-gray-400 shadow-sm hidden sm:block">
                   8:00 - 17:00
                 </div>
                 {user?.role === 'MANAGER' && (
@@ -877,8 +876,8 @@ const ProjectBoard: React.FC = () => {
             </div>
 
             {/* Hourly Timeline Grid Wrapper - Clean & Responsive */}
-            <div className="flex-1 mt-2">
-              <div className="flex flex-col w-full bg-white dark:bg-surface-dark rounded-2xl border border-gray-100 dark:border-gray-800/50 shadow-sm overflow-hidden">
+            <div className="flex-1 mt-2 overflow-x-auto no-scrollbar pb-6">
+              <div className="flex flex-col min-w-[800px] w-full bg-white dark:bg-surface-dark rounded-2xl border border-gray-100 dark:border-gray-800/50 shadow-sm overflow-hidden">
                 {/* Hours Label Bar */}
                 <div className="flex bg-gray-50/50 dark:bg-gray-800/30 border-b border-gray-100 dark:border-gray-800/50">
                   {Array.from({ length: 10 }).map((_, i) => {

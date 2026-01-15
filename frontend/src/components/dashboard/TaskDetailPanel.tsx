@@ -106,7 +106,7 @@ const TaskDetailPanel: React.FC<TaskDetailPanelProps> = ({ task: initialTask, on
       />
 
       {/* Panel */}
-      <div className="fixed inset-y-0 right-0 w-[600px] bg-white dark:bg-[#1a1c23] shadow-2xl transform transition-transform duration-300 ease-in-out z-[100] border-l border-gray-200 dark:border-gray-800 flex flex-col hover:overflow-y-auto">
+      <div className="fixed inset-y-0 right-0 w-full sm:w-[500px] md:w-[600px] bg-white dark:bg-[#1a1c23] shadow-2xl transform transition-transform duration-300 ease-in-out z-[100] border-l border-gray-200 dark:border-gray-800 flex flex-col hover:overflow-y-auto">
         <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 dark:border-gray-800">
           <div className="flex items-center gap-4 text-gray-400 dark:text-gray-500">
             <button className="hover:text-gray-600 dark:hover:text-gray-300 transition-colors">
@@ -141,7 +141,7 @@ const TaskDetailPanel: React.FC<TaskDetailPanelProps> = ({ task: initialTask, on
           <h2 className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-8 leading-tight">
             {task.name}
           </h2>
-          <div className="grid grid-cols-[140px_1fr] gap-y-6 mb-10 text-sm">
+          <div className="grid grid-cols-1 sm:grid-cols-[140px_1fr] gap-y-4 sm:gap-y-6 mb-10 text-sm">
             <div className="text-gray-500 dark:text-gray-400 pt-1">Status</div>
             <div>
               <span className="inline-flex items-center gap-2 px-3 py-1 rounded bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 font-medium text-xs border border-green-200 dark:border-green-800 uppercase">
@@ -175,10 +175,10 @@ const TaskDetailPanel: React.FC<TaskDetailPanelProps> = ({ task: initialTask, on
             <div>
               <span
                 className={`inline-block px-2 py-0.5 text-xs rounded font-medium border ${task.priority === 'HIGH'
-                    ? 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 border-red-200 dark:border-red-800'
-                    : task.priority === 'MEDIUM'
-                      ? 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-400 border-yellow-200 dark:border-yellow-800'
-                      : 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 border-green-200 dark:border-green-800'
+                  ? 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 border-red-200 dark:border-red-800'
+                  : task.priority === 'MEDIUM'
+                    ? 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-400 border-yellow-200 dark:border-yellow-800'
+                    : 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 border-green-200 dark:border-green-800'
                   }`}
               >
                 {task.priority || 'MEDIUM'}
@@ -259,7 +259,7 @@ const TaskDetailPanel: React.FC<TaskDetailPanelProps> = ({ task: initialTask, on
                           {allAttachments.length}
                         </span>
                       </h3>
-                      <div className="flex gap-4 overflow-x-auto pb-4 no-scrollbar">
+                      <div className="flex gap-4 overflow-x-auto pb-4 no-scrollbar -mx-2 px-2 sm:mx-0 sm:px-0">
                         {allAttachments.length > 0 ? (
                           allAttachments.map((url, idx) => {
                             const isPdf = url.toLowerCase().includes('.pdf');
@@ -283,10 +283,10 @@ const TaskDetailPanel: React.FC<TaskDetailPanelProps> = ({ task: initialTask, on
                               >
                                 <div
                                   className={`w-10 h-10 rounded flex items-center justify-center ${isPdf
-                                      ? 'bg-red-100 dark:bg-red-900/30 text-red-500'
-                                      : isWord
-                                        ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-500'
-                                        : 'bg-gray-100 dark:bg-gray-800 text-gray-500'
+                                    ? 'bg-red-100 dark:bg-red-900/30 text-red-500'
+                                    : isWord
+                                      ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-500'
+                                      : 'bg-gray-100 dark:bg-gray-800 text-gray-500'
                                     }`}
                                 >
                                   {isPdf ? (
@@ -348,8 +348,8 @@ const TaskDetailPanel: React.FC<TaskDetailPanelProps> = ({ task: initialTask, on
                     <button
                       onClick={() => dispatch(toggleSubtask({ subtaskId: subtask.id }))}
                       className={`w-5 h-5 rounded-full border flex items-center justify-center transition-all ${subtask.completed
-                          ? 'bg-green-500 border-green-500 text-white'
-                          : 'border-gray-300 dark:border-gray-600 text-transparent hover:border-green-500'
+                        ? 'bg-green-500 border-green-500 text-white'
+                        : 'border-gray-300 dark:border-gray-600 text-transparent hover:border-green-500'
                         }`}
                     >
                       <FaCheckCircle size={10} />

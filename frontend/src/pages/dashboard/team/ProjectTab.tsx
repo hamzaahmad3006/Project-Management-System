@@ -8,10 +8,10 @@ export default function ProjectTab() {
   if (loading) return <Loader fullscreen={false} />;
 
   return (
-    <div className="flex w-full h-screen bg-white dark:bg-[#12141c]">
-      <main className="flex-1 p-0 animate-in fade-in slide-in-from-bottom-2 duration-500 overflow-auto custom-scrollbar">
-        <div className="border border-gray-200 dark:border-gray-800 rounded-xl overflow-hidden shadow-sm bg-white dark:bg-[#1a1c23]">
-          <table className="w-full text-sm">
+    <div className="flex w-full bg-white dark:bg-[#12141c]">
+      <main className="flex-1 p-0 animate-in fade-in slide-in-from-bottom-2 duration-500">
+        <div className="border border-gray-200 dark:border-gray-800 rounded-xl overflow-hidden shadow-sm bg-white dark:bg-[#1a1c23] overflow-x-auto custom-scrollbar">
+          <table className="w-full text-sm min-w-[700px]">
             <thead className="bg-gray-50 dark:bg-gray-800/50 text-gray-500 dark:text-gray-400">
               <tr>
                 <th className="text-left p-4 font-semibold">Name</th>
