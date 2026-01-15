@@ -46,45 +46,45 @@ const Tasks: React.FC = () => {
 
   return (
     <div className="h-full flex flex-col bg-white dark:bg-surface-dark overflow-hidden">
-      <header className="px-8 py-6 border-b border-gray-200 dark:border-gray-800 bg-white dark:bg-surface-dark">
-        <div className="flex flex-col items-center lg:items-start gap-6">
-          <h1 className="text-3xl font-extrabold text-gray-900 dark:text-gray-100 tracking-tight text-center lg:text-left">
+      <header className="px-4 sm:px-6 md:px-8 py-4 sm:py-6 border-b border-gray-200 dark:border-gray-800 bg-white dark:bg-surface-dark">
+        <div className="flex flex-col items-center sm:items-start gap-4 sm:gap-6">
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900 dark:text-gray-100 tracking-tight text-center sm:text-left">
             Tasks
           </h1>
 
-          <div className="flex flex-wrap items-center justify-between gap-4">
+          <div className="flex flex-wrap items-center justify-center sm:justify-between gap-4 w-full">
             <div className="flex bg-gray-100 dark:bg-gray-800 p-1 rounded-lg">
               <button
                 onClick={() => setViewMode('KANBAN')}
-                className={`flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-all ${viewMode === 'KANBAN' ? 'bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 shadow-sm' : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'}`}
+                className={`flex items-center gap-2 px-3 sm:px-4 py-2 rounded-md text-sm font-medium transition-all ${viewMode === 'KANBAN' ? 'bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 shadow-sm' : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'}`}
               >
-                <FaThLarge /> Kanban
+                <FaThLarge /> <span className="hidden sm:inline">Kanban</span>
               </button>
               <button
                 onClick={() => setViewMode('LIST')}
-                className={`flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-all ${viewMode === 'LIST' ? 'bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 shadow-sm' : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'}`}
+                className={`flex items-center gap-2 px-3 sm:px-4 py-2 rounded-md text-sm font-medium transition-all ${viewMode === 'LIST' ? 'bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 shadow-sm' : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'}`}
               >
-                <FaList /> List
+                <FaList /> <span className="hidden sm:inline">List</span>
               </button>
             </div>
 
-            <div className="flex items-center gap-3 ml-auto">
-              <div className="relative">
+            <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-3 w-full sm:w-auto">
+              <div className="relative w-full sm:w-auto">
                 <FaSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
                 <input
                   type="text"
                   placeholder="Search"
-                  className="pl-9 pr-4 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 w-64 text-gray-900 dark:text-gray-100"
+                  className="pl-9 pr-4 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 w-full sm:w-48 md:w-64 text-gray-900 dark:text-gray-100"
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                 />
               </div>
 
               <button className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-gray-600 dark:text-gray-400 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-800 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700">
-                <MdSettingsInputComponent size={12} /> Filters
+                <MdSettingsInputComponent size={12} /> <span className="hidden md:inline">Filters</span>
               </button>
               <button className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-gray-600 dark:text-gray-400 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-800 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700">
-                <FaSortAmountDown size={12} /> Sort By
+                <FaSortAmountDown size={12} /> <span className="hidden md:inline">Sort By</span>
               </button>
 
               {user?.role === 'MANAGER' && (
@@ -100,9 +100,9 @@ const Tasks: React.FC = () => {
         </div>
       </header>
 
-      <div className="flex-1 overflow-x-auto overflow-y-hidden p-8 bg-gray-50 dark:bg-[#0f1117]">
+      <div className="flex-1 overflow-x-auto overflow-y-hidden p-4 sm:p-6 md:p-8 bg-gray-50 dark:bg-[#0f1117]">
         <DragDropContext onDragEnd={handleDragEnd}>
-          <div className="flex h-full gap-6">
+          <div className="flex h-full gap-4 sm:gap-6 min-w-max pb-4">
             {columns.map((col) => (
               <Droppable key={col.id} droppableId={col.id}>
                 {(provided, snapshot) => (
@@ -184,7 +184,7 @@ const Tasks: React.FC = () => {
                                           src={
                                             task.assignedTo.avatar ||
                                             'https://ui-avatars.com/api/?name=' +
-                                              task.assignedTo.name
+                                            task.assignedTo.name
                                           }
                                           alt={task.assignedTo.name}
                                           className="w-5 h-5 rounded-full"
@@ -203,24 +203,23 @@ const Tasks: React.FC = () => {
                                       <span className="text-[#74798B] font-normal">
                                         {task.dueDate
                                           ? new Date(task.dueDate).toLocaleDateString(undefined, {
-                                              month: 'short',
-                                              day: 'numeric',
-                                              year: 'numeric',
-                                            })
+                                            month: 'short',
+                                            day: 'numeric',
+                                            year: 'numeric',
+                                          })
                                           : 'No Deadline'}
                                       </span>
                                     </div>
 
                                     <div
                                       className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold border uppercase tracking-wider
-                                                                        ${
-                                                                          task.priority === 'HIGH'
-                                                                            ? 'bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 border-red-100/50 dark:border-red-900/30'
-                                                                            : task.priority ===
-                                                                                'LOW'
-                                                                              ? 'bg-green-50 dark:bg-green-900/20 text-green-600 dark:text-green-400 border-green-100/50 dark:border-green-900/30'
-                                                                              : 'bg-yellow-50 dark:bg-yellow-900/20 text-yellow-600 dark:text-yellow-400 border-yellow-100/50 dark:border-yellow-900/30'
-                                                                        }`}
+                                                                        ${task.priority === 'HIGH'
+                                          ? 'bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 border-red-100/50 dark:border-red-900/30'
+                                          : task.priority ===
+                                            'LOW'
+                                            ? 'bg-green-50 dark:bg-green-900/20 text-green-600 dark:text-green-400 border-green-100/50 dark:border-green-900/30'
+                                            : 'bg-yellow-50 dark:bg-yellow-900/20 text-yellow-600 dark:text-yellow-400 border-yellow-100/50 dark:border-yellow-900/30'
+                                        }`}
                                     >
                                       <div
                                         className={`w-1.5 h-1.5 rounded-full ${task.priority === 'HIGH' ? 'bg-red-600' : task.priority === 'LOW' ? 'bg-green-600' : 'bg-yellow-600'}`}
