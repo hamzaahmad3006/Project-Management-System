@@ -65,6 +65,7 @@ const CreateEventModal: React.FC<CreateModalProps> = ({ isOpen, onClose }) => {
                   onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                     setStartTime(e.target.value)
                   }
+                  min={new Date().toISOString().slice(0, 16)}
                   className="w-full pl-8 pr-3 py-2.5 border border-gray-300 dark:border-gray-700 rounded-lg focus:outline-none focus:border-blue-500 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 text-sm [color-scheme:light] dark:[color-scheme:dark]"
                   required
                 />
@@ -83,6 +84,7 @@ const CreateEventModal: React.FC<CreateModalProps> = ({ isOpen, onClose }) => {
                   type="datetime-local"
                   value={endTime}
                   onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEndTime(e.target.value)}
+                  min={startTime || new Date().toISOString().slice(0, 16)}
                   className="w-full pl-8 pr-3 py-2.5 border border-gray-300 dark:border-gray-700 rounded-lg focus:outline-none focus:border-blue-500 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 text-sm [color-scheme:light] dark:[color-scheme:dark]"
                   required
                 />
